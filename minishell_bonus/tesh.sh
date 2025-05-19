@@ -11,3 +11,6 @@
 "pwd >> outfile > outfile1 >> outfile2 >> outfile3" #Redirection test
 
 #test 5
+export NAME= adaasdf asdfa sdf asd && echo $NAME #Export test
+
+#test 6

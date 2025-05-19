@@ -1,18 +1,10 @@
-#include <dirent.h>
-#include "apue.h"
+#include "minishell.h"
 
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[], char *envp[])
 {
-    DIR *dp;
-    struct dirent *dirp;
-
-    if (argc != 2)
-        return(perror("usage: ls directory_name"),1);
-    if ((dp = opendir(argv[1])) == NULL)
-        printf("can’t open %s", argv[1]);
-    while ((dirp = readdir(dp)) != NULL)
-        printf("%s        ", dirp->d_name);
-    closedir(dp);
-    exit(0);
+    char *args[] = {"gr", "sfsdfsdfsdfsdfsdf",NULL}; // Arguments for the command
+    if(execve("/usr/bin/grep",args,envp) == -1)
+    {
+        printf("failed");
+    }
 }
