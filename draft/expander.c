@@ -8,17 +8,13 @@ char *expand_dollar(const char *start)
                           (start[len] >= '0' && start[len] <= '9') ||
                           start[len] == '_'))
         len++;
-
     char *key = ft_strndup(start, len);
     if (!key)
         return NULL;
-
     char *val = getenv(key);
     free(key);
-
     if (!val)
         return ft_strdup("");
-
     return ft_strdup(val);
 }
 
@@ -28,7 +24,6 @@ char *expand_string(const char *s)
     char *result = ft_strdup("");
     if (!result)
         return NULL;
-
     while (s[i])
     {
         if (s[i] == '$')
@@ -43,7 +38,6 @@ char *expand_string(const char *s)
             free(result);
             free(expanded);
             result = tmp;
-
             size_t skip = 0;
             while (s[i + 1 + skip] && ((s[i + 1 + skip] >= 'A' && s[i + 1 + skip] <= 'Z') ||
                                        (s[i + 1 + skip] >= 'a' && s[i + 1 + skip] <= 'z') ||
@@ -74,7 +68,6 @@ void expand_tokens(t_token *tok)
             free(tok->value);
             tok->value = ft_strdup(val ? val : "");
             tok->type = TOKEN_WORD;
-
             t_token *old = tok->next;
             tok->next = old->next;
             free(old->value);
@@ -90,9 +83,7 @@ void expand_tokens(t_token *tok)
             tok->type = TOKEN_WORD;
         }
         else if (tok->type == TOKEN_SINGLE_QUOTE)
-        {
             tok->type = TOKEN_WORD;
-        }
         else if (tok->type == TOKEN_WORD && ft_strchr(tok->value, '$'))
         {
             char *expanded = expand_string(tok->value);
@@ -109,10 +100,8 @@ void expand_ast(t_node *node)
 {
     if (!node)
         return;
-
     if (node->type == NODE_CMD)
         expand_tokens(node->tokens);
-
     expand_ast(node->lhs);
     expand_ast(node->rhs);
 }

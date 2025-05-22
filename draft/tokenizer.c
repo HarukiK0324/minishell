@@ -88,7 +88,6 @@ int add_quote(const char *input, t_token **list, char quote)
 {
     const char *start = input + 1;
     size_t len = 0;
-
     while (start[len] && start[len] != quote)
         len++;
     if (start[len] != quote)
@@ -119,7 +118,6 @@ t_token *tokenize(const char *input)
 {
     t_token *tokens = NULL;
     int consumed;
-
     while (*input)
     {
         while (*input && ft_isspace(*input))
@@ -134,10 +132,7 @@ t_token *tokenize(const char *input)
         else
             consumed = add_word(input, &tokens);
         if (consumed <= 0)
-        {
-            free_tokens(tokens);
-            return NULL;
-        }
+            return (free_tokens(tokens),NULL);
         input += consumed;
     }
     return tokens;

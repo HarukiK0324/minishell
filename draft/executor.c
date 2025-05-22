@@ -152,10 +152,7 @@ int handle_builtin(t_token *t)
     else if (ft_strcmp(t->value, "cd") == 0)
         return builtin_cd(t);
     else if (ft_strcmp(t->value, "echo") == 0)
-    {
-        builtin_echo(t);
-        return 0;
-    }
+        return (builtin_echo(t),0);
     return 1;
 }
 
@@ -254,7 +251,6 @@ int exec_cmd(t_token *t)
 {
     if (is_builtin(t))
         return handle_builtin(t);
-
     pid_t pid = fork();
     if (pid == 0)
     {
@@ -294,7 +290,6 @@ int exec_pipe(t_node *node)
         close(pipefd[1]);
         exit(execute_ast(node->lhs));
     }
-
     pid_t pid2 = fork();
     if (pid2 == 0)
     {
@@ -303,7 +298,6 @@ int exec_pipe(t_node *node)
         close(pipefd[1]);
         exit(execute_ast(node->rhs));
     }
-
     close(pipefd[0]);
     close(pipefd[1]);
     waitpid(pid, NULL, 0);
@@ -316,13 +310,10 @@ int execute_ast(t_node *node)
 {
     if (!node)
         return 0;
-
     if (node->type == NODE_CMD)
         return exec_cmd(node->tokens);
-
     if (node->type == NODE_PIPE)
         return exec_pipe(node);
-
     if (node->type == NODE_AND_IF)
     {
         int status = execute_ast(node->lhs);
@@ -330,7 +321,6 @@ int execute_ast(t_node *node)
             return execute_ast(node->rhs);
         return status;
     }
-
     if (node->type == NODE_OR_IF)
     {
         int status = execute_ast(node->lhs);
@@ -338,12 +328,10 @@ int execute_ast(t_node *node)
             return execute_ast(node->rhs);
         return status;
     }
-
     if (node->type == NODE_SEMICOLON)
     {
         execute_ast(node->lhs);
         return execute_ast(node->rhs);
     }
-
     return 1;
 }

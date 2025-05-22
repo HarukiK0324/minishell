@@ -53,7 +53,6 @@ t_node *parse_simple(t_token **tokens)
     }
     if (!head)
         return NULL;
-
     return new_node(NODE_CMD, NULL, NULL, head);
 }
 
@@ -81,7 +80,6 @@ t_node *parse_and_or(t_token **tokens)
     t_node *left = parse_pipe(tokens);
     if (!left)
         return NULL;
-
     while (*tokens && ((*tokens)->type == TOKEN_AND_IF || (*tokens)->type == TOKEN_OR_IF))
     {
         TokenType op = (*tokens)->type;
@@ -94,7 +92,6 @@ t_node *parse_and_or(t_token **tokens)
         }
         left = new_node(op == TOKEN_AND_IF ? NODE_AND_IF : NODE_OR_IF, left, right, NULL);
     }
-
     return left;
 }
 
@@ -114,7 +111,6 @@ t_node *parse_semicolon(t_token **tokens)
         }
         left = new_node(NODE_SEMICOLON, left, right, NULL);
     }
-
     return left;
 }
 
