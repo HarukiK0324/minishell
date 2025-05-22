@@ -1,9 +1,6 @@
 #define _GNU_SOURCE
 #include "minishell.h"
-#include <readline/readline.h>
-#include <readline/history.h>
 
-void rl_replace_line(const char *text, int clear_undo);
 volatile sig_atomic_t g_signal = 0;
 size_t ft_strlen(const char *s)
 {
