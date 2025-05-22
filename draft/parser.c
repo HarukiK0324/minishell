@@ -31,6 +31,10 @@ t_node *parse_simple(t_token **tokens)
         t_node *inner = parse(*tokens);
         if (*tokens && (*tokens)->type == TOKEN_CLOSE_PAREN)
             consume_token(tokens);
+        else {
+            write(2, "minishell: parse error: expected ')'\n", 37);
+            // Free partially built subtree if needed
+        }
         return inner;
     }
 
@@ -68,6 +72,11 @@ t_node *parse_pipe(t_token **tokens)
     {
         consume_token(tokens);
         t_node *right = parse_simple(tokens);
+        if (!right) {
+            write(2, "minishell: parse error: missing right side of pipe\n", 51);
+            free_ast(left);
+            return NULL;
+        }
         left = new_node(NODE_PIPE, left, right, NULL);
     }
 
@@ -85,6 +94,11 @@ t_node *parse_and_or(t_token **tokens)
         TokenType op = (*tokens)->type;
         consume_token(tokens);
         t_node *right = parse_pipe(tokens);
+        if (!right) {
+            write(2, "minishell: parse error: missing right side of && or ||\n", 56);
+            free_ast(left);
+            return NULL;
+        }
         left = new_node(op == TOKEN_AND_IF ? NODE_AND_IF : NODE_OR_IF, left, right, NULL);
     }
 
@@ -101,6 +115,11 @@ t_node *parse_semicolon(t_token **tokens)
     {
         consume_token(tokens);
         t_node *right = parse_and_or(tokens);
+        if (!right) {
+            write(2, "minishell: parse error: missing right side of semicolon\n", 56);
+            free_ast(left);
+            return NULL;
+        }
         left = new_node(NODE_SEMICOLON, left, right, NULL);
     }
 

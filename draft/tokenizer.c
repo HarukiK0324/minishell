@@ -57,6 +57,8 @@ int add_word(const char *input, t_token **list)
     size_t len = 0;
     while (input[len] && !ft_isspace(input[len]) && !ismetachar(input[len]))
         len++;
+    if (len == 0)
+        return -1;
     t_token *token = (t_token *)malloc(sizeof(t_token));
     if (!token)
         return -1;
@@ -90,6 +92,8 @@ int add_quote(const char *input, t_token **list, char quote)
 
     while (start[len] && start[len] != quote)
         len++;
+    if (start[len] != quote)
+        return -1; // unmatched quote error
 
     t_token *token = (t_token *)malloc(sizeof(t_token));
     if (!token)
@@ -125,7 +129,7 @@ t_token *tokenize(const char *input)
         if (!*input)
             break;
         consumed = 0;
-        if (*input == '\'' || *input == '\"')
+        if (*input == '\'' || *input == '"')
             consumed = add_quote(input, &tokens, *input);
         else if (ismetachar(*input))
             consumed = add_metachar(input, &tokens);

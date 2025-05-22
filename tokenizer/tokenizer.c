@@ -53,7 +53,7 @@ int ismetachar(char c)
             c == '&' || c == '$' || c == '`' || c == '\\' || c == '=');
 }
 
-void append_token(Token **token_list, Token *new_token)
+void append_token(t_token **token_list, t_token *new_token)
 {
     if (!new_token)
         return;
@@ -63,23 +63,22 @@ void append_token(Token **token_list, Token *new_token)
     }
     else
     {
-        Token *temp = *token_list;
+        t_token *temp = *token_list;
         while (temp->next)
             temp = temp->next;
         temp->next = new_token;
     }
 }
 
-int add_word(const char *string, Token **token_list)
+int add_word(const char *string, t_token **token_list)
 {
-    Token   *new_token;
+    t_token   *new_token;
     size_t  len;
 
     len = 0;
-    while (string[len] && !ismetachar(string[len]) && !ft_isspace(string[len]) &&
-           string[len] != '\'' && string[len] != '\"' )
+    while (string[len] && !ismetachar(string[len]) && !ft_isspace(string[len]))
         len++;
-    new_token = (Token *)malloc(sizeof(Token));
+    new_token = (t_token *)malloc(sizeof(t_token));
     if (!new_token)
         return(perror("add_word: malloc for token failed"),0);
     new_token->value = ft_strndup(string, len);
@@ -106,17 +105,13 @@ TokenType get_meta_type(const char *string)
     if (ft_strncmp(string, "(", 1) == 0) return TOKEN_OPEN_PAREN;
     if (ft_strncmp(string, ")", 1) == 0) return TOKEN_CLOSE_PAREN;
     if (ft_strncmp(string, ";", 1) == 0) return TOKEN_SEMICOLON;
-    if (ft_strncmp(string, "&", 1) == 0) return TOKEN_AMPERSAND;
-    if (ft_strncmp(string, "`", 1) == 0) return TOKEN_BACKTICK;
     if (ft_strncmp(string, "$", 1) == 0) return TOKEN_DOLLAR;
-    if (ft_strncmp(string, "\\", 1) == 0) return TOKEN_BACKSLASH;
-    if (ft_strncmp(string, "=", 1) == 0) return TOKEN_EQUALS;
     return TOKEN_WORD;
 }
 
-int add_metachar(const char *string, Token **token_list)
+int add_metachar(const char *string, t_token **token_list)
 {
-    Token       *new_token;
+    t_token       *new_token;
     TokenType   type;
     int         len;
 
@@ -128,7 +123,7 @@ int add_metachar(const char *string, Token **token_list)
         len = 1;
     else
         return 0;
-    new_token = (Token *)malloc(sizeof(Token));
+    new_token = (t_token *)malloc(sizeof(t_token));
     if (!new_token)
         return (perror("add_metachar: malloc for token failed"),0);
     new_token->value = ft_strndup(string, len);
@@ -143,9 +138,9 @@ int add_metachar(const char *string, Token **token_list)
     return len;
 }
 
-int add_quote(const char *string, Token **token_list, char quote_char)
+int add_quote(const char *string, t_token **token_list, char quote_char)
 {
-    Token   *new_token;
+    t_token   *new_token;
     size_t  len;
     const char *start_of_content;
 
@@ -153,7 +148,7 @@ int add_quote(const char *string, Token **token_list, char quote_char)
     len = 0;
     while (start_of_content[len] != '\0' && start_of_content[len] != quote_char)
         len++;
-    new_token = (Token *)malloc(sizeof(Token));
+    new_token = (t_token *)malloc(sizeof(t_token));
     if (!new_token)
         return (perror("add_quote: malloc for token failed"),0);
     new_token->value = ft_strndup(start_of_content, len);
@@ -168,10 +163,10 @@ int add_quote(const char *string, Token **token_list, char quote_char)
     return len + 2;
 }
 
-Token *tokenize(const char *input)
+t_token *tokenize(const char *input)
 {
-    Token   *token_head;
-    int     consumed_len;
+    t_token   *token_head;
+    int     result;
 
     token_head = NULL;
     while (*input)
@@ -180,24 +175,24 @@ Token *tokenize(const char *input)
             input++;
         if (*input == '\0')
             break;
-        consumed_len = 0;
+        result = 0;
         if (*input == '\'' || *input == '\"')
-            consumed_len = add_quote(input, &token_head, *input);
+            result = add_quote(input, &token_head, *input);
         else if (ismetachar(*input))
-            consumed_len = add_metachar(input, &token_head);
+            result = add_metachar(input, &token_head);
         else
-            consumed_len = add_word(input, &token_head);
-        if (consumed_len <= 0)
+            result = add_word(input, &token_head);
+        if (result <= 0)
             return (free_tokens(token_head),NULL);
-        input += consumed_len;
+        input += result;
     }
     return token_head;
 }
 
-void free_tokens(Token *token_list)
+void free_tokens(t_token *token_list)
 {
-    Token *current;
-    Token *next_token;
+    t_token *current;
+    t_token *next_token;
 
     current = token_list;
     while (current != NULL)

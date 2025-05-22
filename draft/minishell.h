@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:23:34 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/05/21 21:50:16 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/05/21 22:55:33 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,5 +75,6 @@ t_node     *parse(t_token *token_list);
 void        free_ast(t_node *node);
 void        expand_ast(t_node *node);
 int         execute_ast(t_node *node);
+char      **token_to_argv(t_token *t);
 
 #endif

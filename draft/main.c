@@ -1,7 +1,10 @@
+#define _GNU_SOURCE
 #include "minishell.h"
 #include <readline/readline.h>
 #include <readline/history.h>
 
+void rl_replace_line(const char *text, int clear_undo);
+volatile sig_atomic_t g_signal = 0;
 size_t ft_strlen(const char *s)
 {
     size_t len = 0;
@@ -29,7 +32,7 @@ int ft_strcmp(const char *s1, const char *s2)
         s1++;
         s2++;
     }
-    return *(unsigned char *)s1 - *(unsigned char *)s2;
+    return *(const unsigned char *)s1 - *(const unsigned char *)s2;
 }
 
 int ft_strncmp(const char *s1, const char *s2, size_t n)
@@ -39,7 +42,7 @@ int ft_strncmp(const char *s1, const char *s2, size_t n)
         s1++;
         s2++;
     }
-    return (n == (size_t)-1) ? 0 : *(unsigned char *)s1 - *(unsigned char *)s2;
+    return (n == (size_t)-1) ? 0 : *(const unsigned char *)s1 - *(const unsigned char *)s2;
 }
 
 char *ft_strchr(const char *s, int c)
@@ -72,9 +75,9 @@ void handle_sigint(int sig)
 {
     (void)sig;
     g_signal = 1;
-    write(1, "\n", 1);
+    write(STDOUT_FILENO, "\n", 1);
     rl_on_new_line();
-    rl_replace_line("", 0);
+    // rl_replace_line("", 0);
     rl_redisplay();
 }
 
@@ -100,7 +103,7 @@ int main(void)
         line = readline("minishell> ");
         if (!line)
         {
-            write(1, "exit\n", 5);
+            write(STDOUT_FILENO, "exit\n", 5);
             break;
         }
         if (*line)
@@ -110,9 +113,13 @@ int main(void)
             if (tokens)
             {
                 ast = parse(tokens);
-                expand_ast(ast);
-                execute_ast(ast);
-                free_ast(ast);
+                if (ast) {
+                    expand_ast(ast);
+                    execute_ast(ast);
+                    free_ast(ast);
+                } else {
+                    free_tokens(tokens); // Free tokens if parsing fails
+                }
             }
         }
         free(line);

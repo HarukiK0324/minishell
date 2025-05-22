@@ -83,8 +83,10 @@ void expand_tokens(t_token *tok)
         else if (tok->type == TOKEN_DOUBLE_QUOTE)
         {
             char *expanded = expand_string(tok->value);
-            free(tok->value);
-            tok->value = expanded;
+            if (expanded) {
+                free(tok->value);
+                tok->value = expanded;
+            }
             tok->type = TOKEN_WORD;
         }
         else if (tok->type == TOKEN_SINGLE_QUOTE)
@@ -94,8 +96,10 @@ void expand_tokens(t_token *tok)
         else if (tok->type == TOKEN_WORD && ft_strchr(tok->value, '$'))
         {
             char *expanded = expand_string(tok->value);
-            free(tok->value);
-            tok->value = expanded;
+            if (expanded) {
+                free(tok->value);
+                tok->value = expanded;
+            }
         }
         tok = tok->next;
     }
