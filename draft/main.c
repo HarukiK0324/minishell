@@ -100,7 +100,7 @@ int main(void)
     init_signals();
     while (1)
     {
-        line = readline("minishell> ");
+        line = readline("minishell$ ");
         if (!line)
         {
             write(STDOUT_FILENO, "exit\n", 5);
@@ -118,7 +118,7 @@ int main(void)
                     execute_ast(ast);
                     free_ast(ast);
                 } else {
-                    free_tokens(tokens); // Free tokens if parsing fails
+                    free_tokens(tokens);
                 }
             }
         }

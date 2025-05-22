@@ -194,7 +194,7 @@ void setup_redirects(t_token *t)
             dup2(fd, STDOUT_FILENO);
             close(fd);
         }
-        // << (heredoc) not implemented
+        // << (heredoc) not implemented yet
         t = t->next;
     }
 }
@@ -236,7 +236,7 @@ char	*get_path(char *argv, char *environ[])
 			break ;
 	}
 	if (*environ == NULL)
-        perror(&argv[0]);
+        perror(ft_strjoin("minishell: ",argv));
 	paths = ft_split(*environ + 5, ':');
 	path = NULL;
 	while (paths && paths[i] != NULL && path == NULL)
@@ -246,7 +246,7 @@ char	*get_path(char *argv, char *environ[])
 		free(paths[i++]);
 	free(paths);
 	if (path == NULL)
-        perror(&argv[0]);
+        perror(ft_strjoin("minishell: ",argv));
 	return (path);
 }
 
@@ -269,7 +269,7 @@ int exec_cmd(t_token *t)
                 path = get_path(argv[0], environ);
             execve(path, argv, environ);
         }
-        perror((const char *)argv[0]);
+        perror(ft_strjoin("minishell: ",argv[0]));
         free(argv);
         exit(1);
     }

@@ -24,20 +24,16 @@ t_node *parse_simple(t_token **tokens)
 {
     if (!*tokens)
         return NULL;
-
     if ((*tokens)->type == TOKEN_OPEN_PAREN)
     {
         consume_token(tokens);
         t_node *inner = parse(*tokens);
         if (*tokens && (*tokens)->type == TOKEN_CLOSE_PAREN)
             consume_token(tokens);
-        else {
+        else
             write(2, "minishell: parse error: expected ')'\n", 37);
-            // Free partially built subtree if needed
-        }
         return inner;
     }
-
     t_token *head = NULL, *tail = NULL;
     while (*tokens && (*tokens)->type != TOKEN_PIPE &&
            (*tokens)->type != TOKEN_AND_IF &&
@@ -55,7 +51,6 @@ t_node *parse_simple(t_token **tokens)
             tail = t;
         }
     }
-
     if (!head)
         return NULL;
 
@@ -67,7 +62,6 @@ t_node *parse_pipe(t_token **tokens)
     t_node *left = parse_simple(tokens);
     if (!left)
         return NULL;
-
     while (*tokens && (*tokens)->type == TOKEN_PIPE)
     {
         consume_token(tokens);
@@ -79,7 +73,6 @@ t_node *parse_pipe(t_token **tokens)
         }
         left = new_node(NODE_PIPE, left, right, NULL);
     }
-
     return left;
 }
 
@@ -110,7 +103,6 @@ t_node *parse_semicolon(t_token **tokens)
     t_node *left = parse_and_or(tokens);
     if (!left)
         return NULL;
-
     while (*tokens && (*tokens)->type == TOKEN_SEMICOLON)
     {
         consume_token(tokens);

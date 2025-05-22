@@ -74,7 +74,6 @@ int add_metachar(const char *input, t_token **list)
     TokenType type = get_meta_type(input);
     int len = (type == TOKEN_HEREDOC || type == TOKEN_APPEND ||
                type == TOKEN_AND_IF || type == TOKEN_OR_IF) ? 2 : 1;
-
     t_token *token = (t_token *)malloc(sizeof(t_token));
     if (!token)
         return -1;
@@ -93,8 +92,7 @@ int add_quote(const char *input, t_token **list, char quote)
     while (start[len] && start[len] != quote)
         len++;
     if (start[len] != quote)
-        return -1; // unmatched quote error
-
+        return -1;
     t_token *token = (t_token *)malloc(sizeof(t_token));
     if (!token)
         return -1;
