@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:23:34 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/05 17:28:13 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/05 18:12:34 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,6 @@ typedef enum
 	TOKEN_SEMICOLON,
 	TOKEN_AND_IF,
 	TOKEN_OR_IF,
-	TOKEN_DOLLAR,
-	TOKEN_SINGLE_QUOTE,
-	TOKEN_DOUBLE_QUOTE,
 	TOKEN_WORD,
 	TOKEN_END
 }								TokenType;
