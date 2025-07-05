@@ -27,6 +27,8 @@ int main()
 			free(line);
 			continue;
 		}
+		while(unclosed_quotes(line))
+			line = ft_strjoin(line,readline("dequote> "));
 		printf("line is '%s'\n", line);
 		add_history(line);
 		free(line);
