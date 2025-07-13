@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:23:34 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/10 14:05:13 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/13 22:08:34 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,6 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
-
-extern volatile sig_atomic_t	g_signal;
 
 typedef enum
 {
@@ -35,7 +33,8 @@ typedef enum
 	TOKEN_OR_IF,
 	TOKEN_WORD,
 	TOKEN_END,
-	TOKEN_NEWLINE
+	TOKEN_NEWLINE,
+	TOKEN_ERROR
 }								TokenType;
 
 typedef enum
@@ -70,6 +69,13 @@ typedef struct s_node
 	struct s_node				*lhs;
 	struct s_node				*rhs;
 }								t_node;
+
+typedef struct s_env
+{
+	char						*key;
+	char						*value;
+	struct s_env				*next;
+}								t_env;
 
 size_t							ft_strlen(const char *s);
 char							*ft_strdup(const char *s);

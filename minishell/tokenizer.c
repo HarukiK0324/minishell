@@ -11,6 +11,34 @@ int ismetachar(char c)
             c == ';' || c == '&' || c == '`' || c == '\\');
 }
 
+int ft_strncmp(const char *s1, const char *s2, size_t n)
+{
+    while (n-- && *s1 && (*s1 == *s2))
+    {
+        s1++;
+        s2++;
+    }
+    return (n == (size_t)-1) ? 0 : *(const unsigned char *)s1 - *(const unsigned char *)s2;
+}
+
+char *ft_strdup(const char *s)
+{
+    char *str;
+    ssize_t i;
+    
+    i = 0;
+    str = (char *)malloc(ft_strlen(s) + 1);
+    if (!str)
+        return NULL;
+    while(s[i] != '\0')
+    {
+        str[i] = s[i];
+        i++;
+    }
+    str[i] = '\0';
+    return str;
+}
+
 char *ft_strndup(const char *s, size_t n)
 {
     char *str;
@@ -25,7 +53,7 @@ char *ft_strndup(const char *s, size_t n)
         str[i] = s[i];
         i++;
     }
-    str [i] = '\0';
+    str[i] = '\0';
     return str;
 }
 
@@ -60,7 +88,7 @@ TokenType get_meta_type(const char *s)
     if (ft_strncmp(s, ">", 1) == 0) return TOKEN_REDIR_OUT;
     if (ft_strncmp(s, "(", 1) == 0) return TOKEN_OPEN_PAREN;
     if (ft_strncmp(s, ")", 1) == 0) return TOKEN_CLOSE_PAREN;
-    return NULL;
+    return TOKEN_ERROR;
 }
 
 size_t add_word(const char *input, t_token **list)
@@ -70,7 +98,7 @@ size_t add_word(const char *input, t_token **list)
     char quote;
 
     len = 0;
-    while (input[len] && !ft_isspace(input[len]) && !ismetachar(input[len]))
+    while (input[len] && !ft_isblank(input[len]) && !ismetachar(input[len]))
     {
         if(input[len] == '"' || input[len] == '\'')
         {

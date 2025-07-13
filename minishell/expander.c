@@ -1,44 +1,80 @@
 #include "minishell.h"
 
-char *replace_env_var(char *str)
+int ischar(char c)
+{
+    return ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_');
+}
+
+char *replace_env_var(char *str,int *j)
 {
     int i;
     int k;
+    char *env_var;
 
+    if(str[*j + 1] == '?')
+        return replace_status(g_signal);
     i = 0;
-    while(str[i] && str[i] != '$')
+    while(str[*j + 1 + i] != '\0' && ischar(str[*j + 1 + i]))
         i++;
-    if(str[i] == '$')
+    if(i > 0)
     {
-        k = 1;
-        if(str[i+k] == '?')
-
+        env_var = (char *)malloc(i + 1);
+        if (!env_var)
+            return (perror("malloc"), NULL);
+        k = 0;
+        while(k < i)
+        {
+            env_var[k] = str[*j + 1 + k];
+            k++;
+        }
+        env_var[k] = '\0';
+        
     }
+    
 }
 
-char *trim_string(char *str)
+char *trim_quote(char *str,int *j,char c)
 {
     int i;
-    int j;
-    char *trimmed;
+    char *new_str;
 
     i = 0;
-    while(str[i] && str[i] != '\'')
+    new_str = (char *)malloc(ft_strlen(str) - 1);
+    while(i < *j)
+    {
+        new_str[i] = str[i];
         i++;
-    if(str[i] == '\'')
+    }
+    while(str[i + 1] != c)
+    {
+        new_str[i] = str[i + 1];
+        (*j)++;
         i++;
-    j = i;
-    while(str[j] && str[j] != '\'')
-        j++;
-    if(str[j] == '\'')
-        j++;
-    trimmed = (char *)malloc(j - i + 1);
-    if (!trimmed)
-        return NULL;
-    for(int k = 0; k < j - i; k++)
-        trimmed[k] = str[i + k];
-    trimmed[j - i] = '\0';
-    return trimmed;
+    }
+    while(str[i + 2] != '\0')
+    {
+        new_str[i] = str[i + 2];
+        i++;
+    }
+    new_str[i] = '\0';
+    free(str);
+    return new_str;
+}
+
+char *trim_double_quote(char *str,int *j)
+{
+    int i;
+    char *new_str;
+
+    i = *j + 1;
+    while(str[i] != '"')
+    {
+        if(str[i] == '$')
+            str = replace_env_var(str,&i);
+        else
+            i++;
+    }
+    return trim_quote(str,j,'"');
 }
 
 void expand_cmd(t_cmd *cmd)
@@ -50,15 +86,16 @@ void expand_cmd(t_cmd *cmd)
     while(cmd->argv && cmd->argv[i])
     {
         j = 0;
-        while(cmd->argv[i][j])
+        while(cmd->argv[i][j] != '\0')
         {
             if(cmd->argv[i][j] == '\'')
-                cmd->argv[i] = trim_single_quote(cmd->argv[i],&j);
+                cmd->argv[i] = trim_quote(cmd->argv[i],&j,'\'');
             else if(cmd->argv[i][j] == '"')
                 cmd->argv[i] = trim_double_quote(cmd->argv[i],&j);
             else if(cmd->argv[i][j] == '$')
                 cmd->argv[i] = replace_env_var(cmd->argv[i],&j);
-            j++;
+            else
+                j++;
         }
         i++;
     }
