@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:23:34 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/05 18:12:34 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/10 14:05:13 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,19 +31,17 @@ typedef enum
 	TOKEN_APPEND,
 	TOKEN_OPEN_PAREN,
 	TOKEN_CLOSE_PAREN,
-	TOKEN_SEMICOLON,
 	TOKEN_AND_IF,
 	TOKEN_OR_IF,
 	TOKEN_WORD,
-	TOKEN_END
+	TOKEN_END,
+	TOKEN_NEWLINE
 }								TokenType;
 
 typedef enum
 {
-	NODE_SHELL,
 	NODE_PIPE,
 	NODE_CMD,
-	NODE_SEMICOLON,
 	NODE_AND_IF,
 	NODE_OR_IF
 }								NodeType;
@@ -52,16 +50,16 @@ typedef struct s_token
 {
 	TokenType					type;
 	char						*value;
+	struct s_token				*prev;
 	struct s_token				*next;
 }								t_token;
 
 typedef struct s_cmd
 {
 	char						**argv;
-	char						**envp;
 	char						**input_file;
 	char						**output_file;
-	char						*heredoc_delimiter;
+	char						**heredoc_delimiter;
 	int							append;
 }								t_cmd;
 

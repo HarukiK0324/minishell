@@ -34,13 +34,18 @@ void append_token(t_token **list, t_token *new_token)
     t_token *current;
 
     if (!*list)
+    {
         *list = new_token;
+        new_token->prev = NULL;
+    }
     else
     {
         current = *list;
         while (current->next)
             current = current->next;
         current->next = new_token;
+        new_token->prev = current;
+        new_token->next = NULL;
     }
 }
 
@@ -83,7 +88,6 @@ size_t add_word(const char *input, t_token **list)
         return (perror("token creation"),-1);
     token->type = TOKEN_WORD;
     token->value = ft_strndup(input, len);
-    token->next = NULL;
     append_token(list, token);
     return len;
 }
@@ -106,7 +110,6 @@ size_t add_metachar(const char *input, t_token **list)
         return (perror("token creation"),-1);
     token->type = type;
     token->value = ft_strndup(input, len);
-    token->next = NULL;
     append_token(list, token);
     return len;
 }
