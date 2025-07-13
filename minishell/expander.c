@@ -28,9 +28,7 @@ char *replace_env_var(char *str,int *j)
             k++;
         }
         env_var[k] = '\0';
-        
     }
-    
 }
 
 char *trim_quote(char *str,int *j,char c)
