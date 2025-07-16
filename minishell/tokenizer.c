@@ -18,7 +18,9 @@ int ft_strncmp(const char *s1, const char *s2, size_t n)
         s1++;
         s2++;
     }
-    return (n == (size_t)-1) ? 0 : *(const unsigned char *)s1 - *(const unsigned char *)s2;
+    if(n == (size_t)-1)
+        return 0;
+    return *(const unsigned char *)s1 - *(const unsigned char *)s2;
 }
 
 char *ft_strdup(const char *s)
@@ -29,7 +31,7 @@ char *ft_strdup(const char *s)
     i = 0;
     str = (char *)malloc(ft_strlen(s) + 1);
     if (!str)
-        return NULL;
+        return (perror("malloc"),NULL);
     while(s[i] != '\0')
     {
         str[i] = s[i];
@@ -47,7 +49,7 @@ char *ft_strndup(const char *s, size_t n)
     i = 0;
     str = (char *)malloc(n + 1);
     if (!str)
-        return NULL;
+        return (perror("malloc"),NULL);
     while(i < n && s[i] != '\0')
     {
         str[i] = s[i];
@@ -107,7 +109,7 @@ size_t add_word(const char *input, t_token **list)
             while (input[len] && input[len] != quote)
                 len++;
             if(input[len] == '\0')
-                return(perror("unclosed quote"),-1);
+                return(write(STDERR_FILENO,"unclosed quote\n",15),-1);
         }
         len++;
     }
@@ -127,8 +129,8 @@ size_t add_metachar(const char *input, t_token **list)
     size_t len;
     
     type = get_meta_type(input);
-    if(!type)
-        return (perror("unknown token"),-1);
+    if(type == TOKEN_ERROR)
+        return (write(STDERR_FILENO,"unknown token\n",14),-1);
     if(type == TOKEN_HEREDOC || type == TOKEN_APPEND || type == TOKEN_AND_IF || type == TOKEN_OR_IF)
         len = 2;
     else
