@@ -168,31 +168,29 @@ int	main(int argc, char **argv, char **environ)
 	(void)argc; // Unused parameter
 	(void)argv; // Unused parameter
 	env_list = init_env(environ);
-	sort_env_list(&env_list);
 	while(env_list)
     {
         printf("%s=%s\n", env_list->key, env_list->value);
         env_list = env_list->next;
     }
-    free_list(env_list);
-	// if(!env_list)
-	// 	return (perror("init_env failed"), 1); // Exit if environment initialization fails
-	// while (1)
-	// {
-	// 	input = readline("minishell$ ");
-	// 	if (input && ft_strlen(input) > 0)
-	// 	{
-	// 		while(check_quote(input) == -1)
-	// 			input = append(input,readline("> "),'\n');
-	// 		tokens = tokenize(input);
-	// 		ast = parse(tokens);
-	// 		if(!ast)
-	// 		//exit status 2 or ???
-	// 		status = expander(ast);
-	// 		status = executor(ast);
-	// 		add_history(input);
-	// 		free(input);
-	// 	}
-	// }
-	// printf("exit\n");
+	if(!env_list)
+		return (perror("init_env failed"), 1); // Exit if environment initialization fails
+	while (1)
+	{
+		input = readline("minishell$ ");
+		if (input && ft_strlen(input) > 0)
+		{
+			while(check_quote(input) == -1)
+				input = append(input,readline("> "),'\n');
+			tokens = tokenize(input);
+			ast = parse(tokens);
+			if(!ast)
+			//exit status 2 or ???
+			expander(ast,env_list,&status);
+			executor(ast,env_list,&status);
+			add_history(input);
+			free(input);
+		}
+	}
+	printf("exit\n");
 }
