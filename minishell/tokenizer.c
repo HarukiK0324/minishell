@@ -109,13 +109,13 @@ size_t add_word(const char *input, t_token **list)
             while (input[len] && input[len] != quote)
                 len++;
             if(input[len] == '\0')
-                return(write(STDERR_FILENO,"unclosed quote\n",15),-1);
+                return(write(STDERR_FILENO,"minishell: unclosed quote\n",26),-1);
         }
         len++;
     }
     token = (t_token *)malloc(sizeof(t_token));
     if (!token)
-        return (perror("token creation"),-1);
+        return (write(STDERR_FILENO,"minishell: token creation\n",26),-1);
     token->type = TOKEN_WORD;
     token->value = ft_strndup(input, len);
     append_token(list, token);
@@ -130,14 +130,14 @@ size_t add_metachar(const char *input, t_token **list)
     
     type = get_meta_type(input);
     if(type == TOKEN_ERROR)
-        return (write(STDERR_FILENO,"unknown token\n",14),-1);
+        return (write(STDERR_FILENO,"minishell: unknown token\n",25),-1);
     if(type == TOKEN_HEREDOC || type == TOKEN_APPEND || type == TOKEN_AND_IF || type == TOKEN_OR_IF)
         len = 2;
     else
         len = 1;
     token = (t_token *)malloc(sizeof(t_token));
     if (!token)
-        return (perror("token creation"),-1);
+        return (write(STDERR_FILENO,"minishell: token creation\n",26),-1);
     token->type = type;
     token->value = ft_strndup(input, len);
     append_token(list, token);
