@@ -1,8 +1,12 @@
 #include "minishell.h"
 
-int ischar(char c)
+int is_char(char c)
 {
-    return ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_');
+    return ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_');
+}
+int is_numchar(char c)
+{
+    return (c >= '0' && c <= '9') || is_char(c);
 }
 
 char *to_str(int n)
@@ -128,9 +132,9 @@ char *parse_env_var(char *str,int *j,t_env *env_list, int *status)
     if(str[*j + 1] == '?')
         return replace_status(str, j, status);
     i = 0;
-    while(str[*j + 1 + i] != '\0' && ischar(str[*j + 1 + i]))
+    while(is_numchar(str[*j + 1 + i]))
         i++;
-    if(i > 0)
+    if(i > 0 && is_char(str[*j + 1]))
     {
         env_var = (char *)malloc(i + 1);
         if (!env_var)
