@@ -36,15 +36,10 @@ void free_cmd(t_cmd *cmd)
     if (cmd->argv)
         free(cmd->argv);
     i = 0;
-    while (cmd->input_file && cmd->input_file[i])
-        free(cmd->input_file[i++]);
-    if (cmd->input_file)
-        free(cmd->input_file);
-    i = 0;
-    while (cmd->output_file && cmd->output_file[i])
-        free(cmd->output_file[i++]);
-    if (cmd->output_file)
-        free(cmd->output_file);
+    while (cmd->fds && cmd->fds[i])
+        free(cmd->fds[i++]);
+    if (cmd->fds)
+        free(cmd->fds);
     i = 0;
     while (cmd->heredoc_delimiter && cmd->heredoc_delimiter[i])
         free(cmd->heredoc_delimiter[i++]);
@@ -91,6 +86,19 @@ t_node *init_node(void)
     return node;
 }
 
+t_cmd *init_cmd(void)
+{
+    t_cmd *cmd;
+
+    cmd = (t_cmd *)malloc(sizeof(t_cmd));
+    if (!cmd)
+        return (perror("malloc"), NULL);
+    cmd->argv = NULL;
+    cmd->fds = NULL;
+    cmd->heredoc_delimiter = NULL;
+    return cmd;
+}
+
 t_node *parse_condition(t_token **tokens)
 {
     t_node *node;
@@ -131,7 +139,7 @@ t_cmd *parse_cmd(t_token **tokens)
 {
     t_cmd *cmd;
 
-    cmd = (t_cmd *)malloc(sizeof(t_cmd));
+    cmd = init_cmd();
     if (!cmd)
         return (perror("malloc"), NULL);
     while(*tokens && token_cmd(*tokens))
