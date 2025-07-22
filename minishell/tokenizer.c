@@ -64,17 +64,13 @@ void append_token(t_token **list, t_token *new_token)
     t_token *current;
 
     if (!*list)
-    {
         *list = new_token;
-        new_token->prev = NULL;
-    }
     else
     {
         current = *list;
         while (current->next)
             current = current->next;
         current->next = new_token;
-        new_token->prev = current;
         new_token->next = NULL;
     }
 }
