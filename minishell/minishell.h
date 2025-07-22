@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:23:34 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/22 15:35:46 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/22 16:22:27 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,9 +55,9 @@ typedef struct s_token
 
 typedef struct s_cmd
 {
-	char						**argv;
+	t_token						*argv;
 	t_token						*fds;
-	char						**heredoc_delimiter;
+	t_token						*heredoc_delimiter;
 }								t_cmd;
 
 typedef struct s_node
