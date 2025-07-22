@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:23:34 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/13 22:08:34 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/22 15:07:22 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@
 # include <readline/history.h>
 # include <readline/readline.h>
 # include <signal.h>
+#include <errno.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
@@ -49,17 +50,20 @@ typedef struct s_token
 {
 	TokenType					type;
 	char						*value;
-	struct s_token				*prev;
 	struct s_token				*next;
 }								t_token;
+
+typedef struct s_fds
+{
+	TokenType					type;
+	char						*arg;
+}								t_fds;
 
 typedef struct s_cmd
 {
 	char						**argv;
-	char						**input_file;
-	char						**output_file;
+	t_fds						**fds;
 	char						**heredoc_delimiter;
-	int							append;
 }								t_cmd;
 
 typedef struct s_node
