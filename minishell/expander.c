@@ -196,25 +196,25 @@ char *trim_double_quote(char *str,int *j,t_env *env_list, int *status)
 
 void expand_cmd(t_cmd *cmd,t_env *env_list, int *status)
 {
-    int i;
     int j;
+    t_token *argv;
 
-    i = 0;
-    while(cmd->argv && cmd->argv[i])
+    argv = cmd->argv;
+    while(cmd && argv)
     {
         j = 0;
-        while(cmd->argv[i][j] != '\0')
+        while(argv->value[j] != '\0')
         {
-            if(cmd->argv[i][j] == '\'')
-                cmd->argv[i] = trim_quote(cmd->argv[i],&j,'\'');
-            else if(cmd->argv[i][j] == '"')
-                cmd->argv[i] = trim_double_quote(cmd->argv[i], &j, env_list, status);
-            else if(cmd->argv[i][j] == '$')
-                cmd->argv[i] = parse_env_var(cmd->argv[i], &j, env_list, status);
+            if(argv->value[j] == '\'')
+                argv->value = trim_quote(argv->value,&j,'\'');
+            else if(argv->value[j] == '"')
+                argv->value = trim_double_quote(argv->value, &j, env_list, status);
+            else if(argv->value[j] == '$')
+                argv->value = parse_env_var(argv->value, &j, env_list, status);
             else
                 j++;
         }
-        i++;
+        argv = argv->next;
     }
 }
 
