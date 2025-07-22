@@ -146,7 +146,8 @@ void free_tokens(t_token *head)
     while (head)
     {
         tmp = head->next;
-        free(head->value);
+        if(head->value)
+            free(head->value);
         free(head);
         head = tmp;
     }
