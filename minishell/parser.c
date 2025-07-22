@@ -26,21 +26,11 @@ void print_synerr(TokenType expected)
 
 void free_cmd(t_cmd *cmd)
 {
-    int i;
-
-    i = 0;
     if (!cmd)
         return;
-    while (cmd->argv && cmd->argv[i])
-        free(cmd->argv[i++]);
-    if (cmd->argv)
-        free(cmd->argv);
+    free_tokens(cmd->argv);
     free_tokens(cmd->fds);
-    i = 0;
-    while (cmd->heredoc_delimiter && cmd->heredoc_delimiter[i])
-        free(cmd->heredoc_delimiter[i++]);
-    if (cmd->heredoc_delimiter)
-        free(cmd->heredoc_delimiter);
+    free_tokens(cmd->heredoc_delimiter);
     free(cmd);
 }
 
@@ -146,8 +136,26 @@ int add_fd(t_cmd *cmd, t_token **tokens)
     else if((*tokens)->type != TOKEN_WORD)
         return (print_synerr((*tokens)->type), free_tokens(fd), 0);
     fd->value = (*tokens)->value;
-    append_token(&cmd->fds, fd);
+    if(fd->type == TOKEN_HEREDOC)
+        append_token(&cmd->heredoc_delimiter, fd);
+    else
+        append_token(&cmd->fds, fd);
     (*tokens) = (*tokens)->next;
+    return 1;
+}
+
+int add_argv(t_token *argv, t_token **tokens)
+{
+    t_token *arg;
+
+    arg = (t_token *)malloc(sizeof(t_token));
+    if(!arg)
+        return (perror("malloc"), 0);
+    arg->type = (*tokens)->type;
+    arg->value = (*tokens)->value;
+    arg->next = NULL;
+    (*tokens) = (*tokens)->next;
+    append_token(&argv, arg);
     return 1;
 }
 
@@ -162,15 +170,17 @@ t_cmd *parse_cmd(t_token **tokens)
     {
         if((*tokens)->type == TOKEN_WORD)
         {
-            if(!add_argv(&cmd->argv, (*tokens)->value))
+            if(!add_argv(cmd->argv, tokens))
                 return (free_cmd(cmd), NULL);
         }
         else if((*tokens)->type == TOKEN_REDIR_IN || (*tokens)->type == TOKEN_REDIR_OUT ||
                 (*tokens)->type == TOKEN_HEREDOC || (*tokens)->type == TOKEN_APPEND)
-                {
-                    if(!add_fd(cmd, tokens))
-                        return (free_cmd(cmd), NULL);
-                }
+        {
+            if(!add_fd(cmd, tokens))
+                return (free_cmd(cmd), NULL);
+        }
+        else
+            break;
     }
     return cmd;
 }
