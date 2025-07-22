@@ -35,11 +35,7 @@ void free_cmd(t_cmd *cmd)
         free(cmd->argv[i++]);
     if (cmd->argv)
         free(cmd->argv);
-    i = 0;
-    while (cmd->fds && cmd->fds[i])
-        free(cmd->fds[i++]);
-    if (cmd->fds)
-        free(cmd->fds);
+    free_tokens(cmd->fds);
     i = 0;
     while (cmd->heredoc_delimiter && cmd->heredoc_delimiter[i])
         free(cmd->heredoc_delimiter[i++]);
@@ -135,6 +131,26 @@ t_node *parse_pipe(t_token **tokens)
         return(NULL);
 }
 
+int add_fd(t_cmd *cmd, t_token **tokens)
+{
+    t_token *fd;
+
+    fd = (t_token *)malloc(sizeof(t_token));
+    if (!fd)
+        return (perror("malloc"), 0);
+    fd->type = (*tokens)->type;
+    fd->next = NULL;
+    (*tokens) = (*tokens)->next;
+    if (!(*tokens))
+        return (print_synerr(TOKEN_NEWLINE), free_tokens(fd), 0);
+    else if((*tokens)->type != TOKEN_WORD)
+        return (print_synerr((*tokens)->type), free_tokens(fd), 0);
+    fd->value = (*tokens)->value;
+    append_token(&cmd->fds, fd);
+    (*tokens) = (*tokens)->next;
+    return 1;
+}
+
 t_cmd *parse_cmd(t_token **tokens)
 {
     t_cmd *cmd;
@@ -145,18 +161,17 @@ t_cmd *parse_cmd(t_token **tokens)
     while(*tokens && token_cmd(*tokens))
     {
         if((*tokens)->type == TOKEN_WORD)
-            cmd->argv = add_argv(cmd->argv, (*tokens)->value);
+        {
+            if(!add_argv(&cmd->argv, (*tokens)->value))
+                return (free_cmd(cmd), NULL);
+        }
         else if((*tokens)->type == TOKEN_REDIR_IN || (*tokens)->type == TOKEN_REDIR_OUT ||
                 (*tokens)->type == TOKEN_HEREDOC || (*tokens)->type == TOKEN_APPEND)
-            add_input(cmd, tokens); 
-            // print_synerr(TOKEN_NEWLINE); if no redirection given
-            //change the value of append based on the last type of redirection
+                {
+                    if(!add_fd(cmd, tokens))
+                        return (free_cmd(cmd), NULL);
+                }
     }
-    // if (!cmd->argv)
-    // {
-    //     free(cmd);
-    //     return (perror("malloc"), NULL);
-    // }
     return cmd;
 }
 
