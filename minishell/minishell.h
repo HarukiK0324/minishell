@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:23:34 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/22 16:22:27 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/24 12:55:22 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,8 @@ typedef enum
 	NODE_PIPE,
 	NODE_CMD,
 	NODE_AND_IF,
-	NODE_OR_IF
+	NODE_OR_IF,
+	NODE_INIT
 }								NodeType;
 
 typedef struct s_token
