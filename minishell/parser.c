@@ -65,7 +65,7 @@ t_node *init_node(void)
     node = (t_node *)malloc(sizeof(t_node));
     if (!node)
         return (perror("malloc"),NULL);
-    node->type = NULL;
+    node->type = NODE_INIT;
     node->lhs = NULL;
     node->rhs = NULL;
     node->cmd = NULL;
@@ -116,9 +116,9 @@ t_node *parse_pipe(t_token **tokens)
     if(token_cmd(*tokens))
         return(add_cmd(tokens, node));
     else if((*tokens)->type == TOKEN_OPEN_PAREN)
-        return(add_paren(tokens, node));
+        return (add_paren(tokens, node));
     else
-        return(NULL);
+        return (NULL);
 }
 
 int add_fd(t_cmd *cmd, t_token **tokens)
@@ -189,11 +189,11 @@ t_node *add_condition(t_token **tokens, t_node *node)
 {
     t_node *new_root;
 
-    if(!node->type)
+    if(node->type == NODE_INIT)
         return(print_synerr((*tokens)->type), free_node(node),NULL);
     else if(!(*tokens)->next)
         return(print_synerr(TOKEN_END), free_node(node),NULL);
-    else if( !(token_cmd((*tokens)->next) || (*tokens)->next == TOKEN_OPEN_PAREN))
+    else if( !(token_cmd((*tokens)->next) || (*tokens)->next->type == TOKEN_OPEN_PAREN))
         return(print_synerr((*tokens)->next->type), free_node(node),NULL);
     new_root = init_node();
     if(!new_root)
@@ -243,7 +243,7 @@ t_node *add_pipe(t_token **tokens, t_node *node)
 {
     t_node *new_root;
 
-    if(!node->type)
+    if(node->type == NODE_INIT)
         return(print_synerr(TOKEN_PIPE), free_node(node),NULL);
     else if((*tokens)->next == NULL)
         return(print_synerr(TOKEN_END), free_node(node),NULL);
@@ -265,7 +265,7 @@ t_node *add_cmd(t_token **tokens, t_node *node)
 {
     t_node *new_node;
 
-    if(!node->type)
+    if(node->type == NODE_INIT)
         new_node = node;
     else
         new_node = init_node();
@@ -286,8 +286,8 @@ t_node *parse(t_token *tokens)
         return NULL;
     node = init_node();
     if (!node)
-        return (perror("malloc"), NULL);
-    while(tokens)
+        return (perror("malloc"), free_tokens(tokens), NULL);
+    while(node && tokens)
     {
         if(tokens->type == TOKEN_AND_IF || tokens->type == TOKEN_OR_IF)
             node = add_condition(&tokens,node);
