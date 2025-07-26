@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:40:11 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/26 22:41:30 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/26 23:09:06 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,39 +115,6 @@ size_t	ft_strchar(const char *s, char c)
 		i++;
 	}
 	return (i);
-}
-
-void	sort_env_list(t_env **env_list)
-{
-	t_env	*end;
-	int		swapped;
-	t_env	*cur;
-	char	*k;
-
-	k = cur->key, *v;
-	end = NULL;
-	if (!env_list || !*env_list)
-		return ;
-	swapped = 1;
-	while (swapped)
-	{
-		cur = *env_list;
-		swapped = 0;
-		while (cur->next != end)
-		{
-			if (ft_strcmp(cur->key, cur->next->key) > 0)
-			{
-				k = cur->key, v = cur->value;
-				cur->key = cur->next->key;
-				cur->value = cur->next->value;
-				cur->next->key = k;
-				cur->next->value = v;
-				swapped = 1;
-			}
-			cur = cur->next;
-		}
-		end = cur;
-	}
 }
 
 t_env	*init_env(char **environ)

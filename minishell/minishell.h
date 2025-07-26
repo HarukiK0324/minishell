@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:23:34 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/26 22:47:17 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/26 23:09:10 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,6 @@ int								check_quote(char *input);
 char							*append(char *s1, char *s2, char c);
 void							free_list(t_env *env_list);
 size_t							ft_strchar(const char *s, char c);
-void							sort_env_list(t_env **env_list);
 t_env							*init_env(char **environ);
 void							setup_signal_handlers(void);
 void							handle_sigint(int sig);
