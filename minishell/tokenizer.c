@@ -153,6 +153,19 @@ void free_tokens(t_token *head)
     }
 }
 
+void free_fds(t_fd *head)
+{
+    t_fd *tmp;
+    while (head)
+    {
+        tmp = head->next;
+        if(head->value)
+            free(head->value);
+        free(head);
+        head = tmp;
+    }
+}
+
 t_token *tokenize(const char *input)
 {
     t_token *tokens;
