@@ -48,7 +48,7 @@ char *ft_access(char *path, char *cmd)
     int i;
     int j;
 
-    full_path = (char *)malloc(ft_strlen(path) + ft_strelen(cmd) + 2);
+    full_path = (char *)malloc(ft_strlen(path) + ft_strlen(cmd) + 2);
     if (!full_path)
         return (perror("malloc"), NULL);
     i = -1;
@@ -163,7 +163,7 @@ char *ft_env_join(t_env *env_list)
 
     if (!env_list)
         return NULL;
-    env = (char *)malloc(ft_strlen(env_list->key) + ft_strelen(env_list->value) + 2);
+    env = (char *)malloc(ft_strlen(env_list->key) + ft_strlen(env_list->value) + 2);
     if (!env)
         return (perror("malloc"), NULL);
     i = -1;
