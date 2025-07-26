@@ -58,6 +58,22 @@ int token_cmd(t_token *tokens)
     return 0;
 }
 
+void append_fd(t_fd **list, t_fd *new_fd)
+{
+    t_fd *current;
+
+    if (!*list)
+        *list = new_fd;
+    else
+    {
+        current = *list;
+        while (current->next)
+            current = current->next;
+        current->next = new_fd;
+        new_fd->next = NULL;
+    }
+}
+
 t_node *init_node(void)
 {
     t_node *node;
@@ -123,13 +139,14 @@ t_node *parse_pipe(t_token **tokens)
 
 int add_fd(t_cmd *cmd, t_token **tokens)
 {
-    t_token *fd;
+    t_fd *fd;
 
-    fd = (t_token *)malloc(sizeof(t_token));
+    fd = (t_fd *)malloc(sizeof(t_fd));
     if (!fd)
         return (perror("malloc"), 0);
     fd->type = (*tokens)->type;
     fd->next = NULL;
+    fd->fd = -1;
     (*tokens) = (*tokens)->next;
     if (!(*tokens))
         return (print_synerr(TOKEN_NEWLINE), free_tokens(fd), 0);
@@ -137,9 +154,8 @@ int add_fd(t_cmd *cmd, t_token **tokens)
         return (print_synerr((*tokens)->type), free_tokens(fd), 0);
     fd->value = (*tokens)->value;
     if(fd->type == TOKEN_HEREDOC)
-        append_token(&cmd->heredoc_delimiter, fd);
-    else
-        append_token(&cmd->fds, fd);
+        append_fd(&cmd->heredoc_delimiter, fd);
+    append_fd(&cmd->fds, fd);
     (*tokens) = (*tokens)->next;
     return 1;
 }
