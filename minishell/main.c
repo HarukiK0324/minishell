@@ -1,6 +1,18 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/26 22:40:11 by hkasamat          #+#    #+#             */
+/*   Updated: 2025/07/26 22:41:30 by hkasamat         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-extern volatile sig_atomic_t g_status;
+extern volatile sig_atomic_t	g_status;
 
 size_t	ft_strlen(const char *s)
 {
@@ -14,14 +26,14 @@ size_t	ft_strlen(const char *s)
 	return (i);
 }
 
-int ft_strcmp(const char *s1, const char *s2)
+int	ft_strcmp(const char *s1, const char *s2)
 {
-    while (*s1 && *s1 == *s2)
-    {
-        s1++;
-        s2++;
-    }
-    return *(const unsigned char *)s1 - *(const unsigned char *)s2;
+	while (*s1 && *s1 == *s2)
+	{
+		s1++;
+		s2++;
+	}
+	return (*(const unsigned char *)s1 - *(const unsigned char *)s2);
 }
 
 int	check_quote(char *input)
@@ -34,7 +46,7 @@ int	check_quote(char *input)
 			while (*input != '\0' && *input != '\"')
 				input++;
 			if (*input == '\0')
-				return -1;
+				return (-1);
 		}
 		else if (*input == '\'')
 		{
@@ -42,22 +54,22 @@ int	check_quote(char *input)
 			while (*input != '\0' && *input != '\'')
 				input++;
 			if (*input == '\0')
-				return -1;
+				return (-1);
 		}
 		input++;
 	}
 	return (1);
 }
 
-char *append(char *s1, char *s2,char c)
+char	*append(char *s1, char *s2, char c)
 {
-	char *result;
-	size_t len1;
-	size_t len2;
-	int i;
-	int j;
+	char	*result;
+	size_t	len1;
+	size_t	len2;
+	int		i;
+	int		j;
 
-	if(!s1 || !s2)
+	if (!s1 || !s2)
 		return (perror("append failed"), NULL);
 	len1 = ft_strlen(s1);
 	len2 = ft_strlen(s2);
@@ -65,21 +77,21 @@ char *append(char *s1, char *s2,char c)
 	if (!result)
 		return (perror("malloc failed"), NULL);
 	i = -1;
-	while(s1 && s1[++i] != '\0')
+	while (s1 && s1[++i] != '\0')
 		result[i] = s1[i];
 	result[i++] = c;
 	j = -1;
-	while(s2 && s2[++j] != '\0')
+	while (s2 && s2[++j] != '\0')
 		result[i + j] = s2[j];
 	result[i + j] = '\0';
 	free(s1);
 	free(s2);
-	return result;
+	return (result);
 }
 
-void free_env(t_env *env_list)
+void	free_env(t_env *env_list)
 {
-	t_env *temp;
+	t_env	*temp;
 
 	while (env_list)
 	{
@@ -91,9 +103,9 @@ void free_env(t_env *env_list)
 	}
 }
 
-size_t ft_strchar(const char *s, char c)
+size_t	ft_strchar(const char *s, char c)
 {
-	size_t i;
+	size_t	i;
 
 	i = 0;
 	while (s[i] != '\0')
@@ -105,23 +117,27 @@ size_t ft_strchar(const char *s, char c)
 	return (i);
 }
 
-void sort_env_list(t_env **env_list)
+void	sort_env_list(t_env **env_list)
 {
-	t_env *end = NULL;
-	int swapped;
+	t_env	*end;
+	int		swapped;
+	t_env	*cur;
+	char	*k;
 
+	k = cur->key, *v;
+	end = NULL;
 	if (!env_list || !*env_list)
-		return;
+		return ;
 	swapped = 1;
 	while (swapped)
 	{
-		t_env *cur = *env_list;
+		cur = *env_list;
 		swapped = 0;
 		while (cur->next != end)
 		{
 			if (ft_strcmp(cur->key, cur->next->key) > 0)
 			{
-				char *k = cur->key, *v = cur->value;
+				k = cur->key, v = cur->value;
 				cur->key = cur->next->key;
 				cur->value = cur->next->value;
 				cur->next->key = k;
@@ -134,11 +150,11 @@ void sort_env_list(t_env **env_list)
 	}
 }
 
-t_env *init_env(char **environ)
+t_env	*init_env(char **environ)
 {
-	t_env *env_list;
-	t_env *new_node;
-	int i;
+	t_env	*env_list;
+	t_env	*new_node;
+	int		i;
 
 	env_list = NULL;
 	i = 0;
@@ -147,48 +163,49 @@ t_env *init_env(char **environ)
 		new_node = (t_env *)malloc(sizeof(t_env));
 		if (!new_node)
 			return (perror("malloc"), free_env(env_list), NULL);
-		new_node->key = ft_strndup(environ[i],ft_strchar(environ[i], '='));
-		new_node->value = ft_strdup(environ[i] + ft_strchar(environ[i], '=') + 1);
+		new_node->key = ft_strndup(environ[i], ft_strchar(environ[i], '='));
+		new_node->value = ft_strdup(environ[i] + ft_strchar(environ[i], '=')
+				+ 1);
 		new_node->next = env_list;
 		env_list = new_node;
 		i++;
 	}
-	return env_list;
+	return (env_list);
 }
 
-void setup_signal_handlers(void)
+void	setup_signal_handlers(void)
 {
-    struct sigaction sa_int, sa_quit;
-    
-    // Set up SIGINT handler (Ctrl+C)
-    sa_int.sa_handler = handle_sigint;
-    sigemptyset(&sa_int.sa_mask);
-    sa_int.sa_flags = 0;
-    sigaction(SIGINT, &sa_int, NULL);
-    
-    // Ignore SIGQUIT (Ctrl+\)
-    sa_quit.sa_handler = SIG_IGN;
-    sigemptyset(&sa_quit.sa_mask);
-    sa_quit.sa_flags = 0;
-    sigaction(SIGQUIT, &sa_quit, NULL);
+	struct sigaction	sa_int;
+	struct sigaction	sa_quit;
+
+	// Set up SIGINT handler (Ctrl+C)
+	sa_int.sa_handler = handle_sigint;
+	sigemptyset(&sa_int.sa_mask);
+	sa_int.sa_flags = 0;
+	sigaction(SIGINT, &sa_int, NULL);
+	// Ignore SIGQUIT (Ctrl+\)
+	sa_quit.sa_handler = SIG_IGN;
+	sigemptyset(&sa_quit.sa_mask);
+	sa_quit.sa_flags = 0;
+	sigaction(SIGQUIT, &sa_quit, NULL);
 }
 
-void handle_sigint(int sig)
+void	handle_sigint(int sig)
 {
-    (void)sig;
-    write(STDOUT_FILENO, "\n", 1);
-    rl_on_new_line();
-    rl_replace_line("", 0);
-    rl_redisplay();
-    g_status = 130;
+	(void)sig;
+	write(STDOUT_FILENO, "\n", 1);
+	rl_on_new_line();
+	rl_replace_line("", 0);
+	rl_redisplay();
+	g_status = 130;
 	errno = EINTR;
 }
 
-void reset_default_signal(void)
+void	reset_default_signal(void)
 {
-    // Reset to default behavior
-    signal(SIGINT, SIG_DFL);
-    signal(SIGQUIT, SIG_DFL);
+	// Reset to default behavior
+	signal(SIGINT, SIG_DFL);
+	signal(SIGQUIT, SIG_DFL);
 }
 
 int	main(int argc, char **argv, char **environ)
@@ -197,29 +214,30 @@ int	main(int argc, char **argv, char **environ)
 	t_token	*tokens;
 	t_node	*ast;
 	t_env	*env_list;
-	int status;
+	int		status;
 
 	setup_signal_handlers(); // Set up signal handlers for Ctrl+C and Ctrl+'\'
-	(void)argc; // Unused parameter
-	(void)argv; // Unused parameter
+	(void)argc;              // Unused parameter
+	(void)argv;              // Unused parameter
 	env_list = init_env(environ);
-	if(!env_list)
-		return (perror("init_env failed"), 1); // Exit if environment initialization fails
+	if (!env_list)
+		return (perror("init_env failed"), 1);
+	// Exit if environment initialization fails
 	while (1)
 	{
 		input = readline("minishell$ ");
-		if(!input)
-			break; // Exit on EOF (Ctrl+D)
+		if (!input)
+			break ; // Exit on EOF (Ctrl+D)
 		if (input && ft_strlen(input) > 0)
 		{
-			while(check_quote(input) == -1)
-				input = append(input,readline("> "),'\n');
+			while (check_quote(input) == -1)
+				input = append(input, readline("> "), '\n');
 			tokens = tokenize(input);
 			ast = parse(tokens);
-			if(!ast)
+			if (!ast)
 				status = 2;
-			expander(ast,env_list,&status);
-			executor(ast,env_list,&status);
+			expander(ast, env_list, &status);
+			executor(ast, env_list, &status);
 			free_ast(ast);
 			add_history(input);
 			free(input);

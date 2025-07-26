@@ -6,22 +6,22 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:23:34 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/26 22:34:23 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/26 22:41:38 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
+# include <errno.h>
 # include <readline/history.h>
 # include <readline/readline.h>
 # include <signal.h>
-#include <errno.h>
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
 
-extern volatile sig_atomic_t g_status;
+extern volatile sig_atomic_t	g_status;
 
 typedef enum
 {
@@ -59,7 +59,7 @@ typedef struct s_token
 typedef struct s_fd
 {
 	TokenType					type;
-	int 						fd;
+	int							fd;
 	char						*value;
 	struct s_fd					*next;
 }								t_fd;
@@ -69,8 +69,8 @@ typedef struct s_cmd
 	t_token						*argv;
 	t_fd						*fds;
 	t_fd						*heredoc_delimiter;
-	int 						fd_in;
-	int 						fd_out;
+	int							fd_in;
+	int							fd_out;
 }								t_cmd;
 
 typedef struct s_node
@@ -89,76 +89,87 @@ typedef struct s_env
 }								t_env;
 
 /* main.c */
-size_t      ft_strlen(const char *s);
-int         ft_strcmp(const char *s1, const char *s2);
-int         check_quote(char *input);
-char *append(char *s1, char *s2,char c);
-void free_list(t_env *env_list);
-size_t ft_strchar(const char *s, char c);
-void sort_env_list(t_env **env_list);
-t_env      *init_env(char **environ);
-void setup_signal_handlers(void);
-void handle_sigint(int sig);
-void reset_default_signal(void);
+size_t							ft_strlen(const char *s);
+int								ft_strcmp(const char *s1, const char *s2);
+int								check_quote(char *input);
+char							*append(char *s1, char *s2, char c);
+void							free_list(t_env *env_list);
+size_t							ft_strchar(const char *s, char c);
+void							sort_env_list(t_env **env_list);
+t_env							*init_env(char **environ);
+void							setup_signal_handlers(void);
+void							handle_sigint(int sig);
+void							reset_default_signal(void);
 
 /* executor.c */
-int         is_builtin(char *cmd);
-int         exec_builtin(t_env *env_list, t_cmd *cmd);
-void        executor(t_node *ast, t_env *env_list, int *status);
-void        exec_pipe(t_node *ast, t_env *env_list, int *status);
-void        exec_cmd(t_env *env_list, t_cmd *cmd, int *status);
-void        ft_execve(t_env *env_list, t_cmd *cmd, int *status);
+int								is_builtin(char *cmd);
+int								exec_builtin(t_env *env_list, t_cmd *cmd);
+void							executor(t_node *ast, t_env *env_list,
+									int *status);
+void							exec_pipe(t_node *ast, t_env *env_list,
+									int *status);
+void							exec_cmd(t_env *env_list, t_cmd *cmd,
+									int *status);
+void							ft_execve(t_env *env_list, t_cmd *cmd,
+									int *status);
 
 /* expander.c */
-int         is_char(char c);
-int         is_numchar(char c);
-char       *to_str(int n);
-char       *str_trim(char *str, int *j, int i);
-char       *str_insert(char *str, int *j, char *value);
-char       *replace_env_var(char *str, int *j, int i, char *env_var, t_env *env_list);
-char       *replace_status(char *str, int *j, int *status);
-char       *parse_env_var(char *str, int *j, t_env *env_list, int *status);
-char       *trim_quote(char *str, int *j, char c);
-char       *trim_double_quote(char *str, int *j, t_env *env_list, int *status);
-void        expand_cmd(t_cmd *cmd, t_env *env_list, int *status);
-void        expander(t_node *node, t_env *env_list, int *status);
+int								is_char(char c);
+int								is_numchar(char c);
+char							*to_str(int n);
+char							*str_trim(char *str, int *j, int i);
+char							*str_insert(char *str, int *j, char *value);
+char							*replace_env_var(char *str, int *j, int i,
+									char *env_var, t_env *env_list);
+char							*replace_status(char *str, int *j, int *status);
+char							*parse_env_var(char *str, int *j,
+									t_env *env_list, int *status);
+char							*trim_quote(char *str, int *j, char c);
+char							*trim_double_quote(char *str, int *j,
+									t_env *env_list, int *status);
+void							expand_cmd(t_cmd *cmd, t_env *env_list,
+									int *status);
+void							expander(t_node *node, t_env *env_list,
+									int *status);
 
 /* ft_split.c */
-size_t	count_words(const char *s, char c);
-char	*substring(char const *s, size_t index, char c);
-void	free_all(char **arr, size_t i);
-char	**ft_split(char const *s, char c);
+size_t							count_words(const char *s, char c);
+char							*substring(char const *s, size_t index, char c);
+void							free_all(char **arr, size_t i);
+char							**ft_split(char const *s, char c);
 
 /* parser.c */
-void        print_synerr(TokenType expected);
-void        free_cmd(t_cmd *cmd);
-void        free_node(t_node *node);
-int         token_cmd(t_token *tokens);
-t_node     *init_node(void);
-t_cmd      *init_cmd(void);
-t_node     *parse_condition(t_token **tokens);
-t_node     *parse_pipe(t_token **tokens);
-int add_fd(t_cmd *cmd, t_token **tokens);
-int add_argv(t_token *argv, t_token **tokens);
-t_cmd *parse_cmd(t_token **tokens);
-t_node *add_condition(t_token **tokens, t_node *node);
-t_node *add_paren(t_token **tokens, t_node *node);
-t_node *add_pipe(t_token **tokens, t_node *node);
-t_node     *add_cmd(t_token **tokens, t_node *node);
-t_node     *parse(t_token *tokens);
+void							print_synerr(TokenType expected);
+void							free_cmd(t_cmd *cmd);
+void							free_node(t_node *node);
+int								token_cmd(t_token *tokens);
+t_node							*init_node(void);
+t_cmd							*init_cmd(void);
+t_node							*parse_condition(t_token **tokens);
+t_node							*parse_pipe(t_token **tokens);
+int								add_fd(t_cmd *cmd, t_token **tokens);
+int								add_argv(t_token *argv, t_token **tokens);
+t_cmd							*parse_cmd(t_token **tokens);
+t_node							*add_condition(t_token **tokens, t_node *node);
+t_node							*add_paren(t_token **tokens, t_node *node);
+t_node							*add_pipe(t_token **tokens, t_node *node);
+t_node							*add_cmd(t_token **tokens, t_node *node);
+t_node							*parse(t_token *tokens);
 
 /* tokenizer.c */
-int         ft_isblank(char c);
-int         ismetachar(char c);
-int         ft_strncmp(const char *s1, const char *s2, size_t n);
-char       *ft_strdup(const char *s);
-char       *ft_strndup(const char *s, size_t n);
-void        append_token(t_token **list, t_token *new_token);
-TokenType   get_meta_type(const char *s);
-size_t      add_word(const char *input, t_token **list);
-size_t      add_metachar(const char *input, t_token **list);
-void        free_tokens(t_token *head);
-void free_fds(t_fd *head);
-t_token    *tokenize(const char *input);
+int								ft_isblank(char c);
+int								ismetachar(char c);
+int								ft_strncmp(const char *s1, const char *s2,
+									size_t n);
+char							*ft_strdup(const char *s);
+char							*ft_strndup(const char *s, size_t n);
+void							append_token(t_token **list,
+									t_token *new_token);
+TokenType						get_meta_type(const char *s);
+size_t							add_word(const char *input, t_token **list);
+size_t							add_metachar(const char *input, t_token **list);
+void							free_tokens(t_token *head);
+void							free_fds(t_fd *head);
+t_token							*tokenize(const char *input);
 
 #endif

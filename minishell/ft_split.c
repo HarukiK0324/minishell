@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   ft_split.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/07/26 22:41:22 by hkasamat          #+#    #+#             */
+/*   Updated: 2025/07/26 22:41:27 by hkasamat         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 size_t	count_words(const char *s, char c)
@@ -25,7 +37,7 @@ char	*substring(char const *s, size_t index, char c)
 {
 	size_t	len;
 	size_t	i;
-	char		*str;
+	char	*str;
 
 	len = 0;
 	i = 0;
@@ -58,7 +70,7 @@ void	free_all(char **arr, size_t i)
 
 char	**ft_split(char const *s, char c)
 {
-	char			**arr;
+	char	**arr;
 	size_t	i;
 	size_t	index;
 
