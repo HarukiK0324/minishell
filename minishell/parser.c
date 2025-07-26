@@ -29,8 +29,8 @@ void free_cmd(t_cmd *cmd)
     if (!cmd)
         return;
     free_tokens(cmd->argv);
-    free_tokens(cmd->fds);
-    free_tokens(cmd->heredoc_delimiter);
+    free_fds(cmd->fds);
+    free_fds(cmd->heredoc_delimiter);
     free(cmd);
 }
 
@@ -149,9 +149,9 @@ int add_fd(t_cmd *cmd, t_token **tokens)
     fd->fd = -1;
     (*tokens) = (*tokens)->next;
     if (!(*tokens))
-        return (print_synerr(TOKEN_NEWLINE), free_tokens(fd), 0);
+        return (print_synerr(TOKEN_NEWLINE), free_fds(fd), 0);
     else if((*tokens)->type != TOKEN_WORD)
-        return (print_synerr((*tokens)->type), free_tokens(fd), 0);
+        return (print_synerr((*tokens)->type), free_fds(fd), 0);
     fd->value = (*tokens)->value;
     if(fd->type == TOKEN_HEREDOC)
         append_fd(&cmd->heredoc_delimiter, fd);
