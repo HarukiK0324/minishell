@@ -185,9 +185,10 @@ int	main(int argc, char **argv, char **environ)
 			tokens = tokenize(input);
 			ast = parse(tokens);
 			if(!ast)
-			//exit status 2 or ???
+				status = 2;
 			expander(ast,env_list,&status);
 			executor(ast,env_list,&status);
+			free_ast(ast);
 			add_history(input);
 			free(input);
 		}

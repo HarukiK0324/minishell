@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:23:34 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/26 16:42:43 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/26 16:57:42 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,8 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
+
+extern volatile sig_atomic_t g_status;
 
 typedef enum
 {
@@ -67,6 +69,8 @@ typedef struct s_cmd
 	t_token						*argv;
 	t_fd						*fds;
 	t_fd						*heredoc_delimiter;
+	int 						fd_in;
+	int 						fd_out;
 }								t_cmd;
 
 typedef struct s_node
