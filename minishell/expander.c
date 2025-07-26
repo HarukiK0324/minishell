@@ -223,7 +223,7 @@ void expander(t_node *node,t_env *env_list, int *status)
     if(!node)
         return;
     if(node->type == NODE_CMD)
-        expand_cmd(node->cmd,env_list, status);
+        expand_cmd(node->cmd, env_list, status);
     else
     {
         if(node->lhs)
