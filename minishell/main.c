@@ -77,7 +77,7 @@ char *append(char *s1, char *s2,char c)
 	return result;
 }
 
-void free_list(t_env *env_list)
+void free_env(t_env *env_list)
 {
 	t_env *temp;
 
@@ -146,7 +146,7 @@ t_env *init_env(char **environ)
 	{
 		new_node = (t_env *)malloc(sizeof(t_env));
 		if (!new_node)
-			return (perror("malloc failed"), free_list(env_list), NULL);
+			return (perror("malloc"), free_env(env_list), NULL);
 		new_node->key = ft_strndup(environ[i],ft_strchar(environ[i], '='));
 		new_node->value = ft_strdup(environ[i] + ft_strchar(environ[i], '=') + 1);
 		new_node->next = env_list;
