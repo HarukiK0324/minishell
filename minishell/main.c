@@ -156,6 +156,41 @@ t_env *init_env(char **environ)
 	return env_list;
 }
 
+void setup_signal_handlers(void)
+{
+    struct sigaction sa_int, sa_quit;
+    
+    // Set up SIGINT handler (Ctrl+C)
+    sa_int.sa_handler = handle_sigint;
+    sigemptyset(&sa_int.sa_mask);
+    sa_int.sa_flags = 0;
+    sigaction(SIGINT, &sa_int, NULL);
+    
+    // Ignore SIGQUIT (Ctrl+\)
+    sa_quit.sa_handler = SIG_IGN;
+    sigemptyset(&sa_quit.sa_mask);
+    sa_quit.sa_flags = 0;
+    sigaction(SIGQUIT, &sa_quit, NULL);
+}
+
+void handle_sigint(int sig)
+{
+    (void)sig;
+    write(STDOUT_FILENO, "\n", 1);
+    rl_on_new_line();
+    rl_replace_line("", 0);
+    rl_redisplay();
+    g_status = 130;
+	errno = EINTR;
+}
+
+void reset_default_signal(void)
+{
+    // Reset to default behavior
+    signal(SIGINT, SIG_DFL);
+    signal(SIGQUIT, SIG_DFL);
+}
+
 int	main(int argc, char **argv, char **environ)
 {
 	char	*input;
@@ -164,20 +199,17 @@ int	main(int argc, char **argv, char **environ)
 	t_env	*env_list;
 	int status;
 
-	// signal(SIGINT, );
+	setup_signal_handlers(); // Set up signal handlers for Ctrl+C and Ctrl+'\'
 	(void)argc; // Unused parameter
 	(void)argv; // Unused parameter
 	env_list = init_env(environ);
-	while(env_list)
-    {
-        printf("%s=%s\n", env_list->key, env_list->value);
-        env_list = env_list->next;
-    }
 	if(!env_list)
 		return (perror("init_env failed"), 1); // Exit if environment initialization fails
 	while (1)
 	{
 		input = readline("minishell$ ");
+		if(!input)
+			break; // Exit on EOF (Ctrl+D)
 		if (input && ft_strlen(input) > 0)
 		{
 			while(check_quote(input) == -1)
