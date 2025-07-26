@@ -30,6 +30,18 @@ int exec_builtin(t_env *env_list, t_cmd *cmd)
         return exec_env(env_list);
 }
 
+void free_str_list(char **list)
+{
+    size_t i;
+
+    if (!list)
+        return;
+    i = 0;
+    while (list[i])
+        free(list[i++]);
+    free(list);
+}
+
 char *ft_access(char *path, char *cmd)
 {
     char *full_path;
@@ -62,26 +74,16 @@ char	*get_path_from_env(char *argv, t_env *env_list)
 	while (ft_strcmp(env_list->key, "PATH") != 0)
 		env_list = env_list->next;
     if(!env_list)
-    {
-        write(STDERR_FILENO, "minishell: ", 11);
-        write(STDERR_FILENO, argv, ft_strlen(argv));
-        write(STDERR_FILENO, ": No such file or directory\n", 28);
-        return NULL;
-    }
+        return (write(STDERR_FILENO, "minishell: ", 11), write(STDERR_FILENO, argv, ft_strlen(argv)), write(STDERR_FILENO, ": No such file or directory\n", 28), NULL);
     paths = ft_split(env_list->value, ':');
     path = NULL;
     while(paths && paths[i])
         path = ft_access(paths[i++], argv);
     i = 0;
-    while(paths[i])
-        free(paths[i++]);
-    free(paths);
+    free_str_list(paths);
     if (path)
         return path;
-    write(STDERR_FILENO, "minishell: ", 11);
-    write(STDERR_FILENO, argv, ft_strlen(argv));
-    write(STDERR_FILENO, ": command not found\n", 20);
-    return NULL;
+    return (write(STDERR_FILENO, "minishell: ", 11), write(STDERR_FILENO, argv, ft_strlen(argv)), write(STDERR_FILENO, ": command not found\n", 20), NULL);
 }
 
 char *get_path(char *cmd, t_env *env_list)
@@ -89,6 +91,113 @@ char *get_path(char *cmd, t_env *env_list)
     if(ft_strchar(cmd, '/') == ft_strlen(cmd))
         return ft_strdup(cmd);
     return get_path_from_env(cmd, env_list);
+}
+
+size_t ft_token_size(t_token *tokens)
+{
+    size_t size;
+
+    size = 0;
+    while (tokens)
+    {
+        size++;
+        tokens = tokens->next;
+    }
+    return size;
+}
+
+size_t ft_env_size(t_env *env_list)
+{
+    size_t size;
+
+    size = 0;
+    while (env_list)
+    {
+        size++;
+        env_list = env_list->next;
+    }
+    return size;
+}
+
+void free_argv(char **argv, size_t i)
+{
+    size_t index;
+
+    index = 0;
+    while (index < i)
+    {
+        free(argv[index]);
+        index++;
+    }
+    free(argv);
+}
+
+char **to_list(t_token *argv)
+{
+    char **list;
+    size_t i;
+
+    if (!argv)
+        return NULL;
+    list = (char **)malloc(sizeof(char *) * (ft_token_size(argv) + 1));
+    if (!list)
+        return (perror("malloc"), NULL);
+    i = 0;
+    while (argv)
+    {
+        list[i] = ft_strdup(argv->value);
+        if (!list[i])
+            return (perror("strdup"), free_argv(list,i), NULL);
+        argv = argv->next;
+        i++;
+    }
+    list[i] = NULL;
+    return list;
+}
+
+char *ft_env_join(t_env *env_list)
+{
+    char *env;
+    int i;
+    int j;
+
+    if (!env_list)
+        return NULL;
+    env = (char *)malloc(ft_strlen(env_list->key) + ft_strelen(env_list->value) + 2);
+    if (!env)
+        return (perror("malloc"), NULL);
+    i = -1;
+    while(env_list->key[++i] != '\0')
+        env[i] = env_list->key[i];
+    env[i++] = '=';
+    j = 0;
+    while(env_list->value[j] != '\0')
+        env[i++] = env_list->value[j++];
+    env[i] = '\0';
+    return env;
+}
+
+char **env_to_environ(t_env *env_list)
+{
+    char **environ;
+    size_t i;
+
+    if (!env_list)
+        return NULL;
+    environ = (char **)malloc(sizeof(char *) * (ft_env_size(env_list) + 1));
+    if (!environ)
+        return (perror("malloc"), NULL);
+    i = 0;
+    while (env_list)
+    {
+        environ[i] = ft_env_join(env_list);
+        if (!environ[i])
+            return (free_argv(environ, i), NULL);
+        env_list = env_list->next;
+        i++;
+    }
+    environ[i] = NULL;
+    return environ;
 }
 
 int ft_heredoc(t_token *heredoc_delimiter)
@@ -189,6 +298,10 @@ void ft_execve(t_env *env_list, t_cmd *cmd, int *status)
     write(STDERR_FILENO, "minishell: \n", 13);
     write(STDERR_FILENO, cmd->argv->value, ft_strlen(cmd->argv->value));
     perror(": ");
+    free(path);
+    free_str_list(argv);
+    free_str_list(environ);
+    exit(EXIT_FAILURE);
 }
 
 void exec_cmd(t_env *env_list, t_cmd *cmd, int *status)
