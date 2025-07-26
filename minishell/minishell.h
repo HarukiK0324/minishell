@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:23:34 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/26 16:57:42 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/26 22:34:23 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,6 +97,9 @@ void free_list(t_env *env_list);
 size_t ft_strchar(const char *s, char c);
 void sort_env_list(t_env **env_list);
 t_env      *init_env(char **environ);
+void setup_signal_handlers(void);
+void handle_sigint(int sig);
+void reset_default_signal(void);
 
 /* executor.c */
 int         is_builtin(char *cmd);
@@ -119,6 +122,12 @@ char       *trim_quote(char *str, int *j, char c);
 char       *trim_double_quote(char *str, int *j, t_env *env_list, int *status);
 void        expand_cmd(t_cmd *cmd, t_env *env_list, int *status);
 void        expander(t_node *node, t_env *env_list, int *status);
+
+/* ft_split.c */
+size_t	count_words(const char *s, char c);
+char	*substring(char const *s, size_t index, char c);
+void	free_all(char **arr, size_t i);
+char	**ft_split(char const *s, char c);
 
 /* parser.c */
 void        print_synerr(TokenType expected);
@@ -149,6 +158,7 @@ TokenType   get_meta_type(const char *s);
 size_t      add_word(const char *input, t_token **list);
 size_t      add_metachar(const char *input, t_token **list);
 void        free_tokens(t_token *head);
+void free_fds(t_fd *head);
 t_token    *tokenize(const char *input);
 
 #endif
