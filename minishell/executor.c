@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:40:58 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/27 14:43:23 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/27 16:17:05 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -214,7 +214,40 @@ char	**env_to_environ(t_env *env_list)
 	return (environ);
 }
 
-int	ft_heredoc(t_token *heredoc_delimiter)
+void read_heredoc(t_fd *heredoc_delimiter, int fd)
+{
+    char *line;
+
+    while(1)
+    {
+        line = readline("> ");
+        if(!line || ft_strcmp(line, heredoc_delimiter->value) == 0)
+            return (free(line));
+        else if(fd != -1)
+        {
+            write(fd, line, ft_strlen(line));
+            write(fd, "\n", 1);
+        }
+        free(line);
+    }
+}
+
+int parse_heredoc(t_fd *heredoc_delimiter, int fd)
+{
+    char *line;
+
+    if(!heredoc_delimiter)
+        return (0);
+    while(heredoc_delimiter->next)
+    {
+        read_heredoc(heredoc_delimiter, -1);
+        heredoc_delimiter = heredoc_delimiter->next;
+    }
+    read_heredoc(heredoc_delimiter, fd);
+    heredoc_delimiter->fd = fd;
+}
+
+int	ft_heredoc(t_cmd *cmd)
 {
 	int		fd[2];
 	int		wstatus;
@@ -228,7 +261,7 @@ int	ft_heredoc(t_token *heredoc_delimiter)
 	if (pid == 0)
 	{
 		close(fd[0]);
-		if (read_input(heredoc_delimiter, fd[1]) == -1)
+		if (parse_heredoc(cmd->heredoc_delimiter, fd[1]) == -1)
 			exit(EXIT_FAILURE);
 		close(fd[1]);
 		exit(EXIT_SUCCESS);
@@ -236,7 +269,76 @@ int	ft_heredoc(t_token *heredoc_delimiter)
 	close(fd[1]);
 	waitpid(pid, &wstatus, 0);
 	if (WIFSIGNALED(wstatus))
-		return (fd[0]);
+		return (-1);
+    return 0;
+}
+
+void err_msg(char *value, char *msg)
+{
+    write(STDERR_FILENO, "minishell: ", 11);
+    write(STDERR_FILENO, value, ft_strlen(value));
+    write(STDERR_FILENO, msg, ft_strlen(msg));
+}
+
+void ft_open_fd_int(t_cmd *cmd, t_fd *current)
+{
+    if(current->type == TOKEN_REDIR_IN)
+    {
+        current->fd = open(current->value, O_RDONLY);
+        if(errno == ENOENT)
+            err_msg(current->value, ": No such file or directory\n");
+        else if(errno == EACCES)
+            err_msg(current->value, ": Permission denied\n");
+        else if(current->fd < 0)
+            err_msg(current->value, ": Failed to open file\n");
+    }
+    cmd->fd_in = current->fd;
+}
+
+void ft_open_fd_out(t_cmd *cmd, t_fd *current)
+{
+    if(current->type == TOKEN_REDIR_OUT)
+    {
+        current->fd = open(current->value, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        if(errno == ENOENT)
+            err_msg(current->value, ": No such file or directory\n");
+        else if(errno == EACCES)
+            err_msg(current->value, ": Permission denied\n");
+        else if(current->fd < 0)
+            err_msg(current->value, ": Failed to open file\n");
+    }
+    else if(current->type == TOKEN_APPEND)
+    {
+        current->fd = open(current->value, O_WRONLY | O_CREAT | O_APPEND, 0644);
+        if(errno == ENOENT)
+            err_msg(current->value, ": No such file or directory\n");
+        else if(errno == EACCES)
+            err_msg(current->value, ": Permission denied\n");
+        else if(current->fd < 0)
+            err_msg(current->value, ": Failed to open file\n");
+    }
+    cmd->fd_out = current->fd;
+}
+
+
+int ft_file_redirection(t_cmd *cmd)
+{
+    t_fd	*current;
+
+    if (!cmd->fds)
+        return (0);
+    current = cmd->fds;
+    while (current)
+    {
+        if (current->type == TOKEN_REDIR_IN || current->type == TOKEN_HEREDOC)
+            ft_open_fd_in(cmd, current);
+        else if(current->type == TOKEN_REDIR_OUT || current->type == TOKEN_APPEND)
+            ft_open_fd_out(cmd, current);
+        if (cmd->fd_in == -1 || cmd->fd_out == -1)
+            return (-1);
+        current = current->next;
+    }
+    return (0);
 }
 
 void	exec_pipe(t_node *ast, t_env *env_list, int *status)
@@ -273,6 +375,11 @@ void	exec_pipe(t_node *ast, t_env *env_list, int *status)
 			*status = WEXITSTATUS(*status);
 		else if (WIFSIGNALED(*status))
 			*status = 128 + WTERMSIG(*status);
+        executor(ast->rhs, env_list, status);
+        if (WIFEXITED(*status))
+            *status = WEXITSTATUS(*status);
+        else if (WIFSIGNALED(*status))
+            *status = 128 + WTERMSIG(*status);
 	}
 }
 
@@ -282,36 +389,31 @@ void	ft_execve(t_env *env_list, t_cmd *cmd, int *status)
 	char	**environ;
 	char	**argv;
 
-	if (ft_heredoc(cmd->heredoc_delimiter) == -1)
+    reset_default_signal();
+	if (ft_heredoc(cmd) == -1)
 		exit(EXIT_FAILURE);
-	if (ft_file_redirection(cmd->fds) == -1)
+	if (ft_file_redirection(cmd) == -1)
 		exit(EXIT_FAILURE);
 	if (!cmd->argv || !cmd->argv->value)
 		exit(0);
 	path = get_path(cmd->argv->value, env_list);
 	argv = to_list(cmd->argv);
 	environ = env_to_environ(env_list);
+    if(g_status != 0)
+        return (free(path), free_str_list(argv), free_str_list(environ), exit(128 + g_status));
 	if (!path || !argv || !environ)
 		execve(path, argv, environ);
 	if (errno == ENOENT)
 	{
-		write(STDERR_FILENO, "minishell: ", 11);
-		write(STDERR_FILENO, cmd->argv->value, ft_strlen(cmd->argv->value));
-		write(STDERR_FILENO, ": command not found\n", 20);
 		*status = 127;
-		return ;
+		return err_msg(cmd->argv->value, ": command not found\n");
 	}
 	else if (errno == EACCES)
 	{
-		write(STDERR_FILENO, "minishell: ", 11);
-		write(STDERR_FILENO, cmd->argv->value, ft_strlen(cmd->argv->value));
-		write(STDERR_FILENO, ": permission denied\n", 20);
 		*status = 126;
-		return ;
+		return err_msg(cmd->argv->value, ": permission denied\n");
 	}
-	write(STDERR_FILENO, "minishell: \n", 13);
-	write(STDERR_FILENO, cmd->argv->value, ft_strlen(cmd->argv->value));
-	perror(": ");
+	return err_msg(cmd->argv->value, ": execve failed\n");
 	free(path);
 	free_str_list(argv);
 	free_str_list(environ);
@@ -341,15 +443,13 @@ void	exec_cmd(t_env *env_list, t_cmd *cmd, int *status)
 		free_cmd(cmd);
 		if (waitpid(pid, &wstatus, 0) == -1)
 		{
-			*status = -1;
+			*status = 1;
 			return (perror("waitpid"));
 		}
 		if (WIFEXITED(wstatus))
 			*status = WEXITSTATUS(wstatus);
 		else if (WIFSIGNALED(wstatus))
 			*status = 128 + WTERMSIG(wstatus);
-		else
-			*status = 0;
 	}
 }
 
