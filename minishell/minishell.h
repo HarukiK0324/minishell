@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:23:34 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/27 18:02:48 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/27 20:49:02 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,6 +103,16 @@ t_env							*init_env(char **environ);
 void							setup_signal_handlers(void);
 void							handle_sigint(int sig);
 void							reset_default_signal(void);
+
+/* builtin.c */
+int	only_contains(char *str, char *chars);
+int	exec_echo(t_token *argv);
+int exec_cd(t_token *argv, t_env *env_list);
+int exec_pwd(void);
+int exec_export(t_token *argv, t_env *env_list);
+int exec_unset(t_token *argv, t_env *env_list);
+int exec_env(t_env *env_list);
+int exec_exit(t_token *argv);
 
 /* executor.c */
 int								is_builtin(char *cmd);
