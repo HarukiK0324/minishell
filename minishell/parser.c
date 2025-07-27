@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:41:43 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/27 14:40:41 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/27 17:50:00 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,8 +109,8 @@ t_cmd	*init_cmd(void)
 		return (perror("malloc"), NULL);
 	cmd->argv = NULL;
 	cmd->fds = NULL;
-    cmd->fd_in = 0;
-    cmd->fd_out = 1;
+	cmd->fd_in = 0;
+	cmd->fd_out = 1;
 	cmd->heredoc_delimiter = NULL;
 	return (cmd);
 }

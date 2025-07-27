@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:23:34 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/27 17:49:09 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/27 17:53:57 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <sys/types.h>
+# include <sys/wait.h>
 # include <unistd.h>
 
 extern volatile sig_atomic_t	g_status;
@@ -105,7 +106,8 @@ void							reset_default_signal(void);
 
 /* executor.c */
 int								is_builtin(char *cmd);
-void							exec_builtin(t_env *env_list, t_cmd *cmd, int *status);
+void							exec_builtin(t_env *env_list, t_cmd *cmd,
+									int *status);
 void							executor(t_node *ast, t_env *env_list,
 									int *status);
 void							exec_pipe(t_node *ast, t_env *env_list,

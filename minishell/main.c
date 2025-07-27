@@ -6,13 +6,13 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:40:11 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/27 17:45:39 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/27 17:57:09 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-extern volatile sig_atomic_t	g_status;
+volatile sig_atomic_t	g_status = 0;
 
 size_t	ft_strlen(const char *s)
 {
@@ -175,7 +175,7 @@ void	reset_default_signal(void)
 	signal(SIGQUIT, SIG_DFL);
 }
 
-void free_ast(t_node *ast)
+void	free_ast(t_node *ast)
 {
 	if (!ast)
 		return ;
