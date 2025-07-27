@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:40:58 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/26 22:40:59 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/27 14:43:23 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -228,7 +228,7 @@ int	ft_heredoc(t_token *heredoc_delimiter)
 	if (pid == 0)
 	{
 		close(fd[0]);
-		if (heredoc(heredoc_delimiter, fd[1]) == -1)
+		if (read_input(heredoc_delimiter, fd[1]) == -1)
 			exit(EXIT_FAILURE);
 		close(fd[1]);
 		exit(EXIT_SUCCESS);

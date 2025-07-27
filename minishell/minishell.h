@@ -6,21 +6,21 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:23:34 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/26 23:09:10 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/26 23:17:07 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
-#define _XOPEN_SOURCE 700
+# define _XOPEN_SOURCE 700
 # include <errno.h>
 # include <readline/history.h>
 # include <readline/readline.h>
 # include <signal.h>
 # include <stdio.h>
 # include <stdlib.h>
-#include <sys/types.h>
+# include <sys/types.h>
 # include <unistd.h>
 
 extern volatile sig_atomic_t	g_status;
