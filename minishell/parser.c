@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:41:43 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/27 22:51:27 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/27 23:10:04 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,7 +135,7 @@ t_node	*parse_condition(t_token **tokens)
 {
 	t_node	*node;
 
-	if ((*tokens)->type != TOKEN_OPEN_PAREN || !token_cmd(*tokens))
+	if (!((*tokens)->type == TOKEN_OPEN_PAREN || token_cmd(*tokens)))
 		return (NULL);
 	node = init_node();
 	if (!node)
@@ -162,7 +162,7 @@ t_node	*parse_pipe(t_token **tokens)
 		return (perror("malloc"), NULL);
 	if (token_cmd(*tokens))
 		return (add_cmd(tokens, node));
-	else if ((*tokens)->type == TOKEN_OPEN_PAREN)
+	else if (*tokens && (*tokens)->type == TOKEN_OPEN_PAREN)
 		return (add_paren(tokens, node));
 	else
 		return (NULL);
@@ -273,7 +273,7 @@ t_node	*add_paren(t_token **tokens, t_node *node)
 	if (!new_root)
 		return (perror("malloc"), NULL);
 	*tokens = (*tokens)->next;
-	while (*tokens && (*tokens)->type != TOKEN_CLOSE_PAREN)
+	while (*tokens && new_root && (*tokens)->type != TOKEN_CLOSE_PAREN)
 	{
 		if ((*tokens)->type == TOKEN_AND_IF || (*tokens)->type == TOKEN_OR_IF)
 			new_root = add_condition(tokens, new_root);
@@ -284,8 +284,8 @@ t_node	*add_paren(t_token **tokens, t_node *node)
 		else if (token_cmd(*tokens))
 			new_root = add_cmd(tokens, new_root);
 	}
-	if (!(*tokens))
-		return (free_node(new_root), print_synerr(TOKEN_END), NULL);
+	if (!(*tokens) || !new_root)
+		return (free_node(new_root), free_node(node), print_synerr(TOKEN_END), NULL);
 	*tokens = (*tokens)->next;
 	return (new_root);
 }

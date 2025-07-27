@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:41:53 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/27 20:49:59 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/27 22:59:35 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,8 @@ char	*ft_strdup(const char *s)
 	char	*str;
 	ssize_t	i;
 
+    if(!s)
+        return (NULL);
 	i = 0;
 	str = (char *)malloc(ft_strlen(s) + 1);
 	if (!str)
