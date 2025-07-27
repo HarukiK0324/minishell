@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:41:53 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/27 17:57:11 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/27 18:03:04 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ void	append_token(t_token **list, t_token *new_token)
 	}
 }
 
-TokenType	get_meta_type(const char *s)
+t_TokenType	get_meta_type(const char *s)
 {
 	if (ft_strncmp(s, "<<", 2) == 0)
 		return (TOKEN_HEREDOC);
@@ -142,7 +142,7 @@ size_t	add_word(const char *input, t_token **list)
 
 size_t	add_metachar(const char *input, t_token **list)
 {
-	TokenType	type;
+	t_TokenType	type;
 	t_token		*token;
 	size_t		len;
 

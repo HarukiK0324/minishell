@@ -6,13 +6,13 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:41:43 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/27 17:50:00 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/27 18:03:10 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	print_synerr(TokenType expected)
+void	print_synerr(t_TokenType expected)
 {
 	char	*token;
 

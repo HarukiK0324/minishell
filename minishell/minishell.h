@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:23:34 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/27 17:53:57 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/27 18:02:48 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@
 
 extern volatile sig_atomic_t	g_status;
 
-typedef enum
+typedef enum t_TokenType
 {
 	TOKEN_PIPE,
 	TOKEN_REDIR_IN,
@@ -42,27 +42,27 @@ typedef enum
 	TOKEN_END,
 	TOKEN_NEWLINE,
 	TOKEN_ERROR
-}								TokenType;
+}								t_TokenType;
 
-typedef enum
+typedef enum t_NodeType
 {
 	NODE_PIPE,
 	NODE_CMD,
 	NODE_AND_IF,
 	NODE_OR_IF,
 	NODE_INIT
-}								NodeType;
+}								t_NodeType;
 
 typedef struct s_token
 {
-	TokenType					type;
+	t_TokenType					type;
 	char						*value;
 	struct s_token				*next;
 }								t_token;
 
 typedef struct s_fd
 {
-	TokenType					type;
+	t_TokenType					type;
 	int							fd;
 	char						*value;
 	struct s_fd					*next;
@@ -79,7 +79,7 @@ typedef struct s_cmd
 
 typedef struct s_node
 {
-	NodeType					type;
+	t_NodeType					type;
 	t_cmd						*cmd;
 	struct s_node				*lhs;
 	struct s_node				*rhs;
@@ -143,7 +143,7 @@ void							free_all(char **arr, size_t i);
 char							**ft_split(char const *s, char c);
 
 /* parser.c */
-void							print_synerr(TokenType expected);
+void							print_synerr(t_TokenType expected);
 void							free_cmd(t_cmd *cmd);
 void							free_node(t_node *node);
 int								token_cmd(t_token *tokens);
@@ -169,7 +169,7 @@ char							*ft_strdup(const char *s);
 char							*ft_strndup(const char *s, size_t n);
 void							append_token(t_token **list,
 									t_token *new_token);
-TokenType						get_meta_type(const char *s);
+t_TokenType						get_meta_type(const char *s);
 size_t							add_word(const char *input, t_token **list);
 size_t							add_metachar(const char *input, t_token **list);
 void							free_tokens(t_token *head);

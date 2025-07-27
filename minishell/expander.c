@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:41:10 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/27 17:49:55 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/27 17:59:36 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,7 @@ int	is_char(char c)
 {
 	return ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_');
 }
+
 int	is_numchar(char c)
 {
 	return (c >= '0' && c <= '9') || is_char(c);
