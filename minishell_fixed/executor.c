@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:40:58 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/28 03:49:44 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/28 03:59:46 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ char	*get_path_from_env(char *argv, t_env *env_list)
 	char	*path;
 
 	i = 0;
-	while (ft_strcmp(env_list->key, "PATH") != 0)
+	while (env_list && ft_strcmp(env_list->key, "PATH") != 0)
 		env_list = env_list->next;
 	if (!env_list)
 		return (write(STDERR_FILENO, "minishell: ", 11), write(STDERR_FILENO,
@@ -90,8 +90,11 @@ char	*get_path_from_env(char *argv, t_env *env_list)
 	paths = ft_split(env_list->value, ':');
 	path = NULL;
 	while (paths && paths[i])
+	{
 		path = ft_access(paths[i++], argv);
-	i = 0;
+		if(path)
+			break;
+	}
 	free_str_list(paths);
 	if (path)
 		return (path);
@@ -402,7 +405,7 @@ void	ft_execve(t_env *env_list, t_cmd *cmd, int *status)
 	if (g_status != 0)
 		return (free(path), free_str_list(argv), free_str_list(environ),
 			exit(128 + g_status));
-	if (!path || !argv || !environ)
+	if (path && argv && environ)
 		execve(path, argv, environ);
 	if (errno == ENOENT)
 	{
