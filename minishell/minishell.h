@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:23:34 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/27 20:50:02 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/27 21:25:29 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,7 +162,7 @@ t_cmd							*init_cmd(void);
 t_node							*parse_condition(t_token **tokens);
 t_node							*parse_pipe(t_token **tokens);
 int								add_fd(t_cmd *cmd, t_token **tokens);
-int								add_argv(t_token *argv, t_token **tokens);
+int								add_argv(t_token **argv, t_token **tokens);
 t_cmd							*parse_cmd(t_token **tokens);
 t_node							*add_condition(t_token **tokens, t_node *node);
 t_node							*add_paren(t_token **tokens, t_node *node);

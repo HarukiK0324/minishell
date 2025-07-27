@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:41:43 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/27 20:50:01 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/27 22:51:27 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,6 +115,22 @@ t_cmd	*init_cmd(void)
 	return (cmd);
 }
 
+t_fd *dup_fd(t_fd *fd)
+{
+    t_fd	*new_fd;
+
+    new_fd = (t_fd *)malloc(sizeof(t_fd));
+    if (!new_fd)
+        return (perror("malloc"), NULL);
+    new_fd->type = fd->type;
+    new_fd->value = ft_strdup(fd->value);
+    if (!new_fd->value)
+        return (free(new_fd), NULL);
+    new_fd->fd = fd->fd;
+    new_fd->next = NULL;
+    return (new_fd);
+}
+
 t_node	*parse_condition(t_token **tokens)
 {
 	t_node	*node;
@@ -167,15 +183,15 @@ int	add_fd(t_cmd *cmd, t_token **tokens)
 		return (print_synerr(TOKEN_NEWLINE), free_fds(fd), 0);
 	else if ((*tokens)->type != TOKEN_WORD)
 		return (print_synerr((*tokens)->type), free_fds(fd), 0);
-	fd->value = (*tokens)->value;
+	fd->value = ft_strdup((*tokens)->value);
 	if (fd->type == TOKEN_HEREDOC)
-		append_fd(&cmd->heredoc_delimiter, fd);
+		append_fd(&cmd->heredoc_delimiter, dup_fd(fd));
 	append_fd(&cmd->fds, fd);
 	(*tokens) = (*tokens)->next;
 	return (1);
 }
 
-int	add_argv(t_token *argv, t_token **tokens)
+int	add_argv(t_token **argv, t_token **tokens)
 {
 	t_token	*arg;
 
@@ -183,10 +199,10 @@ int	add_argv(t_token *argv, t_token **tokens)
 	if (!arg)
 		return (perror("malloc"), 0);
 	arg->type = (*tokens)->type;
-	arg->value = (*tokens)->value;
+	arg->value = ft_strdup((*tokens)->value);
 	arg->next = NULL;
 	(*tokens) = (*tokens)->next;
-	append_token(&argv, arg);
+	append_token(argv, arg);
 	return (1);
 }
 
@@ -201,7 +217,7 @@ t_cmd	*parse_cmd(t_token **tokens)
 	{
 		if ((*tokens)->type == TOKEN_WORD)
 		{
-			if (!add_argv(cmd->argv, tokens))
+			if (!add_argv(&cmd->argv, tokens))
 				return (free_cmd(cmd), NULL);
 		}
 		else if ((*tokens)->type == TOKEN_REDIR_IN
@@ -231,7 +247,7 @@ t_node	*add_condition(t_token **tokens, t_node *node)
 		return (print_synerr((*tokens)->next->type), free_node(node), NULL);
 	new_root = init_node();
 	if (!new_root)
-		return (perror("malloc"), NULL);
+		return (perror("malloc"), free_node(node), NULL);
 	new_root->lhs = node;
 	if ((*tokens)->type == TOKEN_AND_IF)
 		new_root->type = NODE_AND_IF;
@@ -240,7 +256,7 @@ t_node	*add_condition(t_token **tokens, t_node *node)
 	*tokens = (*tokens)->next;
 	new_root->rhs = parse_condition(tokens);
 	if (!new_root->rhs)
-		return (free_node(new_root), NULL);
+		return (free_node(new_root), free_node(node), NULL);
 	return (new_root);
 }
 
