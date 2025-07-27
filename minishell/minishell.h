@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:23:34 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/27 15:48:30 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/27 17:49:09 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,7 @@ void							reset_default_signal(void);
 
 /* executor.c */
 int								is_builtin(char *cmd);
-int								exec_builtin(t_env *env_list, t_cmd *cmd);
+void							exec_builtin(t_env *env_list, t_cmd *cmd, int *status);
 void							executor(t_node *ast, t_env *env_list,
 									int *status);
 void							exec_pipe(t_node *ast, t_env *env_list,

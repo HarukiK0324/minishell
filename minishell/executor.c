@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:40:58 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/27 17:46:06 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/27 17:49:02 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,22 +22,22 @@ int	is_builtin(char *cmd)
     return (0);
 }
 
-int	exec_builtin(t_env *env_list, t_cmd *cmd)
+void	exec_builtin(t_env *env_list, t_cmd *cmd, int *status)
 {
 	if (ft_strcmp(cmd->argv->value, "cd") == 0)
-		return (exec_cd(cmd->argv, env_list));
+		*status = exec_cd(cmd->argv, env_list);
 	else if (ft_strcmp(cmd->argv->value, "echo") == 0)
-		return (exec_echo(cmd->argv));
+		*status = exec_echo(cmd->argv);
 	else if (ft_strcmp(cmd->argv->value, "exit") == 0)
-		return (exec_exit(cmd->argv));
+		*status = exec_exit(cmd->argv);
 	else if (ft_strcmp(cmd->argv->value, "export") == 0)
-		return (exec_export(cmd->argv, env_list));
+		*status = exec_export(cmd->argv, env_list);
 	else if (ft_strcmp(cmd->argv->value, "pwd") == 0)
-		return (exec_pwd());
+		*status = exec_pwd();
 	else if (ft_strcmp(cmd->argv->value, "unset") == 0)
-		return (exec_unset(cmd->argv, env_list));
+		*status = exec_unset(cmd->argv, env_list);
 	else if (ft_strcmp(cmd->argv->value, "env") == 0)
-		return (exec_env(env_list));
+		*status = exec_env(env_list);
 }
 
 void	free_str_list(char **list)
@@ -427,10 +427,7 @@ void	exec_cmd(t_env *env_list, t_cmd *cmd, int *status)
 	int		wstatus;
 
 	if (is_builtin(cmd->argv->value))
-	{
-		*status = exec_builtin(env_list, cmd);
-		return ;
-	}
+		return (exec_builtin(env_list, cmd, status));
 	pid = fork();
 	if (pid < 0)
 	{
