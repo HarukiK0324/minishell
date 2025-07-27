@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:40:11 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/27 15:13:03 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/27 17:45:39 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,6 +173,19 @@ void	reset_default_signal(void)
 	// Reset to default behavior
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
+}
+
+void free_ast(t_node *ast)
+{
+	if (!ast)
+		return ;
+	if (ast->cmd)
+		free_cmd(ast->cmd);
+	if (ast->lhs)
+		free_ast(ast->lhs);
+	if (ast->rhs)
+		free_ast(ast->rhs);
+	free(ast);
 }
 
 int	main(int argc, char **argv, char **environ)

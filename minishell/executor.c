@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:40:58 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/27 16:17:05 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/27 17:46:06 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ int	is_builtin(char *cmd)
 		|| ft_strcmp(cmd, "pwd") == 0 || ft_strcmp(cmd, "unset") == 0
 		|| ft_strcmp(cmd, "env") == 0)
 		return (1);
+    return (0);
 }
 
 int	exec_builtin(t_env *env_list, t_cmd *cmd)
@@ -280,7 +281,7 @@ void err_msg(char *value, char *msg)
     write(STDERR_FILENO, msg, ft_strlen(msg));
 }
 
-void ft_open_fd_int(t_cmd *cmd, t_fd *current)
+void ft_open_fd_in(t_cmd *cmd, t_fd *current)
 {
     if(current->type == TOKEN_REDIR_IN)
     {
