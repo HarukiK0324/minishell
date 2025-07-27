@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:40:58 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/28 03:59:46 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/28 04:02:06 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,7 @@ char	*get_path_from_env(char *argv, t_env *env_list)
 
 char	*get_path(char *cmd, t_env *env_list)
 {
-	if (ft_strchar(cmd, '/') == ft_strlen(cmd))
+	if (ft_strchar(cmd, '/') != ft_strlen(cmd))
 		return (ft_strdup(cmd));
 	return (get_path_from_env(cmd, env_list));
 }
