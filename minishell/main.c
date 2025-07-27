@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:40:11 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/27 14:38:28 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/27 15:13:03 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -211,4 +211,5 @@ int	main(int argc, char **argv, char **environ)
 		}
 	}
 	printf("exit\n");
+	exit(status);
 }
