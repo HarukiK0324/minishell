@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:40:58 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/28 11:38:21 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/28 12:10:51 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,9 +84,7 @@ char	*get_path_from_env(char *argv, t_env *env_list)
 	while (env_list && ft_strcmp(env_list->key, "PATH") != 0)
 		env_list = env_list->next;
 	if (!env_list)
-		return (write(STDERR_FILENO, "minishell: ", 11), write(STDERR_FILENO,
-				argv, ft_strlen(argv)), write(STDERR_FILENO,
-				": No such file or directory\n", 28), NULL);
+		return (NULL);
 	paths = ft_split(env_list->value, ':');
 	path = NULL;
 	while (paths && paths[i])
@@ -98,9 +96,7 @@ char	*get_path_from_env(char *argv, t_env *env_list)
 	free_str_list(paths);
 	if (path)
 		return (path);
-	return (write(STDERR_FILENO, "minishell: ", 11), write(STDERR_FILENO, argv,
-			ft_strlen(argv)), write(STDERR_FILENO, ": command not found\n", 20),
-		NULL);
+	return (NULL);
 }
 
 char	*get_path(char *cmd, t_env *env_list)
@@ -414,7 +410,8 @@ void	ft_execve(t_env *env_list, t_cmd *cmd, int *status)
 			exit(128 + g_status));
 	if (path && argv && environ)
 		execve(path, argv, environ);
-	free(path);
+	if (path)
+		free(path);
 	free_str_list(argv);
 	free_str_list(environ);
 	if (errno == ENOENT)
@@ -429,7 +426,7 @@ void	ft_execve(t_env *env_list, t_cmd *cmd, int *status)
 		err_msg(cmd->argv->value, ": permission denied\n");
 		exit(*status);
 	}
-	err_msg(cmd->argv->value, ": execve failed\n");
+	err_msg(cmd->argv->value, ": command not founds\n");
 	exit(EXIT_FAILURE);
 }
 
