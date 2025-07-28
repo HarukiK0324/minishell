@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:40:11 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/28 03:51:12 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/28 11:35:43 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,7 +146,7 @@ void	setup_signal_handlers(void)
 	struct sigaction	sa_quit;
 
 	// Set up SIGINT handler (Ctrl+C)
-	sa_int.sa_handler = handle_sigint;
+	sa_int.sa_handler = handle_interactive_sigint;
 	sigemptyset(&sa_int.sa_mask);
 	sa_int.sa_flags = 0;
 	sigaction(SIGINT, &sa_int, NULL);
@@ -157,6 +157,16 @@ void	setup_signal_handlers(void)
 	sigaction(SIGQUIT, &sa_quit, NULL);
 }
 
+void	handle_interactive_sigint(int sig)
+{
+	(void)sig;
+	write(STDOUT_FILENO, "\n", 1);
+	rl_on_new_line();
+	// rl_replace_line("", 0);
+	rl_redisplay();
+	errno = EINTR;
+}
+
 void	handle_sigint(int sig)
 {
 	(void)sig;
@@ -164,14 +174,20 @@ void	handle_sigint(int sig)
 	rl_on_new_line();
 	// rl_replace_line("", 0);
 	rl_redisplay();
-	g_status = 130;
+	g_status = 2;
 	errno = EINTR;
 }
 
 void	reset_default_signal(void)
 {
 	// Reset to default behavior
-	signal(SIGINT, SIG_DFL);
+	struct sigaction	sa_int;
+
+	// Set up SIGINT handler (Ctrl+C)
+	sa_int.sa_handler = handle_sigint;
+	sigemptyset(&sa_int.sa_mask);
+	sa_int.sa_flags = 0;
+	sigaction(SIGINT, &sa_int, NULL);
 	signal(SIGQUIT, SIG_DFL);
 }
 
@@ -265,7 +281,6 @@ int	main(int argc, char **argv, char **environ)
 	t_env	*env_list;
 	int		status;
 
-	setup_signal_handlers(); // Set up signal handlers for Ctrl+C and Ctrl+'\'
 	(void)argc;              // Unused parameter
 	(void)argv;              // Unused parameter
 	env_list = init_env(environ);
@@ -274,6 +289,7 @@ int	main(int argc, char **argv, char **environ)
 	// Exit if environment initialization fails
 	while (1)
 	{
+		setup_signal_handlers(); // Set up signal handlers for Ctrl+C and Ctrl+'\'
 		input = readline("minishell$ ");
 		if (!input)
 			break ; // Exit on EOF (Ctrl+D)

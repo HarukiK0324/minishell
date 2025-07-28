@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:40:58 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/28 04:02:06 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/28 11:38:21 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -238,8 +238,6 @@ void	read_heredoc(t_fd *heredoc_delimiter, int fd)
 
 void	parse_heredoc(t_fd *heredoc_delimiter, int fd)
 {
-	char	*line;
-
 	if (!heredoc_delimiter)
 		return ;
 	while (heredoc_delimiter->next)
@@ -344,46 +342,55 @@ int	ft_file_redirection(t_cmd *cmd)
 	return (0);
 }
 
-void	exec_pipe(t_node *ast, t_env *env_list, int *status)
+void exec_pipe(t_node *ast, t_env *env_list, int *status)
 {
-	int		fd[2];
-	pid_t	pid;
+    int fd[2];
+    pid_t pid1;
+	pid_t pid2;
+    int status1;
+	int status2;
 
-	if (pipe(fd) == -1)
-	{
-		*status = -1;
-		return (perror("pipe"));
-	}
-	pid = fork();
-	if (pid < 0)
-	{
-		*status = -1;
-		return (perror("fork"));
-	}
-	if (pid == 0)
-	{
-		dup2(fd[1], STDOUT_FILENO);
-		close(fd[0]);
-		close(fd[1]);
-		executor(ast->lhs, env_list, status);
-		exit(*status);
-	}
-	else
-	{
-		dup2(fd[0], STDIN_FILENO);
-		close(fd[0]);
-		close(fd[1]);
-		waitpid(pid, status, 0);
-		if (WIFEXITED(*status))
-			*status = WEXITSTATUS(*status);
-		else if (WIFSIGNALED(*status))
-			*status = 128 + WTERMSIG(*status);
-		executor(ast->rhs, env_list, status);
-		if (WIFEXITED(*status))
-			*status = WEXITSTATUS(*status);
-		else if (WIFSIGNALED(*status))
-			*status = 128 + WTERMSIG(*status);
-	}
+    if (pipe(fd) == -1)
+    {
+        *status = -1;
+        return (perror("pipe"));
+    }
+    pid1 = fork();
+    if (pid1 < 0)
+    {
+        *status = -1;
+        return (perror("fork"));
+    }
+    if (pid1 == 0)
+    {
+        dup2(fd[1], STDOUT_FILENO);
+        close(fd[0]);
+        close(fd[1]);
+        executor(ast->lhs, env_list, status);
+        exit(*status);
+    }
+    pid2 = fork();
+    if (pid2 < 0)
+    {
+        *status = -1;
+        return (perror("fork"));
+    }
+    if (pid2 == 0)
+    {
+        dup2(fd[0], STDIN_FILENO);
+        close(fd[0]);
+        close(fd[1]);
+        executor(ast->rhs, env_list, status);
+        exit(*status);
+    }
+    close(fd[0]);
+    close(fd[1]);
+    waitpid(pid1, &status1, 0);
+    waitpid(pid2, &status2, 0);
+    if (WIFEXITED(status2))
+        *status = WEXITSTATUS(status2);
+    else if (WIFSIGNALED(status2))
+        *status = 128 + WTERMSIG(status2);
 }
 
 void	ft_execve(t_env *env_list, t_cmd *cmd, int *status)
@@ -407,19 +414,21 @@ void	ft_execve(t_env *env_list, t_cmd *cmd, int *status)
 			exit(128 + g_status));
 	if (path && argv && environ)
 		execve(path, argv, environ);
+	free(path);
+	free_str_list(argv);
+	free_str_list(environ);
 	if (errno == ENOENT)
 	{
 		*status = 127;
-		return (err_msg(cmd->argv->value, ": command not found\n"));
+		err_msg(cmd->argv->value, ": command not found\n");
+		exit(*status);
 	}
 	else if (errno == EACCES)
 	{
 		*status = 126;
-		return (err_msg(cmd->argv->value, ": permission denied\n"));
+		err_msg(cmd->argv->value, ": permission denied\n");
+		exit(*status);
 	}
-	free(path);
-	free_str_list(argv);
-	free_str_list(environ);
 	err_msg(cmd->argv->value, ": execve failed\n");
 	exit(EXIT_FAILURE);
 }
@@ -441,8 +450,7 @@ void	exec_cmd(t_env *env_list, t_cmd *cmd, int *status)
 		ft_execve(env_list, cmd, status);
 	else
 	{
-		free_cmd(cmd);
-		if (waitpid(pid, &wstatus, 0) == -1)
+		if (waitpid(pid, &wstatus, 0) == -1 && g_status == 0)
 		{
 			*status = 1;
 			return (perror("waitpid"));

@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:41:53 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/28 03:46:28 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/28 11:21:22 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 char	*ft_strdup(const char *s)
 {
 	char	*str;
-	ssize_t	i;
+	size_t	i;
 
 	if(!s)
 		return (NULL);
@@ -58,7 +58,7 @@ char	*ft_strdup(const char *s)
 char	*ft_strndup(const char *s, size_t n)
 {
 	char	*str;
-	ssize_t	i;
+	size_t	i;
 
 	i = 0;
 	str = (char *)malloc(n + 1);
@@ -196,7 +196,7 @@ void	free_fds(t_fd *head)
 t_token	*tokenize(const char *input)
 {
 	t_token	*tokens;
-	ssize_t	len;
+	size_t	len;
 
 	tokens = NULL;
 	while (*input)

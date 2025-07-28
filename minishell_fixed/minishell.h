@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:23:34 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/28 03:27:10 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/28 11:35:34 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,6 +102,7 @@ size_t							ft_strchar(const char *s, char c);
 t_env							*init_env(char **environ);
 void							setup_signal_handlers(void);
 void							handle_sigint(int sig);
+void							handle_interactive_sigint(int sig);
 void							reset_default_signal(void);
 
 /* builtin.c */
@@ -130,16 +131,16 @@ void							ft_execve(t_env *env_list, t_cmd *cmd,
 /* expander.c */
 int								is_char(char c);
 int								is_numchar(char c);
-char							*to_str(int n);
-char							*str_trim(char *str, int *j, int i);
-char							*str_insert(char *str, int *j, char *value);
-char							*replace_env_var(char *str, int *j, int i,
+char							*to_str(size_t n);
+char							*str_trim(char *str, size_t *j, size_t i);
+char							*str_insert(char *str, size_t *j, char *value);
+char							*replace_env_var(char *str, size_t *j, size_t i,
 									char *env_var, t_env *env_list);
-char							*replace_status(char *str, int *j, int *status);
-char							*parse_env_var(char *str, int *j,
+char							*replace_status(char *str, size_t *j, int *status);
+char							*parse_env_var(char *str, size_t *j,
 									t_env *env_list, int *status);
-char							*trim_quote(char *str, int *j, char c);
-char							*trim_double_quote(char *str, int *j,
+char							*trim_quote(char *str, size_t *j, char c);
+char							*trim_double_quote(char *str, size_t *j,
 									t_env *env_list, int *status);
 void							expand_cmd(t_cmd *cmd, t_env *env_list,
 									int *status);

@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:41:10 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/27 20:50:07 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/28 11:20:42 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,11 @@ int	is_numchar(char c)
 	return (c >= '0' && c <= '9') || is_char(c);
 }
 
-char	*to_str(int n)
+char	*to_str(size_t n)
 {
 	char	*str;
-	int		len;
-	int		temp;
+	size_t		len;
+	size_t		temp;
 
 	len = 0;
 	temp = n;
@@ -49,12 +49,12 @@ char	*to_str(int n)
 	return (str);
 }
 
-char	*str_trim(char *str, int *j, int i)
+char	*str_trim(char *str, size_t *j, size_t i)
 {
 	char	*new_str;
-	int		k;
+	size_t		k;
 
-	if (!str || *j < 0 || i < 0 || *j + i >= ft_strlen(str))
+	if (!str || *j < 0 || i < 0 || (*j + i >= ft_strlen(str)))
 		return (perror("str_trim failed"), NULL);
 	new_str = (char *)malloc(ft_strlen(str) - i);
 	if (!new_str)
@@ -75,11 +75,11 @@ char	*str_trim(char *str, int *j, int i)
 	return (new_str);
 }
 
-char	*str_insert(char *str, int *j, char *value)
+char	*str_insert(char *str, size_t *j, char *value)
 {
 	char	*new_str;
-	int		k;
-	int		i;
+	size_t	k;
+	size_t	i;
 
 	if (!str || !value)
 		return (perror("str_insert failed"), NULL);
@@ -103,7 +103,7 @@ char	*str_insert(char *str, int *j, char *value)
 	return (new_str);
 }
 
-char	*replace_env_var(char *str, int *j, int i, char *env_var,
+char	*replace_env_var(char *str, size_t *j, size_t i, char *env_var,
 		t_env *env_list)
 {
 	char	*value;
@@ -124,7 +124,7 @@ char	*replace_env_var(char *str, int *j, int i, char *env_var,
 	return (str);
 }
 
-char	*replace_status(char *str, int *j, int *status)
+char	*replace_status(char *str, size_t *j, int *status)
 {
 	char	*status_str;
 
@@ -137,10 +137,10 @@ char	*replace_status(char *str, int *j, int *status)
 	return (str);
 }
 
-char	*parse_env_var(char *str, int *j, t_env *env_list, int *status)
+char	*parse_env_var(char *str, size_t *j, t_env *env_list, int *status)
 {
-	int		i;
-	int		k;
+	size_t		i;
+	size_t		k;
 	char	*env_var;
 
 	if (str[*j + 1] == '?')
@@ -164,9 +164,9 @@ char	*parse_env_var(char *str, int *j, t_env *env_list, int *status)
 	return (str);
 }
 
-char	*trim_quote(char *str, int *j, char c)
+char	*trim_quote(char *str, size_t *j, char c)
 {
-	int		i;
+	size_t		i;
 	char	*new_str;
 
 	i = 0;
@@ -192,10 +192,9 @@ char	*trim_quote(char *str, int *j, char c)
 	return (new_str);
 }
 
-char	*trim_double_quote(char *str, int *j, t_env *env_list, int *status)
+char	*trim_double_quote(char *str, size_t *j, t_env *env_list, int *status)
 {
-	int		i;
-	char	*new_str;
+	size_t		i;
 
 	i = *j + 1;
 	while (str[i] != '"')
@@ -210,7 +209,7 @@ char	*trim_double_quote(char *str, int *j, t_env *env_list, int *status)
 
 void	expand_cmd(t_cmd *cmd, t_env *env_list, int *status)
 {
-	int		j;
+	size_t		j;
 	t_token	*argv;
 
 	argv = cmd->argv;
