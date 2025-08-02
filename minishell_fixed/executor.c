@@ -475,7 +475,7 @@ void	exec_cmd(t_env *env_list, t_cmd *cmd, int *status)
 	pid_t	pid;
 	int		wstatus;
 
-	if (is_builtin(cmd->argv->value))
+	if (cmd->argv && is_builtin(cmd->argv->value))
 		return (exec_builtin(env_list, cmd, status));
 	pid = fork();
 	if (pid < 0)
