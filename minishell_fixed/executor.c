@@ -238,7 +238,7 @@ void	read_heredoc(t_fd *heredoc_delimiter, int fd)
 		line = readline("> ");
 		if(!line)
 			return ;
-		if (ft_strcmp(line, "") == 0 || ft_strcmp(line, heredoc_delimiter->value) == 0)
+		if (ft_strcmp(line, heredoc_delimiter->value) == 0)
 			return (free(line));
 		else if (fd != -1)
 		{
