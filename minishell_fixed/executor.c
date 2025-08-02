@@ -23,14 +23,7 @@ void exec_builtin(t_env *env_list, t_cmd *cmd, int *status)
         *status = 1;
         return;
 	}
-    if (ft_heredoc(cmd) == -1)
-    {
-        *status = 1;
-        close(original_stdin);
-        close(original_stdout);
-        return;
-    }
-    if (ft_file_redirection(cmd) == -1)
+    if (ft_file_redirection(cmd, ft_heredoc(cmd)) == -1)
     {
         *status = 1;
         if (cmd->fd_in != 0)
@@ -263,7 +256,7 @@ void	read_heredoc(t_fd *heredoc_delimiter, int fd)
 	}
 }
 
-void	parse_heredoc(t_fd *heredoc_delimiter, int fd)
+void	parse_heredoc(t_fd *heredoc_delimiter, int fd_in, int fd_out)
 {
 	if (!heredoc_delimiter)
 		return ;
@@ -271,9 +264,10 @@ void	parse_heredoc(t_fd *heredoc_delimiter, int fd)
 	{
 		read_heredoc(heredoc_delimiter, -1);
 		heredoc_delimiter = heredoc_delimiter->next;
+		heredoc_delimiter->fd = 0;
 	}
-	read_heredoc(heredoc_delimiter, fd);
-	heredoc_delimiter->fd = fd;
+	read_heredoc(heredoc_delimiter, fd_in);
+	heredoc_delimiter->fd = fd_out;
 }
 
 int	ft_heredoc(t_cmd *cmd)
@@ -292,7 +286,7 @@ int	ft_heredoc(t_cmd *cmd)
 	if (pid == 0)
 	{
 		close(fd[0]);
-		parse_heredoc(cmd->heredoc_delimiter, fd[1]);
+		parse_heredoc(cmd->heredoc_delimiter, fd[1],fd[0]);
 		close(fd[1]);
 		exit(EXIT_SUCCESS);
 	}
@@ -348,10 +342,12 @@ int	ft_open_fd_out(t_cmd *cmd, t_fd *current)
 	return (0);
 }
 
-int	ft_file_redirection(t_cmd *cmd)
+int	ft_file_redirection(t_cmd *cmd, int heredoc_fd)
 {
 	t_fd	*current;
 
+	if (heredoc_fd == -1)
+		return (-1);
 	if (!cmd->fds)
 		return (0);
 	current = cmd->fds;
@@ -432,9 +428,7 @@ void	ft_execve(t_env *env_list, t_cmd *cmd, int *status)
 	char	**argv;
 
 	reset_default_signal();
-	if (ft_heredoc(cmd) == -1)
-		exit(EXIT_FAILURE);
-	if (ft_file_redirection(cmd) == -1)
+	if (ft_file_redirection(cmd, ft_heredoc(cmd)) == -1)
 		exit(EXIT_FAILURE);
 
 	if (cmd->fd_in != 0)

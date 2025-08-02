@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   parser.c                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/26 22:41:43 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/28 03:45:22 by hkasamat         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "minishell.h"
 
 void	print_synerr(t_TokenType expected)
@@ -42,7 +30,6 @@ void	free_cmd(t_cmd *cmd)
 		return ;
 	free_tokens(cmd->argv);
 	free_fds(cmd->fds);
-	free_fds(cmd->heredoc_delimiter);
 	free(cmd);
 }
 
@@ -115,22 +102,6 @@ t_cmd	*init_cmd(void)
 	return (cmd);
 }
 
-t_fd *dup_fd(t_fd *fd)
-{
-    t_fd	*new_fd;
-
-    new_fd = (t_fd *)malloc(sizeof(t_fd));
-    if (!new_fd)
-        return (perror("malloc"), NULL);
-    new_fd->type = fd->type;
-    new_fd->value = ft_strdup(fd->value);
-    if (!new_fd->value)
-        return (free(new_fd), NULL);
-    new_fd->fd = fd->fd;
-    new_fd->next = NULL;
-    return (new_fd);
-}
-
 t_node	*parse_condition(t_token **tokens)
 {
 	t_node	*node;
@@ -195,7 +166,7 @@ int	add_fd(t_cmd *cmd, t_token **tokens)
 		return (print_synerr((*tokens)->type), free_fds(fd), 0);
 	fd->value = ft_strdup((*tokens)->value);
 	if (fd->type == TOKEN_HEREDOC)
-		append_fd(&cmd->heredoc_delimiter, dup_fd(fd));
+		append_fd(&cmd->heredoc_delimiter, fd);
 	append_fd(&cmd->fds, fd);
 	(*tokens) = (*tokens)->next;
 	return (1);
