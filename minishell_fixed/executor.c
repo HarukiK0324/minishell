@@ -10,49 +10,63 @@ int	is_builtin(char *cmd)
 	return (0);
 }
 
-void	exec_builtin(t_env *env_list, t_cmd *cmd, int *status)
+void exec_builtin(t_env *env_list, t_cmd *cmd, int *status)
 {
 	int original_stdin;
 	int original_stdout;
 	
 	original_stdin = dup(STDIN_FILENO);
 	original_stdout = dup(STDOUT_FILENO);
-	if (ft_heredoc(cmd) == -1)
-	{
-		*status = 1;
-		return;
+    if (original_stdin == -1 || original_stdout == -1)
+    {
+        perror("dup");
+        *status = 1;
+        return;
 	}
-	if (ft_file_redirection(cmd) == -1)
-	{
-		*status = 1;
-		return;
-	}
-	if (cmd->fd_in != 0)
-		dup2(cmd->fd_in, STDIN_FILENO);
-	if (cmd->fd_out != 1)
-		dup2(cmd->fd_out, STDOUT_FILENO);
-	if (ft_strcmp(cmd->argv->value, "cd") == 0)
-		*status = exec_cd(cmd->argv, env_list);
-	else if (ft_strcmp(cmd->argv->value, "echo") == 0)
-		*status = exec_echo(cmd->argv);
-	else if (ft_strcmp(cmd->argv->value, "exit") == 0)
-		*status = exec_exit(cmd->argv);
-	else if (ft_strcmp(cmd->argv->value, "export") == 0)
-		*status = exec_export(cmd->argv, env_list);
-	else if (ft_strcmp(cmd->argv->value, "pwd") == 0)
-		*status = exec_pwd();
-	else if (ft_strcmp(cmd->argv->value, "unset") == 0)
-		*status = exec_unset(cmd->argv, env_list);
-	else if (ft_strcmp(cmd->argv->value, "env") == 0)
-		*status = exec_env(env_list);
-	dup2(original_stdin, STDIN_FILENO);
-	dup2(original_stdout, STDOUT_FILENO);
-	close(original_stdin);
-	close(original_stdout);
-	if (cmd->fd_in != 0)
-		close(cmd->fd_in);
-	if (cmd->fd_out != 1)
-		close(cmd->fd_out);
+    if (ft_heredoc(cmd) == -1)
+    {
+        *status = 1;
+        close(original_stdin);
+        close(original_stdout);
+        return;
+    }
+    if (ft_file_redirection(cmd) == -1)
+    {
+        *status = 1;
+        if (cmd->fd_in != 0)
+            close(cmd->fd_in);
+        if (cmd->fd_out != 1)
+            close(cmd->fd_out);
+        close(original_stdin);
+        close(original_stdout);
+        return;
+    }
+    if (cmd->fd_in != 0)
+        dup2(cmd->fd_in, STDIN_FILENO);
+    if (cmd->fd_out != 1)
+        dup2(cmd->fd_out, STDOUT_FILENO);
+    if (ft_strcmp(cmd->argv->value, "cd") == 0)
+        *status = exec_cd(cmd->argv, env_list);
+    else if (ft_strcmp(cmd->argv->value, "echo") == 0)
+        *status = exec_echo(cmd->argv);
+    else if (ft_strcmp(cmd->argv->value, "exit") == 0)
+        *status = exec_exit(cmd->argv);
+    else if (ft_strcmp(cmd->argv->value, "export") == 0)
+        *status = exec_export(cmd->argv, env_list);
+    else if (ft_strcmp(cmd->argv->value, "pwd") == 0)
+        *status = exec_pwd();
+    else if (ft_strcmp(cmd->argv->value, "unset") == 0)
+        *status = exec_unset(cmd->argv, env_list);
+    else if (ft_strcmp(cmd->argv->value, "env") == 0)
+        *status = exec_env(env_list);
+    dup2(original_stdin, STDIN_FILENO);
+    dup2(original_stdout, STDOUT_FILENO);
+    close(original_stdin);
+    close(original_stdout);
+    if (cmd->fd_in != 0)
+        close(cmd->fd_in);
+    if (cmd->fd_out != 1)
+        close(cmd->fd_out);
 }
 
 void	free_str_list(char **list)
@@ -296,46 +310,42 @@ void	err_msg(char *value, char *msg)
 	write(STDOUT_FILENO, msg, ft_strlen(msg));
 }
 
-void	ft_open_fd_in(t_cmd *cmd, t_fd *current)
+int	ft_open_fd_in(t_cmd *cmd, t_fd *current)
 {
 	if (current->type == TOKEN_REDIR_IN)
 	{
 		current->fd = open(current->value, O_RDONLY);
 		if (errno == ENOENT)
-			err_msg(current->value, ": No such file or directory\n");
+			return(err_msg(current->value, ": No such file or directory\n"),-1);
 		else if (errno == EACCES)
-			err_msg(current->value, ": Permission denied\n");
+		return(err_msg(current->value, ": Permission denied\n"),-1);
 		else if (current->fd < 0)
-			err_msg(current->value, ": Failed to open file\n");
+			return(err_msg(current->value, ": Failed to open file\n"),-1);
 	}
-	close(cmd->fd_in);
+	else if (current->type == TOKEN_HEREDOC)
+		current->fd = dup(current->fd);
+	if (cmd->fd_in != 0)
+		close(cmd->fd_in);
 	cmd->fd_in = current->fd;
+	return (0);
 }
 
-void	ft_open_fd_out(t_cmd *cmd, t_fd *current)
+int	ft_open_fd_out(t_cmd *cmd, t_fd *current)
 {
 	if (current->type == TOKEN_REDIR_OUT)
-	{
 		current->fd = open(current->value, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-		if (errno == ENOENT)
-			err_msg(current->value, ": No such file or directory\n");
-		else if (errno == EACCES)
-			err_msg(current->value, ": Permission denied\n");
-		else if (current->fd < 0)
-			err_msg(current->value, ": Failed to open file\n");
-	}
 	else if (current->type == TOKEN_APPEND)
-	{
 		current->fd = open(current->value, O_WRONLY | O_CREAT | O_APPEND, 0644);
-		if (errno == ENOENT)
-			err_msg(current->value, ": No such file or directory\n");
-		else if (errno == EACCES)
-			err_msg(current->value, ": Permission denied\n");
-		else if (current->fd < 0)
-			err_msg(current->value, ": Failed to open file\n");
-	}
-	close(cmd->fd_out);
+	if (errno == ENOENT)
+		return(err_msg(current->value, ": No such file or directory\n"),-1);
+	else if (errno == EACCES)
+		return(err_msg(current->value, ": Permission denied\n"),-1);
+	else if (current->fd < 0)
+		return(err_msg(current->value, ": Failed to open file\n"),-1);
+	if (cmd->fd_out != 1)
+		close(cmd->fd_out);
 	cmd->fd_out = current->fd;
+	return (0);
 }
 
 int	ft_file_redirection(t_cmd *cmd)
@@ -348,10 +358,15 @@ int	ft_file_redirection(t_cmd *cmd)
 	while (current)
 	{
 		if (current->type == TOKEN_REDIR_IN || current->type == TOKEN_HEREDOC)
-			ft_open_fd_in(cmd, current);
-		else if (current->type == TOKEN_REDIR_OUT
-			|| current->type == TOKEN_APPEND)
-			ft_open_fd_out(cmd, current);
+		{
+			if (ft_open_fd_in(cmd, current) == -1)
+				return (-1);
+		}
+		else if (current->type == TOKEN_REDIR_OUT || current->type == TOKEN_APPEND)
+		{
+			if (ft_open_fd_out(cmd, current) == -1)
+				return (-1);
+		}
 		if (cmd->fd_in == -1 || cmd->fd_out == -1)
 			return (-1);
 		current = current->next;
