@@ -289,7 +289,7 @@ int	main(int argc, char **argv, char **environ)
 		if (input && ft_strlen(input) > 0)
 		{
 			if (check_quote(input) == -1)
-				return(err_msg("Unmatched quotes", "Syntax error"), 2);
+				return(err_msg("Unmatched quotes", ": Syntax error"), 2);
 			tokens = tokenize(input);
 			saved_tokens = tokens;
 			while (tokens)
