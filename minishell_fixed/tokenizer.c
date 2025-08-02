@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:41:53 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/28 11:21:22 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/02 14:36:25 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,6 +137,7 @@ size_t	add_word(const char *input, t_token **list)
 	if (!token)
 		return (write(STDERR_FILENO, "minishell: token creation\n", 26), -1);
 	token->type = TOKEN_WORD;
+	token->next = NULL;
 	token->value = ft_strndup(input, len);
 	append_token(list, token);
 	return (len);
@@ -160,6 +161,7 @@ size_t	add_metachar(const char *input, t_token **list)
 	if (!token)
 		return (write(STDERR_FILENO, "minishell: token creation\n", 26), -1);
 	token->type = type;
+	token->next = NULL;
 	token->value = ft_strndup(input, len);
 	append_token(list, token);
 	return (len);
