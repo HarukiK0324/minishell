@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:41:43 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/27 23:10:04 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/28 02:40:08 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -141,7 +141,7 @@ t_node	*parse_condition(t_token **tokens)
 	if (!node)
 		return (perror("malloc"), NULL);
 	while (node && *tokens && (*tokens)->type != TOKEN_AND_IF
-		&& (*tokens)->type != TOKEN_OR_IF)
+		&& (*tokens)->type != TOKEN_OR_IF && (*tokens)->type != TOKEN_CLOSE_PAREN)
 	{
 		if ((*tokens)->type == TOKEN_OPEN_PAREN)
 			node = add_paren(tokens, node);
@@ -277,14 +277,16 @@ t_node	*add_paren(t_token **tokens, t_node *node)
 	{
 		if ((*tokens)->type == TOKEN_AND_IF || (*tokens)->type == TOKEN_OR_IF)
 			new_root = add_condition(tokens, new_root);
-		else if ((*tokens)->type == TOKEN_OPEN_PAREN)
+		else if (new_root->type == NODE_INIT && (*tokens)->type == TOKEN_OPEN_PAREN)
 			new_root = add_paren(tokens, new_root);
 		else if ((*tokens)->type == TOKEN_PIPE)
 			new_root = add_pipe(tokens, new_root);
 		else if (token_cmd(*tokens))
 			new_root = add_cmd(tokens, new_root);
+        else
+            break;
 	}
-	if (!(*tokens) || !new_root)
+	if (!new_root || (*tokens)->type != TOKEN_CLOSE_PAREN)
 		return (free_node(new_root), free_node(node), print_synerr(TOKEN_END), NULL);
 	*tokens = (*tokens)->next;
 	return (new_root);
@@ -343,7 +345,7 @@ t_node	*parse(t_token *tokens)
 	{
 		if (tokens->type == TOKEN_AND_IF || tokens->type == TOKEN_OR_IF)
 			node = add_condition(&tokens, node);
-		else if (tokens->type == TOKEN_OPEN_PAREN)
+		else if (!node && tokens->type == TOKEN_OPEN_PAREN)
 			node = add_paren(&tokens, node);
 		else if (tokens->type == TOKEN_PIPE)
 			node = add_pipe(&tokens, node);
@@ -352,5 +354,7 @@ t_node	*parse(t_token *tokens)
 		else
 			return (print_synerr(tokens->type), free_node(node), NULL);
 	}
+    if(!node)
+        return (free_node(node), NULL);
 	return (node);
 }

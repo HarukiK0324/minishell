@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:23:34 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/27 21:25:29 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/28 11:32:49 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,6 +101,7 @@ void							free_list(t_env *env_list);
 size_t							ft_strchar(const char *s, char c);
 t_env							*init_env(char **environ);
 void							setup_signal_handlers(void);
+void							handle_interactive_sigint(int sig);
 void							handle_sigint(int sig);
 void							reset_default_signal(void);
 

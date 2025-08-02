@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:40:11 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/27 20:50:04 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/27 23:35:00 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -218,6 +218,7 @@ int	main(int argc, char **argv, char **environ)
 				status = 2;
 			expander(ast, env_list, &status);
 			executor(ast, env_list, &status);
+			free_tokens(tokens);
 			free_ast(ast);
 			add_history(input);
 			free(input);

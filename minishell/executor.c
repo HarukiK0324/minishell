@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:40:58 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/27 20:50:09 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/27 23:36:30 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -453,6 +453,8 @@ void	exec_cmd(t_env *env_list, t_cmd *cmd, int *status)
 
 void	executor(t_node *ast, t_env *env_list, int *status)
 {
+    if(!ast)
+		return ;
 	if (ast->type == NODE_PIPE && g_status == 0)
 		exec_pipe(ast, env_list, status);
 	else if (ast->type == NODE_AND_IF && g_status == 0)
