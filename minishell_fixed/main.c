@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:40:11 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/28 11:35:43 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/02 13:52:44 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,9 +180,9 @@ void	handle_sigint(int sig)
 
 void	reset_default_signal(void)
 {
-	// Reset to default behavior
 	struct sigaction	sa_int;
 
+	// Reset to default behavior
 	// Set up SIGINT handler (Ctrl+C)
 	sa_int.sa_handler = handle_sigint;
 	sigemptyset(&sa_int.sa_mask);
@@ -204,69 +204,73 @@ void	free_ast(t_node *ast)
 	free(ast);
 }
 
-void print_ast(t_node *ast)
+void	print_ast(t_node *ast)
 {
+	t_token	*arg;
+	t_fd	*fd;
+	t_fd	*heredoc;
+
 	if (!ast)
-		return;
-	switch(ast->type)
+		return ;
+	switch (ast->type)
 	{
-		case NODE_CMD:
-			printf("Command Node:\n");
-			if (ast->cmd)
+	case NODE_CMD:
+		printf("Command Node:\n");
+		if (ast->cmd)
+		{
+			arg = ast->cmd->argv;
+			while (arg)
 			{
-				t_token *arg = ast->cmd->argv;
-				while (arg)
-				{
-					printf("  Arg: %s\n", arg->value);
-					arg = arg->next;
-				}
-				t_fd *fd = ast->cmd->fds;
-				while (fd)
-				{
-					printf("  FD: %s (type: ", fd->value);
-					switch (fd->type)
-					{
-						case TOKEN_REDIR_IN:
-							printf("Redirect In)\n");
-							break;
-						case TOKEN_REDIR_OUT:
-							printf("Redirect Out)\n");
-							break;
-						case TOKEN_HEREDOC:
-							printf("Heredoc)\n");
-							break;
-						case TOKEN_APPEND:
-							printf("Append)\n");
-							break;
-						default:
-							printf("Unknown)\n");
-							break;
-					}
-					fd = fd->next;
-				}
-				t_fd *heredoc = ast->cmd->heredoc_delimiter;
-				while (heredoc)
-				{
-					printf("  Heredoc Delimiter: %s\n", heredoc->value);
-					heredoc = heredoc->next;
-				}
+				printf("  Arg: %s\n", arg->value);
+				arg = arg->next;
 			}
-			break;
-		case NODE_PIPE:
-			printf("Pipe Node:\n");
-			break;
-		case NODE_AND_IF:
-			printf("And If Node:\n");
-			break;
-		case NODE_OR_IF:
-			printf("Or If Node:\n");
-			break;
-		case NODE_INIT:
-			printf("Init Node:\n");
-			break;
-		default:
-			printf("Unknown Node Type\n");
-			break;
+			fd = ast->cmd->fds;
+			while (fd)
+			{
+				printf("  FD: %s (type: ", fd->value);
+				switch (fd->type)
+				{
+				case TOKEN_REDIR_IN:
+					printf("Redirect In)\n");
+					break ;
+				case TOKEN_REDIR_OUT:
+					printf("Redirect Out)\n");
+					break ;
+				case TOKEN_HEREDOC:
+					printf("Heredoc)\n");
+					break ;
+				case TOKEN_APPEND:
+					printf("Append)\n");
+					break ;
+				default:
+					printf("Unknown)\n");
+					break ;
+				}
+				fd = fd->next;
+			}
+			heredoc = ast->cmd->heredoc_delimiter;
+			while (heredoc)
+			{
+				printf("  Heredoc Delimiter: %s\n", heredoc->value);
+				heredoc = heredoc->next;
+			}
+		}
+		break ;
+	case NODE_PIPE:
+		printf("Pipe Node:\n");
+		break ;
+	case NODE_AND_IF:
+		printf("And If Node:\n");
+		break ;
+	case NODE_OR_IF:
+		printf("Or If Node:\n");
+		break ;
+	case NODE_INIT:
+		printf("Init Node:\n");
+		break ;
+	default:
+		printf("Unknown Node Type\n");
+		break ;
 	}
 	print_ast(ast->lhs);
 	print_ast(ast->rhs);
@@ -276,20 +280,21 @@ int	main(int argc, char **argv, char **environ)
 {
 	char	*input;
 	t_token	*tokens;
-	// t_token *saved_tokens;
 	t_node	*ast;
 	t_env	*env_list;
 	int		status;
 
-	(void)argc;              // Unused parameter
-	(void)argv;              // Unused parameter
+	// t_token *saved_tokens;
+	(void)argc; // Unused parameter
+	(void)argv; // Unused parameter
 	env_list = init_env(environ);
 	if (!env_list)
 		return (perror("init_env failed"), 1);
 	// Exit if environment initialization fails
 	while (1)
 	{
-		setup_signal_handlers(); // Set up signal handlers for Ctrl+C and Ctrl+'\'
+		setup_signal_handlers();
+		// Set up signal handlers for Ctrl+C and Ctrl+'\'
 		input = readline("minishell$ ");
 		if (!input)
 			break ; // Exit on EOF (Ctrl+D)
@@ -305,37 +310,37 @@ int	main(int argc, char **argv, char **environ)
 			// 	{
 			// 		case TOKEN_WORD:
 			// 			printf("Word:");
-			// 			break;
+			// 			break ;
 			// 		case TOKEN_PIPE:
 			// 			printf("Pipe:");
-			// 			break;
+			// 			break ;
 			// 		case TOKEN_REDIR_IN:
 			// 			printf("Redirect In:");
-			// 			break;
+			// 			break ;
 			// 		case TOKEN_REDIR_OUT:
 			// 			printf("Redirect Out:");
-			// 			break;
+			// 			break ;
 			// 		case TOKEN_HEREDOC:
 			// 			printf("Heredoc:");
-			// 			break;
+			// 			break ;
 			// 		case TOKEN_APPEND:
 			// 			printf("Append:");
-			// 			break;
+			// 			break ;
 			// 		case TOKEN_AND_IF:
 			// 			printf("And If:");
-			// 			break;
+			// 			break ;
 			// 		case TOKEN_OR_IF:
 			// 			printf("Or If:");
-			// 			break;
-			// 		case TOKEN_OPEN_PAREN:	
+			// 			break ;
+			// 		case TOKEN_OPEN_PAREN:
 			// 			printf("Open Parenthesis:");
-			// 			break;
+			// 			break ;
 			// 		case TOKEN_CLOSE_PAREN:
 			// 			printf("Close Parenthesis:");
-			// 			break;
+			// 			break ;
 			// 		default:
 			// 			printf("Unknown Token:");
-			// 			break;
+			// 			break ;
 			// 	}
 			// 	printf("Token: %s\n", tokens->value);
 			// 	tokens = tokens->next;
