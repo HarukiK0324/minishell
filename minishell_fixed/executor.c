@@ -430,7 +430,6 @@ void	ft_execve(t_env *env_list, t_cmd *cmd, int *status)
 	reset_default_signal();
 	if (ft_file_redirection(cmd, ft_heredoc(cmd)) == -1)
 		exit(EXIT_FAILURE);
-
 	if (cmd->fd_in != 0)
 	{
 		if (dup2(cmd->fd_in, STDIN_FILENO) == -1)

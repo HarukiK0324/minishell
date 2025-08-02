@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   minishell.h                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/04/02 16:23:34 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/02 18:14:59 by hkasamat         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
@@ -135,7 +123,7 @@ int 							ft_heredoc(t_cmd *cmd);
 void 							err_msg(char *value, char *msg);
 int 							ft_open_fd_in(t_cmd *cmd, t_fd *current);
 int 							ft_open_fd_out(t_cmd *cmd, t_fd *current);
-int 							ft_file_redirection(t_cmd *cmd, int heredoc_fd);
+int 							ft_file_redirection(t_cmd *cmd);
 void							executor(t_node *ast, t_env *env_list,
 									int *status);
 void							exec_pipe(t_node *ast, t_env *env_list,
