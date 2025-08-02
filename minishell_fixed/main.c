@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:40:11 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/02 14:41:01 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/02 14:55:33 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -284,6 +284,7 @@ int	main(int argc, char **argv, char **environ)
 	t_env	*env_list;
 	int		status;
 	t_token	*saved_tokens;
+	t_token	*saved_tokens;
 
 	(void)argc; // Unused parameter
 	(void)argv; // Unused parameter
@@ -345,18 +346,14 @@ int	main(int argc, char **argv, char **environ)
 					printf(" Token: %s\n", tokens->value);
 				tokens = tokens->next;
 			}
-			ast = parse(saved_tokens);
-			if (!ast)
-			{
-				printf("failed parsing\n");
-				status = 2;
-			}
-			print_ast(ast);
-			expander(ast, env_list, &status);
-			executor(ast, env_list, &status);
-			free_ast(ast);
-			add_history(input);
-			free(input);
+			// ast = parse(tokens);
+			// if (!ast)
+			// 	status = 2;
+			// expander(ast, env_list, &status);
+			// executor(ast, env_list, &status);
+			// free_ast(ast);
+			// add_history(input);
+			// free(input);
 		}
 	}
 	printf("exit\n");

@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   expander.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/26 22:41:10 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/28 11:20:42 by hkasamat         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "minishell.h"
 
 int	is_char(char c)
@@ -240,9 +228,9 @@ void	expander(t_node *node, t_env *env_list, int *status)
 		expand_cmd(node->cmd, env_list, status);
 	else
 	{
-		if (node->lhs)
-			expander(node->lhs, env_list, status);
-		if (node->rhs)
+		expander(node->lhs, env_list, status);
+		if (node->type == NODE_PIPE)
 			expander(node->rhs, env_list, status);
+		
 	}
 }
