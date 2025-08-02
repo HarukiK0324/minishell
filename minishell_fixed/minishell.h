@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/02 16:23:34 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/28 11:35:34 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/02 16:00:32 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,6 +119,23 @@ int								exec_exit(t_token *argv);
 int								is_builtin(char *cmd);
 void							exec_builtin(t_env *env_list, t_cmd *cmd,
 									int *status);
+void 							free_str_list(char **list);
+char							*ft_access(char *path, char *cmd);
+char							*get_path_from_env(char *argv, t_env *env_list);
+char							*get_path(char *cmd, t_env *env_list);
+size_t							ft_token_size(t_token *tokens);
+size_t							ft_env_size(t_env *env_list);
+void							free_argv(char **argv, size_t i);
+char							**to_list(t_token *tokens);
+char							*ft_env_join(t_env *env_list);
+char							**env_to_environ(t_env *env_list);
+void 							read_heredoc(t_fd *heredoc_delimiter, int fd);
+void 							parse_heredoc(t_fd *heredoc_delimiter, int fd);
+int 							ft_heredoc(t_cmd *cmd);
+void 							err_msg(char *value, char *msg);
+void 							ft_open_fd_in(t_cmd *cmd, t_fd *current);
+void 							ft_open_fd_out(t_cmd *cmd, t_fd *current);
+int 							ft_file_redirection(t_cmd *cmd);
 void							executor(t_node *ast, t_env *env_list,
 									int *status);
 void							exec_pipe(t_node *ast, t_env *env_list,

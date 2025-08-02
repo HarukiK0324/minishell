@@ -12,6 +12,25 @@ int	is_builtin(char *cmd)
 
 void	exec_builtin(t_env *env_list, t_cmd *cmd, int *status)
 {
+	int original_stdin;
+	int original_stdout;
+	
+	original_stdin = dup(STDIN_FILENO);
+	original_stdout = dup(STDOUT_FILENO);
+	if (ft_heredoc(cmd) == -1)
+	{
+		*status = 1;
+		return;
+	}
+	if (ft_file_redirection(cmd) == -1)
+	{
+		*status = 1;
+		return;
+	}
+	if (cmd->fd_in != 0)
+		dup2(cmd->fd_in, STDIN_FILENO);
+	if (cmd->fd_out != 1)
+		dup2(cmd->fd_out, STDOUT_FILENO);
 	if (ft_strcmp(cmd->argv->value, "cd") == 0)
 		*status = exec_cd(cmd->argv, env_list);
 	else if (ft_strcmp(cmd->argv->value, "echo") == 0)
@@ -26,6 +45,14 @@ void	exec_builtin(t_env *env_list, t_cmd *cmd, int *status)
 		*status = exec_unset(cmd->argv, env_list);
 	else if (ft_strcmp(cmd->argv->value, "env") == 0)
 		*status = exec_env(env_list);
+	dup2(original_stdin, STDIN_FILENO);
+	dup2(original_stdout, STDOUT_FILENO);
+	close(original_stdin);
+	close(original_stdout);
+	if (cmd->fd_in != 0)
+		close(cmd->fd_in);
+	if (cmd->fd_out != 1)
+		close(cmd->fd_out);
 }
 
 void	free_str_list(char **list)
@@ -241,6 +268,8 @@ int	ft_heredoc(t_cmd *cmd)
 	int		wstatus;
 	pid_t	pid;
 
+	if (!cmd->heredoc_delimiter)
+		return (0);
 	if (pipe(fd) == -1)
 		return (perror("pipe"), -1);
 	pid = fork();
