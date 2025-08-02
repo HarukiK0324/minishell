@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/26 22:40:58 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/28 12:10:51 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/28 13:44:24 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -272,9 +272,9 @@ int	ft_heredoc(t_cmd *cmd)
 
 void	err_msg(char *value, char *msg)
 {
-	write(STDERR_FILENO, "minishell: ", 11);
-	write(STDERR_FILENO, value, ft_strlen(value));
-	write(STDERR_FILENO, msg, ft_strlen(msg));
+	write(STDOUT_FILENO, "minishell: ", 11);
+	write(STDOUT_FILENO, value, ft_strlen(value));
+	write(STDOUT_FILENO, msg, ft_strlen(msg));
 }
 
 void	ft_open_fd_in(t_cmd *cmd, t_fd *current)

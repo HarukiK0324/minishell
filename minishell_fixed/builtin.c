@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/27 00:00:00 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/27 20:50:10 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/07/28 13:05:55 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -149,6 +149,8 @@ static char	*ft_strchr(const char *s, int c)
 
 static void	print_export(t_env *env_list)
 {
+	if (!env_list)
+		return ;
 	while (env_list)
 	{
 		printf("declare -x %s=\"%s\"\n", env_list->key, env_list->value);
