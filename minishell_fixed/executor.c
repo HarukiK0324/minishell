@@ -209,7 +209,9 @@ void	read_heredoc(t_fd *heredoc_delimiter, int fd)
 	while (1)
 	{
 		line = readline("> ");
-		if (!line || ft_strcmp(line, heredoc_delimiter->value) == 0)
+		if(!line)
+			return ;
+		if (ft_strcmp(line, "") == 0 || ft_strcmp(line, heredoc_delimiter->value) == 0)
 			return (free(line));
 		else if (fd != -1)
 		{
@@ -277,6 +279,7 @@ void	ft_open_fd_in(t_cmd *cmd, t_fd *current)
 		else if (current->fd < 0)
 			err_msg(current->value, ": Failed to open file\n");
 	}
+	close(cmd->fd_in);
 	cmd->fd_in = current->fd;
 }
 
@@ -302,6 +305,7 @@ void	ft_open_fd_out(t_cmd *cmd, t_fd *current)
 		else if (current->fd < 0)
 			err_msg(current->value, ": Failed to open file\n");
 	}
+	close(cmd->fd_out);
 	cmd->fd_out = current->fd;
 }
 
@@ -388,6 +392,25 @@ void	ft_execve(t_env *env_list, t_cmd *cmd, int *status)
 		exit(EXIT_FAILURE);
 	if (ft_file_redirection(cmd) == -1)
 		exit(EXIT_FAILURE);
+
+	if (cmd->fd_in != 0)
+	{
+		if (dup2(cmd->fd_in, STDIN_FILENO) == -1)
+		{
+			perror("dup2 input redirection failed");
+			exit(EXIT_FAILURE);
+		}
+		close(cmd->fd_in);
+	}
+	if (cmd->fd_out != 1)
+	{
+		if (dup2(cmd->fd_out, STDOUT_FILENO) == -1)
+		{
+			perror("dup2 output redirection failed");
+			exit(EXIT_FAILURE);
+		}
+		close(cmd->fd_out);
+	}
 	if (!cmd->argv || !cmd->argv->value)
 		exit(0);
 	path = get_path(cmd->argv->value, env_list);
