@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   executor.c                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/26 22:40:58 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/07/28 13:44:24 by hkasamat         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "minishell.h"
 
 int	is_builtin(char *cmd)
@@ -469,13 +457,19 @@ void	executor(t_node *ast, t_env *env_list, int *status)
 	{
 		executor(ast->lhs, env_list, status);
 		if (*status == 0 && g_status == 0)
+		{
+			expander(ast->rhs, env_list, status);
 			executor(ast->rhs, env_list, status);
+		}
 	}
 	else if (ast->type == NODE_OR_IF && g_status == 0)
 	{
 		executor(ast->lhs, env_list, status);
 		if (*status != 0 && g_status == 0)
+		{
+			expander(ast->rhs, env_list, status);
 			executor(ast->rhs, env_list, status);
+		}
 	}
 	else if (ast->type == NODE_CMD && g_status == 0)
 		exec_cmd(env_list, ast->cmd, status);

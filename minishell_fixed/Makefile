@@ -1,5 +1,5 @@
 CC = cc
-CFLAGS = -Wall -Wextra -Werror -I.
+# CFLAGS = -Wall -Wextra -Werror -I.
 LDFLAGS = -lreadline
 NAME = minishell
 

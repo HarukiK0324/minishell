@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/07/26 22:40:11 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/02 14:09:42 by hkasamat         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "minishell.h"
 
 volatile sig_atomic_t	g_status = 0;
@@ -284,7 +272,7 @@ int	main(int argc, char **argv, char **environ)
 	t_env	*env_list;
 	int		status;
 
-	t_token *saved_tokens;
+	// t_token *saved_tokens;
 	(void)argc; // Unused parameter
 	(void)argv; // Unused parameter
 	env_list = init_env(environ);
@@ -303,48 +291,48 @@ int	main(int argc, char **argv, char **environ)
 			while (check_quote(input) == -1)
 				input = append(input, readline("> "), '\n');
 			tokens = tokenize(input);
-			saved_tokens = tokens;
-			while(tokens)
-			{
-				if(!tokens->type)
-				{
-					printf("Token type is not set.\n");
-					break ;
-				}
-				if(tokens->type == TOKEN_WORD)
-					printf("Word:");
-				else if(tokens->type == TOKEN_PIPE)
-					printf("Pipe:");
-				else if(tokens->type == TOKEN_REDIR_IN)
-					printf("Redirect In:");
-				else if(tokens->type == TOKEN_REDIR_OUT)
-					printf("Redirect Out:");
-				else if(tokens->type == TOKEN_HEREDOC)
-					printf("Heredoc:");
-				else if(tokens->type == TOKEN_APPEND)
-					printf("Append:");
-				else if(tokens->type == TOKEN_AND_IF)
-					printf("And If:");
-				else if(tokens->type == TOKEN_OR_IF)
-					printf("Or If:");
-				else if(tokens->type == TOKEN_OPEN_PAREN)
-					printf("Open Parenthesis:");
-				else if(tokens->type == TOKEN_CLOSE_PAREN)
-					printf("Close Parenthesis:");
-				else if(tokens->type == TOKEN_END)
-					printf("End of Tokens:");
-				else if(tokens->type == TOKEN_NEWLINE)
-					printf("Newline:");
-				else if(tokens->type == TOKEN_ERROR)
-					printf("Error:");
-				else
-					printf("Unknown Token:");
-				if(!tokens->value)
-					printf(" (No value)\n");
-				else
-					printf(" Token: %s\n", tokens->value);
-				tokens = tokens->next;
-			}
+			// saved_tokens = tokens;
+			// while(tokens)
+			// {
+			// 	if(tokens->type < 0 || tokens->type >= TOKEN_ERROR)
+			// 	{
+			// 		printf("Token type is not set.\n");
+			// 		break ;
+			// 	}
+			// 	if(tokens->type == TOKEN_WORD)
+			// 		printf("Word:");
+			// 	else if(tokens->type == TOKEN_PIPE)
+			// 		printf("Pipe:");
+			// 	else if(tokens->type == TOKEN_REDIR_IN)
+			// 		printf("Redirect In:");
+			// 	else if(tokens->type == TOKEN_REDIR_OUT)
+			// 		printf("Redirect Out:");
+			// 	else if(tokens->type == TOKEN_HEREDOC)
+			// 		printf("Heredoc:");
+			// 	else if(tokens->type == TOKEN_APPEND)
+			// 		printf("Append:");
+			// 	else if(tokens->type == TOKEN_AND_IF)
+			// 		printf("And If:");
+			// 	else if(tokens->type == TOKEN_OR_IF)
+			// 		printf("Or If:");
+			// 	else if(tokens->type == TOKEN_OPEN_PAREN)
+			// 		printf("Open Parenthesis:");
+			// 	else if(tokens->type == TOKEN_CLOSE_PAREN)
+			// 		printf("Close Parenthesis:");
+			// 	else if(tokens->type == TOKEN_END)
+			// 		printf("End of Tokens:");
+			// 	else if(tokens->type == TOKEN_NEWLINE)
+			// 		printf("Newline:");
+			// 	else if(tokens->type == TOKEN_ERROR)
+			// 		printf("Error:");
+			// 	else
+			// 		printf("Unknown Token:");
+			// 	if(!tokens->value)
+			// 		printf(" (No value)\n");
+			// 	else
+			// 		printf(" Token: %s\n", tokens->value);
+			// 	tokens = tokens->next;
+			// }
 			// ast = parse(tokens);
 			// if (!ast)
 			// 	status = 2;
