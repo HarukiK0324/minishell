@@ -288,8 +288,8 @@ int	main(int argc, char **argv, char **environ)
 			break ; // Exit on EOF (Ctrl+D)
 		if (input && ft_strlen(input) > 0)
 		{
-			while (check_quote(input) == -1)
-				input = append(input, readline("> "), '\n');
+			if (check_quote(input) == -1)
+				return(err_msg("Unmatched quotes", "Syntax error"), 2);
 			tokens = tokenize(input);
 			saved_tokens = tokens;
 			while (tokens)
