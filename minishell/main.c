@@ -176,6 +176,19 @@ void	reset_default_signal(void)
 	sigemptyset(&sa_int.sa_mask);
 	sa_int.sa_flags = 0;
 	sigaction(SIGINT, &sa_int, NULL);
+	signal(SIGQUIT, SIG_IGN);
+}
+
+void reset_heredoc_signal(void)
+{
+	struct sigaction	sa_int;
+
+	// Reset to default behavior
+	// Set up SIGINT handler (Ctrl+C)
+	sa_int.sa_handler = handle_sigint;
+	sigemptyset(&sa_int.sa_mask);
+	sa_int.sa_flags = 0;
+	sigaction(SIGINT, &sa_int, NULL);
 	signal(SIGQUIT, SIG_DFL);
 }
 
@@ -340,10 +353,13 @@ int	main(int argc, char **argv, char **environ)
 				status = 2;
 			}
 			expander(ast, env_list, &status);
-			executor(ast, env_list, &status);
+			heredoc(ast, &status);
+			if(g_status == 0)
+				executor(ast, env_list, &status);
 			free_ast(ast);
 			add_history(input);
 			free(input);
+			g_status = 0;
 		}
 	}
 	printf("exit\n");

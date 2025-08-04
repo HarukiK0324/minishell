@@ -62,6 +62,7 @@ typedef struct s_cmd
 	t_fd						*fds;
 	t_fd						*heredoc_delimiter;
 	int							heredoc_count;
+	int							heredoc_fd;
 	int							fd_in;
 	int							fd_out;
 }								t_cmd;
@@ -93,6 +94,7 @@ void							setup_signal_handlers(void);
 void							handle_sigint(int sig);
 void							handle_interactive_sigint(int sig);
 void							reset_default_signal(void);
+void							reset_heredoc_signal(void);
 
 /* builtin.c */
 int								only_contains(char *str, char *chars);
@@ -122,8 +124,9 @@ void 							read_heredoc(t_fd *heredoc_delimiter, int fd);
 void 							parse_heredoc(t_fd *heredoc_delimiter, int fd_in, int fd_out);
 int 							ft_heredoc(t_cmd *cmd);
 void 							err_msg(char *value, char *msg);
-int 							ft_open_fd_in(int *fd, t_fd *current);
-int 							ft_open_fd_out(int *fd, t_fd *current);
+void 							ft_open_heredoc(t_cmd *cmd, t_fd *current, int heredoc_count);
+void 							ft_open_fd_in(t_cmd *cmd, t_fd *current);
+void 							ft_open_fd_out(t_cmd *cmd, t_fd *current);
 int 							process_redirections(t_cmd *cmd);
 void							executor(t_node *ast, t_env *env_list,
 									int *status);
@@ -158,6 +161,13 @@ size_t							count_words(const char *s, char c);
 char							*substring(char const *s, size_t index, char c);
 void							free_all(char **arr, size_t i);
 char							**ft_split(char const *s, char c);
+
+/* heredoc.c */
+void							read_heredoc(t_fd *heredoc_delimiter, int fd);
+void							parse_heredoc(t_fd *heredoc_delimiter, int fd_in, int fd_out);
+int								ft_heredoc(t_cmd *cmd);
+void							process_heredoc(t_cmd *cmd, int *status);
+void							heredoc(t_node *ast, int *status);
 
 /* parser.c */
 void							print_synerr(t_TokenType expected);

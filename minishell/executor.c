@@ -236,67 +236,6 @@ char	**env_to_environ(t_env *env_list)
 	return (environ);
 }
 
-void	read_heredoc(t_fd *heredoc_delimiter, int fd)
-{
-	char	*line;
-
-	while (1)
-	{
-		line = readline("> ");
-		if(!line)
-			return ;
-		if (ft_strcmp(line, heredoc_delimiter->value) == 0)
-			return (free(line));
-		else
-		{
-			write(fd, line, ft_strlen(line));
-			write(fd, "\n", 1);
-		}
-		free(line);
-	}
-}
-
-void	parse_heredoc(t_fd *heredoc_delimiter, int fd_in, int fd_out)
-{
-	if (!heredoc_delimiter)
-		return ;
-	while (heredoc_delimiter->next)
-	{
-		read_heredoc(heredoc_delimiter, -1);
-		heredoc_delimiter = heredoc_delimiter->next;
-		heredoc_delimiter->fd = 0;
-	}
-	read_heredoc(heredoc_delimiter, fd_in);
-	heredoc_delimiter->fd = fd_out;
-}
-
-int	ft_heredoc(t_cmd *cmd)
-{
-	int		fd[2];
-	int		wstatus;
-	pid_t	pid;
-
-	if (!cmd->heredoc_delimiter)
-		return (0);
-	if (pipe(fd) == -1)
-		return (perror("pipe"), -1);
-	pid = fork();
-	if (pid < 0)
-		return (perror("fork"), -1);
-	if (pid == 0)
-	{
-		close(fd[0]);
-		parse_heredoc(cmd->heredoc_delimiter, fd[1],fd[0]);
-		close(fd[1]);
-		exit(EXIT_SUCCESS);
-	}
-	close(fd[1]);
-	waitpid(pid, &wstatus, 0);
-	if (WIFSIGNALED(wstatus))
-		return (-1);
-	return (0);
-}
-
 void	err_msg(char *value, char *msg)
 {
 	write(STDERR_FILENO, "minishell: ", 11);
@@ -304,314 +243,110 @@ void	err_msg(char *value, char *msg)
 	write(STDERR_FILENO, msg, ft_strlen(msg));
 }
 
-int	ft_open_fd_in(int *fd, t_fd *current)
+void ft_open_heredoc(t_cmd *cmd, t_fd *current, int heredoc_count)
 {
-	if (current->type == TOKEN_REDIR_IN)
+	if(heredoc_count == cmd->heredoc_count)
 	{
-		*fd = open(current->value, O_RDONLY);
-		if (errno == ENOENT)
-			return(err_msg(current->value, ": No such file or directory\n"),-1);
-		else if (errno == EACCES)
-		return(err_msg(current->value, ": Permission denied\n"),-1);
-		else if (*fd < 0)
-			return(err_msg(current->value, ": Failed to open file\n"),-1);
+		if(cmd->fd_in != 0 && cmd->fd_in > 0)
+			close(cmd->fd_in);
+		cmd->fd_in = current->fd;
 	}
-	return (0);
 }
 
-int	ft_open_fd_out(int *fd, t_fd *current)
+void	ft_open_fd_in(t_cmd *cmd, t_fd *current)
 {
-	if (current->type == TOKEN_REDIR_OUT)
-		*fd = open(current->value, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	else if (current->type == TOKEN_APPEND)
-		*fd = open(current->value, O_WRONLY | O_CREAT | O_APPEND, 0644);
+	if (cmd->fd_in != 0 && cmd->fd_in > 0)
+		close(cmd->fd_in);
+	current->fd = open(current->value, O_RDONLY);
 	if (errno == ENOENT)
-		return(err_msg(current->value, ": No such file or directory\n"),-1);
+		err_msg(current->value, ": No such file or directory\n");
 	else if (errno == EACCES)
-		return(err_msg(current->value, ": Permission denied\n"),-1);
-	else if (*fd < 0)
-		return(err_msg(current->value, ": Failed to open file\n"),-1);
-	return (0);
+		err_msg(current->value, ": Permission denied\n");
+	else if (current->fd < 0)
+		err_msg(current->value, ": Failed to open file\n");
+	cmd->fd_in = current->fd;
+}
+
+void	ft_open_fd_out(t_cmd *cmd, t_fd *current)
+{
+	if (cmd->fd_out != 1 && cmd->fd_out > 0)
+		close(cmd->fd_out);
+	if (current->type == TOKEN_REDIR_OUT)
+		current->fd = open(current->value, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	else if (current->type == TOKEN_APPEND)
+		current->fd = open(current->value, O_WRONLY | O_CREAT | O_APPEND, 0644);
+	if (errno == ENOENT)
+		err_msg(current->value, ": No such file or directory\n");
+	else if (errno == EACCES)
+		err_msg(current->value, ": Permission denied\n");
+	else if (current->fd < 0)
+		err_msg(current->value, ": Failed to open file\n");
+	cmd->fd_out = current->fd;
 }
 
 int process_redirections(t_cmd *cmd)
 {
-    // Step 1: Count how many heredocs we have
-    int heredoc_count = 0;
-    t_fd *curr_heredoc = cmd->heredoc_delimiter;
-    while (curr_heredoc)
-    {
-        heredoc_count++;
-        curr_heredoc = curr_heredoc->next;
-    }
-    if (heredoc_count > 0)
-    {
-        // Step 2: Create an array to store prepared heredoc fds
-        int *heredoc_fds = malloc(sizeof(int) * heredoc_count);
-        if (!heredoc_fds)
-            return (perror("malloc"), -1);
-            
-        // Step 3: Prepare all heredocs and store their fds in order
-        curr_heredoc = cmd->heredoc_delimiter;
-        for (int i = 0; i < heredoc_count; i++)
-        {
-            int pipe_fds[2];
-            if (pipe(pipe_fds) == -1)
-            {
-                // Clean up already created pipes
-                for (int j = 0; j < i; j++)
-                    close(heredoc_fds[j]);
-                free(heredoc_fds);
-                return (perror("pipe"), -1);
-            }
-            
-            pid_t pid = fork();
-            if (pid < 0)
-            {
-                // Clean up all pipes
-                close(pipe_fds[0]);
-                close(pipe_fds[1]);
-                for (int j = 0; j < i; j++)
-                    close(heredoc_fds[j]);
-                free(heredoc_fds);
-                return (perror("fork"), -1);
-            }
-            
-            if (pid == 0)
-            {
-                // Child process
-                reset_default_signal();
-                close(pipe_fds[0]);
-                read_heredoc(curr_heredoc, pipe_fds[1]);
-                close(pipe_fds[1]);
-                exit(EXIT_SUCCESS);
-            }
-            close(pipe_fds[1]);
-            int wstatus;
-            waitpid(pid, &wstatus, 0);
-            if (WIFSIGNALED(wstatus))
-            {
-                close(pipe_fds[0]);
-                for (int j = 0; j < i; j++)
-                    close(heredoc_fds[j]);
-                free(heredoc_fds);
-                return -1;
-            }
-            heredoc_fds[i] = pipe_fds[0];
-            curr_heredoc = curr_heredoc->next;
-        }
-        
-        // Step 4: Process all redirections in original order
-        int heredoc_index = 0;
-        t_fd *current = cmd->fds;
-        while (current)
-        {
-            if (current->type == TOKEN_REDIR_IN)
-            {
-                int new_fd;
-                if (ft_open_fd_in(&new_fd, current) < 0)
-                {
-                    for (int j = 0; j < heredoc_count; j++)
-                        close(heredoc_fds[j]);
-                    free(heredoc_fds);
-                    return -1;
-                }
-                if (cmd->fd_in != 0)
-                    close(cmd->fd_in);
-                cmd->fd_in = new_fd;
-            }
-            else if (current->type == TOKEN_HEREDOC)
-            {
-				if (cmd->fd_in != 0)
-					close(cmd->fd_in);
-				cmd->fd_in = heredoc_fds[heredoc_index++];
-            }
-            else if (current->type == TOKEN_REDIR_OUT || current->type == TOKEN_APPEND)
-            {
-                // Output redirection handling...
-                int new_fd;
-                if (ft_open_fd_out(&new_fd, current) < 0)
-                {
-                    for (int j = 0; j < heredoc_count; j++)
-                        close(heredoc_fds[j]);
-                    free(heredoc_fds);
-                    return -1;
-                }
-                if (cmd->fd_out != 1)
-                    close(cmd->fd_out);
-                cmd->fd_out = new_fd;
-            }
-            current = current->next;
-        }
-        
-        // Close any unused heredoc fds
-        for (int i = heredoc_index; i < heredoc_count; i++)
-            close(heredoc_fds[i]);
-        free(heredoc_fds);
-    }
-    else
-    {
-        // No heredocs, just process regular redirections
-        t_fd *current = cmd->fds;
-        while (current)
-        {
-            if (current->type == TOKEN_REDIR_IN)
-            {
-                int new_fd;
-                if (ft_open_fd_in(&new_fd, current) < 0)
-                    return -1;
-                if (cmd->fd_in != 0)
-                    close(cmd->fd_in);
-                cmd->fd_in = new_fd;
-            }
-            else if (current->type == TOKEN_REDIR_OUT || current->type == TOKEN_APPEND)
-            {
-                // Output redirection handling...
-                int new_fd;
-                if (ft_open_fd_out(&new_fd, current) < 0)
-                    return -1;
-                if (cmd->fd_out != 1)
-                    close(cmd->fd_out);
-                cmd->fd_out = new_fd;
-            }
-            current = current->next;
-        }
-    }
+	int heredoc_count;
+	t_fd *current;
+
+	current = cmd->fds;
+	if(current == NULL)
+		return (0);
+	heredoc_count = 0;
+	while(current)
+	{
+		if (current->type == TOKEN_REDIR_IN)
+			ft_open_fd_in(cmd, current);
+		else if(current->type == TOKEN_HEREDOC)
+			ft_open_heredoc(cmd, current, ++heredoc_count);
+		else if (current->type == TOKEN_REDIR_OUT || current->type == TOKEN_APPEND)
+			ft_open_fd_out(cmd, current);
+		current = current->next;
+	}
     return 0;
 }
-
-// void exec_pipe(t_node *ast, t_env *env_list, int *status)
-// {
-//     int fd[2];
-//     pid_t pid1;
-// 	pid_t pid2;
-//     int status1;
-// 	int status2;
-
-//     if (pipe(fd) == -1)
-//     {
-//         *status = -1;
-//         return (perror("pipe"));
-//     }
-//     pid1 = fork();
-//     if (pid1 < 0)
-//     {
-//         *status = -1;
-//         return (perror("fork"));
-//     }
-//     if (pid1 == 0)
-//     {
-//         dup2(fd[1], STDOUT_FILENO);
-//         close(fd[0]);
-//         close(fd[1]);
-//         executor(ast->lhs, env_list, status);
-//         exit(*status);
-//     }
-//     pid2 = fork();
-//     if (pid2 < 0)
-//     {
-//         *status = -1;
-//         return (perror("fork"));
-//     }
-//     if (pid2 == 0)
-//     {
-//         dup2(fd[0], STDIN_FILENO);
-//         close(fd[0]);
-//         close(fd[1]);
-//         executor(ast->rhs, env_list, status);
-//         exit(*status);
-//     }
-//     close(fd[0]);
-//     close(fd[1]);
-//     waitpid(pid1, &status1, 0);
-//     waitpid(pid2, &status2, 0);
-//     if (WIFEXITED(status2))
-//         *status = WEXITSTATUS(status2);
-//     else if (WIFSIGNALED(status2))
-//         *status = 128 + WTERMSIG(status2);
-// }
 
 void exec_pipe(t_node *ast, t_env *env_list, int *status)
 {
     int fd[2];
-    pid_t pid1, pid2;
-    int status1, status2;
+    pid_t pid1;
+	pid_t pid2;
+    int status1;
+	int status2;
 
     if (pipe(fd) == -1)
     {
         *status = -1;
-        perror("pipe");
-        return;
+        return (perror("pipe"));
     }
-
-    // Left side
     pid1 = fork();
     if (pid1 < 0)
     {
         *status = -1;
-        perror("fork");
-        return;
+        return (perror("fork"));
     }
     if (pid1 == 0)
     {
-        // Handle heredocs and file redirections for the left command
-        if (ast->lhs->type == NODE_CMD)
-        {
-            t_cmd *cmd = ast->lhs->cmd;
-            if (process_redirections(cmd) == -1)
-                exit(1);
-            if (cmd->fd_in != 0)
-            {
-                dup2(cmd->fd_in, STDIN_FILENO);
-                close(cmd->fd_in);
-            }
-            if (cmd->fd_out != 1)
-            {
-                dup2(cmd->fd_out, STDOUT_FILENO);
-                close(cmd->fd_out);
-            }
-        }
         dup2(fd[1], STDOUT_FILENO);
         close(fd[0]);
         close(fd[1]);
         executor(ast->lhs, env_list, status);
         exit(*status);
     }
-
-    // Right side
     pid2 = fork();
     if (pid2 < 0)
     {
         *status = -1;
-        perror("fork");
-        return;
+        return (perror("fork"));
     }
     if (pid2 == 0)
     {
-        // Handle heredocs and file redirections for the right command
-        if (ast->rhs->type == NODE_CMD)
-        {
-            t_cmd *cmd = ast->rhs->cmd;
-            if (process_redirections(cmd) == -1)
-                exit(1);
-            if (cmd->fd_in != 0)
-            {
-                dup2(cmd->fd_in, STDIN_FILENO);
-                close(cmd->fd_in);
-            }
-            if (cmd->fd_out != 1)
-            {
-                dup2(cmd->fd_out, STDOUT_FILENO);
-                close(cmd->fd_out);
-            }
-        }
         dup2(fd[0], STDIN_FILENO);
         close(fd[0]);
         close(fd[1]);
         executor(ast->rhs, env_list, status);
         exit(*status);
     }
-
     close(fd[0]);
     close(fd[1]);
     waitpid(pid1, &status1, 0);
@@ -714,19 +449,15 @@ void	executor(t_node *ast, t_env *env_list, int *status)
 		return ;
 	if (ast->type == NODE_PIPE && g_status == 0)
 		exec_pipe(ast, env_list, status);
-	else if (ast->type == NODE_AND_IF && g_status == 0)
+	else if ((ast->type == NODE_AND_IF || ast->type == NODE_OR_IF) && g_status == 0)
 	{
 		executor(ast->lhs, env_list, status);
-		if (*status == 0 && g_status == 0)
+		if (ast->type == NODE_AND_IF && *status == 0 && g_status == 0)
 		{
 			expander(ast->rhs, env_list, status);
 			executor(ast->rhs, env_list, status);
 		}
-	}
-	else if (ast->type == NODE_OR_IF && g_status == 0)
-	{
-		executor(ast->lhs, env_list, status);
-		if (*status != 0 && g_status == 0)
+		else if (ast->type == NODE_OR_IF && *status != 0 && g_status == 0)
 		{
 			expander(ast->rhs, env_list, status);
 			executor(ast->rhs, env_list, status);

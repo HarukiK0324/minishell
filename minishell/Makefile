@@ -6,7 +6,7 @@ NAME = minishell
 SRC_DIR = .
 OBJ_DIR = obj
 
-SRC = builtin.c executor.c expander.c ft_split.c main.c parser.c tokenizer.c
+SRC = builtin.c executor.c expander.c ft_split.c main.c parser.c tokenizer.c heredoc.c
 OBJ = $(SRC:%.c=$(OBJ_DIR)/%.o)
 
 all: $(NAME)
