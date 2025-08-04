@@ -249,7 +249,7 @@ void ft_open_heredoc(t_cmd *cmd, t_fd *current, int heredoc_count)
 	{
 		if(cmd->fd_in != 0 && cmd->fd_in > 0)
 			close(cmd->fd_in);
-		cmd->fd_in = current->fd;
+		cmd->fd_in = cmd->heredoc_fd;
 	}
 }
 

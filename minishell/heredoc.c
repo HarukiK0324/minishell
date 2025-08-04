@@ -54,6 +54,7 @@ int	ft_heredoc(t_cmd *cmd)
 		exit(EXIT_SUCCESS);
 	}
 	close(fd[1]);
+    cmd->heredoc_fd = fd[0];
 	waitpid(pid, &wstatus, 0);
 	if (WIFSIGNALED(wstatus))
 		return (-1);
