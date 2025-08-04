@@ -1,0 +1,86 @@
+#include "minishell.h"
+
+void	read_heredoc(t_fd *heredoc_delimiter, int fd)
+{
+	char	*line;
+
+	while (1)
+	{
+		line = readline("> ");
+		if(!line)
+			return ;
+		if (ft_strcmp(line, heredoc_delimiter->value) == 0)
+			return (free(line));
+		else if (fd != -1)
+		{
+			write(fd, line, ft_strlen(line));
+			write(fd, "\n", 1);
+		}
+		free(line);
+	}
+}
+
+void	parse_heredoc(t_fd *heredoc_delimiter, int fd_in, int fd_out)
+{
+	if (!heredoc_delimiter)
+		return ;
+	while (heredoc_delimiter->next)
+	{
+		read_heredoc(heredoc_delimiter, -1);
+		heredoc_delimiter->fd = -1;
+		heredoc_delimiter = heredoc_delimiter->next;
+	}
+	read_heredoc(heredoc_delimiter, fd_in);
+	heredoc_delimiter->fd = fd_out;
+}
+
+int	ft_heredoc(t_cmd *cmd)
+{
+	int		fd[2];
+	int		wstatus;
+	pid_t	pid;
+    
+	if (pipe(fd) == -1)
+		return (perror("pipe"), -1);
+	pid = fork();
+	if (pid < 0)
+		return (perror("fork"), -1);
+	if (pid == 0)
+	{
+        reset_heredoc_signal();
+		close(fd[0]);
+		parse_heredoc(cmd->heredoc_delimiter, fd[1],fd[0]);
+		close(fd[1]);
+		exit(EXIT_SUCCESS);
+	}
+	close(fd[1]);
+	waitpid(pid, &wstatus, 0);
+	if (WIFSIGNALED(wstatus))
+		return (-1);
+	return (0);
+}
+
+void process_heredoc(t_cmd *cmd, int *status)
+{
+    if (!cmd->heredoc_delimiter)
+        return;
+    if (ft_heredoc(cmd) == -1)
+    {
+        *status = 130;
+        g_status = 2;
+        return;
+    }
+}
+
+void heredoc(t_node *ast, int *status)
+{
+    if(!ast)
+		return ;
+    if (ast->type == NODE_PIPE || ast->type == NODE_AND_IF || ast->type == NODE_OR_IF)
+    {
+        heredoc(ast->lhs, status);
+        heredoc(ast->rhs, status);
+    }
+	else if (ast->type == NODE_CMD && g_status == 0)
+		process_heredoc(ast->cmd, status);
+}
