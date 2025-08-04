@@ -123,7 +123,8 @@ int 							ft_heredoc(t_cmd *cmd);
 void 							err_msg(char *value, char *msg);
 int 							ft_open_fd_in(t_cmd *cmd, t_fd *current);
 int 							ft_open_fd_out(t_cmd *cmd, t_fd *current);
-int 							ft_file_redirection(t_cmd *cmd);
+int 							ft_file_redirection(t_cmd *cmd, int heredoc_fd);
+int 							process_redirections(t_cmd *cmd);
 void							executor(t_node *ast, t_env *env_list,
 									int *status);
 void							exec_pipe(t_node *ast, t_env *env_list,
