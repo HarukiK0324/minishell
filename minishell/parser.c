@@ -61,6 +61,8 @@ void	append_fd(t_fd **list, t_fd *new_fd)
 {
 	t_fd	*current;
 
+	if(!new_fd)
+		return ;
 	if (!*list)
 		*list = new_fd;
 	else
@@ -71,6 +73,20 @@ void	append_fd(t_fd **list, t_fd *new_fd)
 		current->next = new_fd;
 		new_fd->next = NULL;
 	}
+}
+
+t_fd	*dup_fd(t_fd *fd)
+{
+	t_fd	*new_fd;
+
+	new_fd = (t_fd *)malloc(sizeof(t_fd));
+	if (!new_fd)
+		return (perror("malloc"), NULL);
+	new_fd->type = fd->type;
+	new_fd->fd = fd->fd;
+	new_fd->value = ft_strdup(fd->value);
+	new_fd->next = NULL;
+	return (new_fd);
 }
 
 t_node	*init_node(void)
@@ -166,7 +182,10 @@ int	add_fd(t_cmd *cmd, t_token **tokens)
 		return (print_synerr((*tokens)->type), free_fds(fd), 0);
 	fd->value = ft_strdup((*tokens)->value);
 	if (fd->type == TOKEN_HEREDOC)
-		append_fd(&cmd->heredoc_delimiter, fd);
+	{
+		cmd->heredoc_count++;
+		append_fd(&cmd->heredoc_delimiter, dup_fd(fd));
+	}
 	append_fd(&cmd->fds, fd);
 	(*tokens) = (*tokens)->next;
 	return (1);

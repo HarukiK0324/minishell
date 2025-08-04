@@ -480,47 +480,138 @@ int process_redirections(t_cmd *cmd)
     return 0;
 }
 
+// void exec_pipe(t_node *ast, t_env *env_list, int *status)
+// {
+//     int fd[2];
+//     pid_t pid1;
+// 	pid_t pid2;
+//     int status1;
+// 	int status2;
+
+//     if (pipe(fd) == -1)
+//     {
+//         *status = -1;
+//         return (perror("pipe"));
+//     }
+//     pid1 = fork();
+//     if (pid1 < 0)
+//     {
+//         *status = -1;
+//         return (perror("fork"));
+//     }
+//     if (pid1 == 0)
+//     {
+//         dup2(fd[1], STDOUT_FILENO);
+//         close(fd[0]);
+//         close(fd[1]);
+//         executor(ast->lhs, env_list, status);
+//         exit(*status);
+//     }
+//     pid2 = fork();
+//     if (pid2 < 0)
+//     {
+//         *status = -1;
+//         return (perror("fork"));
+//     }
+//     if (pid2 == 0)
+//     {
+//         dup2(fd[0], STDIN_FILENO);
+//         close(fd[0]);
+//         close(fd[1]);
+//         executor(ast->rhs, env_list, status);
+//         exit(*status);
+//     }
+//     close(fd[0]);
+//     close(fd[1]);
+//     waitpid(pid1, &status1, 0);
+//     waitpid(pid2, &status2, 0);
+//     if (WIFEXITED(status2))
+//         *status = WEXITSTATUS(status2);
+//     else if (WIFSIGNALED(status2))
+//         *status = 128 + WTERMSIG(status2);
+// }
+
 void exec_pipe(t_node *ast, t_env *env_list, int *status)
 {
     int fd[2];
-    pid_t pid1;
-	pid_t pid2;
-    int status1;
-	int status2;
+    pid_t pid1, pid2;
+    int status1, status2;
 
     if (pipe(fd) == -1)
     {
         *status = -1;
-        return (perror("pipe"));
+        perror("pipe");
+        return;
     }
+
+    // Left side
     pid1 = fork();
     if (pid1 < 0)
     {
         *status = -1;
-        return (perror("fork"));
+        perror("fork");
+        return;
     }
     if (pid1 == 0)
     {
+        // Handle heredocs and file redirections for the left command
+        if (ast->lhs->type == NODE_CMD)
+        {
+            t_cmd *cmd = ast->lhs->cmd;
+            if (process_redirections(cmd) == -1)
+                exit(1);
+            if (cmd->fd_in != 0)
+            {
+                dup2(cmd->fd_in, STDIN_FILENO);
+                close(cmd->fd_in);
+            }
+            if (cmd->fd_out != 1)
+            {
+                dup2(cmd->fd_out, STDOUT_FILENO);
+                close(cmd->fd_out);
+            }
+        }
         dup2(fd[1], STDOUT_FILENO);
         close(fd[0]);
         close(fd[1]);
         executor(ast->lhs, env_list, status);
         exit(*status);
     }
+
+    // Right side
     pid2 = fork();
     if (pid2 < 0)
     {
         *status = -1;
-        return (perror("fork"));
+        perror("fork");
+        return;
     }
     if (pid2 == 0)
     {
+        // Handle heredocs and file redirections for the right command
+        if (ast->rhs->type == NODE_CMD)
+        {
+            t_cmd *cmd = ast->rhs->cmd;
+            if (process_redirections(cmd) == -1)
+                exit(1);
+            if (cmd->fd_in != 0)
+            {
+                dup2(cmd->fd_in, STDIN_FILENO);
+                close(cmd->fd_in);
+            }
+            if (cmd->fd_out != 1)
+            {
+                dup2(cmd->fd_out, STDOUT_FILENO);
+                close(cmd->fd_out);
+            }
+        }
         dup2(fd[0], STDIN_FILENO);
         close(fd[0]);
         close(fd[1]);
         executor(ast->rhs, env_list, status);
         exit(*status);
     }
+
     close(fd[0]);
     close(fd[1]);
     waitpid(pid1, &status1, 0);

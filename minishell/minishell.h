@@ -61,6 +61,7 @@ typedef struct s_cmd
 	t_token						*argv;
 	t_fd						*fds;
 	t_fd						*heredoc_delimiter;
+	int							heredoc_count;
 	int							fd_in;
 	int							fd_out;
 }								t_cmd;
