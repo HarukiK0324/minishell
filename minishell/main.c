@@ -179,7 +179,7 @@ void	reset_default_signal(void)
 	signal(SIGQUIT, SIG_IGN);
 }
 
-void reset_heredoc_signal(void)
+void	reset_heredoc_signal(void)
 {
 	struct sigaction	sa_int;
 
@@ -302,7 +302,7 @@ int	main(int argc, char **argv, char **environ)
 		if (ft_strlen(input) > 0)
 		{
 			if (check_quote(input) == -1)
-				return(err_msg("Unmatched quotes", ": Syntax error"), 2);
+				return (err_msg("Unmatched quotes", ": Syntax error"), 2);
 			tokens = tokenize(input);
 			saved_tokens = tokens;
 			// while (tokens)
@@ -354,7 +354,7 @@ int	main(int argc, char **argv, char **environ)
 			}
 			expander(ast, env_list, &status);
 			heredoc(ast, &status);
-			if(g_status == 0)
+			if (g_status == 0)
 				executor(ast, env_list, &status);
 			free_ast(ast);
 			add_history(input);

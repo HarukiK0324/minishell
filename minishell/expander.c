@@ -13,8 +13,8 @@ int	is_numchar(char c)
 char	*to_str(size_t n)
 {
 	char	*str;
-	size_t		len;
-	size_t		temp;
+	size_t	len;
+	size_t	temp;
 
 	len = 0;
 	temp = n;
@@ -40,7 +40,7 @@ char	*to_str(size_t n)
 char	*str_trim(char *str, size_t *j, size_t i)
 {
 	char	*new_str;
-	size_t		k;
+	size_t	k;
 
 	if (!str || *j < 0 || i < 0 || (*j + i >= ft_strlen(str)))
 		return (perror("str_trim failed"), NULL);
@@ -127,8 +127,8 @@ char	*replace_status(char *str, size_t *j, int *status)
 
 char	*parse_env_var(char *str, size_t *j, t_env *env_list, int *status)
 {
-	size_t		i;
-	size_t		k;
+	size_t	i;
+	size_t	k;
 	char	*env_var;
 
 	if (str[*j + 1] == '?')
@@ -154,7 +154,7 @@ char	*parse_env_var(char *str, size_t *j, t_env *env_list, int *status)
 
 char	*trim_quote(char *str, size_t *j, char c)
 {
-	size_t		i;
+	size_t	i;
 	char	*new_str;
 
 	i = 0;
@@ -182,7 +182,7 @@ char	*trim_quote(char *str, size_t *j, char c)
 
 char	*trim_double_quote(char *str, size_t *j, t_env *env_list, int *status)
 {
-	size_t		i;
+	size_t	i;
 
 	i = *j + 1;
 	while (str[i] != '"')
@@ -197,7 +197,7 @@ char	*trim_double_quote(char *str, size_t *j, t_env *env_list, int *status)
 
 void	expand_cmd(t_cmd *cmd, t_env *env_list, int *status)
 {
-	size_t		j;
+	size_t	j;
 	t_token	*argv;
 
 	argv = cmd->argv;
@@ -231,6 +231,5 @@ void	expander(t_node *node, t_env *env_list, int *status)
 		expander(node->lhs, env_list, status);
 		if (node->type == NODE_PIPE)
 			expander(node->rhs, env_list, status);
-		
 	}
 }

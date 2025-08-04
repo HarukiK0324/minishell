@@ -110,7 +110,7 @@ int								exec_exit(t_token *argv);
 int								is_builtin(char *cmd);
 void							exec_builtin(t_env *env_list, t_cmd *cmd,
 									int *status);
-void 							free_str_list(char **list);
+void							free_str_list(char **list);
 char							*ft_access(char *path, char *cmd);
 char							*get_path_from_env(char *argv, t_env *env_list);
 char							*get_path(char *cmd, t_env *env_list);
@@ -120,14 +120,16 @@ void							free_argv(char **argv, size_t i);
 char							**to_list(t_token *tokens);
 char							*ft_env_join(t_env *env_list);
 char							**env_to_environ(t_env *env_list);
-void 							read_heredoc(t_fd *heredoc_delimiter, int fd);
-void 							parse_heredoc(t_fd *heredoc_delimiter, int fd_in, int fd_out);
-int 							ft_heredoc(t_cmd *cmd);
-void 							err_msg(char *value, char *msg);
-void 							ft_open_heredoc(t_cmd *cmd, t_fd *current, int heredoc_count);
-void 							ft_open_fd_in(t_cmd *cmd, t_fd *current);
-void 							ft_open_fd_out(t_cmd *cmd, t_fd *current);
-int 							process_redirections(t_cmd *cmd);
+void							read_heredoc(t_fd *heredoc_delimiter, int fd);
+void							parse_heredoc(t_fd *heredoc_delimiter,
+									int fd_in, int fd_out);
+int								ft_heredoc(t_cmd *cmd);
+void							err_msg(char *value, char *msg);
+void							ft_open_heredoc(t_cmd *cmd, t_fd *current,
+									int heredoc_count);
+void							ft_open_fd_in(t_cmd *cmd, t_fd *current);
+void							ft_open_fd_out(t_cmd *cmd, t_fd *current);
+int								process_redirections(t_cmd *cmd);
 void							executor(t_node *ast, t_env *env_list,
 									int *status);
 void							exec_pipe(t_node *ast, t_env *env_list,
@@ -145,7 +147,8 @@ char							*str_trim(char *str, size_t *j, size_t i);
 char							*str_insert(char *str, size_t *j, char *value);
 char							*replace_env_var(char *str, size_t *j, size_t i,
 									char *env_var, t_env *env_list);
-char							*replace_status(char *str, size_t *j, int *status);
+char							*replace_status(char *str, size_t *j,
+									int *status);
 char							*parse_env_var(char *str, size_t *j,
 									t_env *env_list, int *status);
 char							*trim_quote(char *str, size_t *j, char c);
@@ -164,7 +167,8 @@ char							**ft_split(char const *s, char c);
 
 /* heredoc.c */
 void							read_heredoc(t_fd *heredoc_delimiter, int fd);
-void							parse_heredoc(t_fd *heredoc_delimiter, int fd_in, int fd_out);
+void							parse_heredoc(t_fd *heredoc_delimiter,
+									int fd_in, int fd_out);
 int								ft_heredoc(t_cmd *cmd);
 void							process_heredoc(t_cmd *cmd, int *status);
 void							heredoc(t_node *ast, int *status);

@@ -61,7 +61,7 @@ void	append_fd(t_fd **list, t_fd *new_fd)
 {
 	t_fd	*current;
 
-	if(!new_fd)
+	if (!new_fd)
 		return ;
 	if (!*list)
 		*list = new_fd;
@@ -121,10 +121,11 @@ t_cmd	*init_cmd(void)
 t_node	*parse_condition(t_token **tokens)
 {
 	t_node	*node;
-	t_node *new_root;
+	t_node	*new_root;
 
 	node = parse_pipe(tokens);
-	while(node && (*tokens) && ((*tokens)->type == TOKEN_AND_IF || (*tokens)->type == TOKEN_OR_IF))
+	while (node && (*tokens) && ((*tokens)->type == TOKEN_AND_IF
+			|| (*tokens)->type == TOKEN_OR_IF))
 	{
 		new_root = init_node();
 		if (!new_root)
@@ -136,7 +137,7 @@ t_node	*parse_condition(t_token **tokens)
 		*tokens = (*tokens)->next;
 		new_root->lhs = node;
 		new_root->rhs = parse_pipe(tokens);
-		if(!new_root->rhs)
+		if (!new_root->rhs)
 			return (free_node(new_root), NULL);
 		node = new_root;
 	}
@@ -146,10 +147,10 @@ t_node	*parse_condition(t_token **tokens)
 t_node	*parse_pipe(t_token **tokens)
 {
 	t_node	*node;
-	t_node *new_root;
+	t_node	*new_root;
 
 	node = parse_cmd(tokens);
-	while(node && (*tokens) && (*tokens)->type == TOKEN_PIPE)
+	while (node && (*tokens) && (*tokens)->type == TOKEN_PIPE)
 	{
 		new_root = init_node();
 		if (!new_root)
@@ -213,7 +214,7 @@ t_node	*parse_cmd(t_token **tokens)
 
 	if (!*tokens)
 		return (print_synerr(TOKEN_END), NULL);
-	else if((*tokens)->type == TOKEN_OPEN_PAREN)
+	else if ((*tokens)->type == TOKEN_OPEN_PAREN)
 	{
 		*tokens = (*tokens)->next;
 		node = parse_condition(tokens);
@@ -226,7 +227,7 @@ t_node	*parse_cmd(t_token **tokens)
 		(*tokens) = (*tokens)->next;
 		return (node);
 	}
-	else if(!token_cmd(*tokens))
+	else if (!token_cmd(*tokens))
 		return (print_synerr((*tokens)->type), NULL);
 	node = init_node();
 	cmd = init_cmd();

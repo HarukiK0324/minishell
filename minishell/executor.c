@@ -10,56 +10,56 @@ int	is_builtin(char *cmd)
 	return (0);
 }
 
-void exec_builtin(t_env *env_list, t_cmd *cmd, int *status)
+void	exec_builtin(t_env *env_list, t_cmd *cmd, int *status)
 {
-	int original_stdin;
-	int original_stdout;
-	
+	int	original_stdin;
+	int	original_stdout;
+
 	original_stdin = dup(STDIN_FILENO);
 	original_stdout = dup(STDOUT_FILENO);
-    if (original_stdin == -1 || original_stdout == -1)
-    {
-        perror("dup");
-        *status = 1;
-        return;
+	if (original_stdin == -1 || original_stdout == -1)
+	{
+		perror("dup");
+		*status = 1;
+		return ;
 	}
-    if (process_redirections(cmd) == -1)
-    {
-        *status = 1;
-        if (cmd->fd_in != 0)
-            close(cmd->fd_in);
-        if (cmd->fd_out != 1)
-            close(cmd->fd_out);
-        close(original_stdin);
-        close(original_stdout);
-        return;
-    }
-    if (cmd->fd_in != 0)
-        dup2(cmd->fd_in, STDIN_FILENO);
-    if (cmd->fd_out != 1)
-        dup2(cmd->fd_out, STDOUT_FILENO);
-    if (ft_strcmp(cmd->argv->value, "cd") == 0)
-        *status = exec_cd(cmd->argv, env_list);
-    else if (ft_strcmp(cmd->argv->value, "echo") == 0)
-        *status = exec_echo(cmd->argv);
-    else if (ft_strcmp(cmd->argv->value, "exit") == 0)
-        *status = exec_exit(cmd->argv);
-    else if (ft_strcmp(cmd->argv->value, "export") == 0)
-        *status = exec_export(cmd->argv, env_list);
-    else if (ft_strcmp(cmd->argv->value, "pwd") == 0)
-        *status = exec_pwd();
-    else if (ft_strcmp(cmd->argv->value, "unset") == 0)
-        *status = exec_unset(cmd->argv, env_list);
-    else if (ft_strcmp(cmd->argv->value, "env") == 0)
-        *status = exec_env(env_list);
-    dup2(original_stdin, STDIN_FILENO);
-    dup2(original_stdout, STDOUT_FILENO);
-    close(original_stdin);
-    close(original_stdout);
-    if (cmd->fd_in != 0)
-        close(cmd->fd_in);
-    if (cmd->fd_out != 1)
-        close(cmd->fd_out);
+	if (process_redirections(cmd) == -1)
+	{
+		*status = 1;
+		if (cmd->fd_in != 0)
+			close(cmd->fd_in);
+		if (cmd->fd_out != 1)
+			close(cmd->fd_out);
+		close(original_stdin);
+		close(original_stdout);
+		return ;
+	}
+	if (cmd->fd_in != 0)
+		dup2(cmd->fd_in, STDIN_FILENO);
+	if (cmd->fd_out != 1)
+		dup2(cmd->fd_out, STDOUT_FILENO);
+	if (ft_strcmp(cmd->argv->value, "cd") == 0)
+		*status = exec_cd(cmd->argv, env_list);
+	else if (ft_strcmp(cmd->argv->value, "echo") == 0)
+		*status = exec_echo(cmd->argv);
+	else if (ft_strcmp(cmd->argv->value, "exit") == 0)
+		*status = exec_exit(cmd->argv);
+	else if (ft_strcmp(cmd->argv->value, "export") == 0)
+		*status = exec_export(cmd->argv, env_list);
+	else if (ft_strcmp(cmd->argv->value, "pwd") == 0)
+		*status = exec_pwd();
+	else if (ft_strcmp(cmd->argv->value, "unset") == 0)
+		*status = exec_unset(cmd->argv, env_list);
+	else if (ft_strcmp(cmd->argv->value, "env") == 0)
+		*status = exec_env(env_list);
+	dup2(original_stdin, STDIN_FILENO);
+	dup2(original_stdout, STDOUT_FILENO);
+	close(original_stdin);
+	close(original_stdout);
+	if (cmd->fd_in != 0)
+		close(cmd->fd_in);
+	if (cmd->fd_out != 1)
+		close(cmd->fd_out);
 }
 
 void	free_str_list(char **list)
@@ -112,8 +112,8 @@ char	*get_path_from_env(char *argv, t_env *env_list)
 	while (paths && paths[i])
 	{
 		path = ft_access(paths[i++], argv);
-		if(path)
-			break;
+		if (path)
+			break ;
 	}
 	free_str_list(paths);
 	if (path)
@@ -243,11 +243,11 @@ void	err_msg(char *value, char *msg)
 	write(STDERR_FILENO, msg, ft_strlen(msg));
 }
 
-void ft_open_heredoc(t_cmd *cmd, t_fd *current, int heredoc_count)
+void	ft_open_heredoc(t_cmd *cmd, t_fd *current, int heredoc_count)
 {
-	if(heredoc_count == cmd->heredoc_count)
+	if (heredoc_count == cmd->heredoc_count)
 	{
-		if(cmd->fd_in != 0 && cmd->fd_in > 0)
+		if (cmd->fd_in != 0 && cmd->fd_in > 0)
 			close(cmd->fd_in);
 		cmd->fd_in = cmd->heredoc_fd;
 	}
@@ -284,77 +284,78 @@ void	ft_open_fd_out(t_cmd *cmd, t_fd *current)
 	cmd->fd_out = current->fd;
 }
 
-int process_redirections(t_cmd *cmd)
+int	process_redirections(t_cmd *cmd)
 {
-	int heredoc_count;
-	t_fd *current;
+	int		heredoc_count;
+	t_fd	*current;
 
 	current = cmd->fds;
-	if(current == NULL)
+	if (current == NULL)
 		return (0);
 	heredoc_count = 0;
-	while(current)
+	while (current)
 	{
 		if (current->type == TOKEN_REDIR_IN)
 			ft_open_fd_in(cmd, current);
-		else if(current->type == TOKEN_HEREDOC)
+		else if (current->type == TOKEN_HEREDOC)
 			ft_open_heredoc(cmd, current, ++heredoc_count);
-		else if (current->type == TOKEN_REDIR_OUT || current->type == TOKEN_APPEND)
+		else if (current->type == TOKEN_REDIR_OUT
+			|| current->type == TOKEN_APPEND)
 			ft_open_fd_out(cmd, current);
 		current = current->next;
 	}
-    return 0;
+	return (0);
 }
 
-void exec_pipe(t_node *ast, t_env *env_list, int *status)
+void	exec_pipe(t_node *ast, t_env *env_list, int *status)
 {
-    int fd[2];
-    pid_t pid1;
-	pid_t pid2;
-    int status1;
-	int status2;
+	int		fd[2];
+	pid_t	pid1;
+	pid_t	pid2;
+	int		status1;
+	int		status2;
 
-    if (pipe(fd) == -1)
-    {
-        *status = -1;
-        return (perror("pipe"));
-    }
-    pid1 = fork();
-    if (pid1 < 0)
-    {
-        *status = -1;
-        return (perror("fork"));
-    }
-    if (pid1 == 0)
-    {
-        dup2(fd[1], STDOUT_FILENO);
-        close(fd[0]);
-        close(fd[1]);
-        executor(ast->lhs, env_list, status);
-        exit(*status);
-    }
-    pid2 = fork();
-    if (pid2 < 0)
-    {
-        *status = -1;
-        return (perror("fork"));
-    }
-    if (pid2 == 0)
-    {
-        dup2(fd[0], STDIN_FILENO);
-        close(fd[0]);
-        close(fd[1]);
-        executor(ast->rhs, env_list, status);
-        exit(*status);
-    }
-    close(fd[0]);
-    close(fd[1]);
-    waitpid(pid1, &status1, 0);
-    waitpid(pid2, &status2, 0);
-    if (WIFEXITED(status2))
-        *status = WEXITSTATUS(status2);
-    else if (WIFSIGNALED(status2))
-        *status = 128 + WTERMSIG(status2);
+	if (pipe(fd) == -1)
+	{
+		*status = -1;
+		return (perror("pipe"));
+	}
+	pid1 = fork();
+	if (pid1 < 0)
+	{
+		*status = -1;
+		return (perror("fork"));
+	}
+	if (pid1 == 0)
+	{
+		dup2(fd[1], STDOUT_FILENO);
+		close(fd[0]);
+		close(fd[1]);
+		executor(ast->lhs, env_list, status);
+		exit(*status);
+	}
+	pid2 = fork();
+	if (pid2 < 0)
+	{
+		*status = -1;
+		return (perror("fork"));
+	}
+	if (pid2 == 0)
+	{
+		dup2(fd[0], STDIN_FILENO);
+		close(fd[0]);
+		close(fd[1]);
+		executor(ast->rhs, env_list, status);
+		exit(*status);
+	}
+	close(fd[0]);
+	close(fd[1]);
+	waitpid(pid1, &status1, 0);
+	waitpid(pid2, &status2, 0);
+	if (WIFEXITED(status2))
+		*status = WEXITSTATUS(status2);
+	else if (WIFSIGNALED(status2))
+		*status = 128 + WTERMSIG(status2);
 }
 
 void	ft_execve(t_env *env_list, t_cmd *cmd, int *status)
@@ -445,11 +446,12 @@ void	exec_cmd(t_env *env_list, t_cmd *cmd, int *status)
 
 void	executor(t_node *ast, t_env *env_list, int *status)
 {
-    if(!ast)
+	if (!ast)
 		return ;
 	if (ast->type == NODE_PIPE && g_status == 0)
 		exec_pipe(ast, env_list, status);
-	else if ((ast->type == NODE_AND_IF || ast->type == NODE_OR_IF) && g_status == 0)
+	else if ((ast->type == NODE_AND_IF || ast->type == NODE_OR_IF)
+		&& g_status == 0)
 	{
 		executor(ast->lhs, env_list, status);
 		if (ast->type == NODE_AND_IF && *status == 0 && g_status == 0)
