@@ -303,6 +303,7 @@ int	main(int argc, char **argv, char **environ)
 
 	(void)argc; // Unused parameter
 	(void)argv; // Unused parameter
+	status = 0;
 	env_list = init_env(environ);
 	if (!env_list)
 		return (perror("init_env failed"), 1);
