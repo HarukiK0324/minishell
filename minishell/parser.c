@@ -257,5 +257,6 @@ t_node	*parse(t_token *tokens)
 	if (!tokens)
 		return (NULL);
 	node = parse_condition(&tokens);
+	free_tokens(tokens);
 	return (node);
 }

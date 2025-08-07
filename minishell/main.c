@@ -166,9 +166,21 @@ void	handle_sigint(int sig)
 	errno = EINTR;
 }
 
+void handle_sigquit(int sig)
+{
+	(void)sig;
+	write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
+	rl_on_new_line();
+	// rl_replace_line("", 0);
+	rl_redisplay();
+	g_status = 3;
+	errno = EINTR;
+}
+
 void	reset_default_signal(void)
 {
 	struct sigaction	sa_int;
+	struct sigaction	sa_quit;
 
 	// Reset to default behavior
 	// Set up SIGINT handler (Ctrl+C)
@@ -176,7 +188,10 @@ void	reset_default_signal(void)
 	sigemptyset(&sa_int.sa_mask);
 	sa_int.sa_flags = 0;
 	sigaction(SIGINT, &sa_int, NULL);
-	signal(SIGQUIT, SIG_IGN);
+	sa_quit.sa_handler = handle_sigquit;
+	sigemptyset(&sa_quit.sa_mask);
+	sa_quit.sa_flags = 0;
+	sigaction(SIGQUIT, &sa_quit, NULL);
 }
 
 void	reset_heredoc_signal(void)
@@ -302,7 +317,11 @@ int	main(int argc, char **argv, char **environ)
 		if (ft_strlen(input) > 0)
 		{
 			if (check_quote(input) == -1)
-				return (err_msg("Unmatched quotes", ": Syntax error"), 2);
+			{
+				free(input);
+				err_msg("Unmatched quotes", ": Syntax error\n");
+				continue;
+			}
 			tokens = tokenize(input);
 			saved_tokens = tokens;
 			// while (tokens)
@@ -349,12 +368,16 @@ int	main(int argc, char **argv, char **environ)
 			ast = parse(saved_tokens);
 			if (!ast)
 			{
-				printf("failed parsing\n");
+				printf("failed tokenizing/parsing\n");
 				status = 2;
 			}
 			expander(ast, env_list, &status);
+			if(g_status != 0)
+				status = 2;
+			else
+				status = 0;
 			heredoc(ast, &status);
-			if (g_status == 0)
+			if (g_status == 0 && status == 0)
 				executor(ast, env_list, &status);
 			free_ast(ast);
 			add_history(input);
@@ -362,6 +385,7 @@ int	main(int argc, char **argv, char **environ)
 			g_status = 0;
 		}
 	}
+	free_env(env_list);
 	printf("exit\n");
 	exit(status);
 }

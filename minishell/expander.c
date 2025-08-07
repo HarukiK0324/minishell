@@ -107,7 +107,7 @@ char	*replace_env_var(char *str, size_t *j, size_t i, char *env_var,
 		env_list = env_list->next;
 	}
 	str = str_trim(str, j, i);
-	if (value && ft_strlen(value))
+	if (str && value && ft_strlen(value))
 		str = str_insert(str, j, value);
 	return (str);
 }
@@ -118,9 +118,10 @@ char	*replace_status(char *str, size_t *j, int *status)
 
 	status_str = to_str(*status);
 	if (!status_str)
-		return (perror("malloc"), NULL);
+		return (NULL);
 	str = str_trim(str, j, 1);
-	str = str_insert(str, j, status_str);
+	if (str)
+		str = str_insert(str, j, status_str);
 	free(status_str);
 	return (str);
 }
@@ -131,12 +132,12 @@ char	*parse_env_var(char *str, size_t *j, t_env *env_list, int *status)
 	size_t	k;
 	char	*env_var;
 
-	if (str[*j + 1] == '?')
+	if (str && str[*j + 1] == '?')
 		return (replace_status(str, j, status));
 	i = 0;
-	while (is_numchar(str[*j + 1 + i]))
+	while (str && is_numchar(str[*j + 1 + i]))
 		i++;
-	if (i > 0 && is_char(str[*j + 1]))
+	if (i > 0 && str && is_char(str[*j + 1]))
 	{
 		env_var = (char *)malloc(i + 1);
 		if (!env_var)
@@ -157,13 +158,12 @@ char	*trim_quote(char *str, size_t *j, char c)
 	size_t	i;
 	char	*new_str;
 
-	i = 0;
+	i = -1;
 	new_str = (char *)malloc(ft_strlen(str) - 1);
-	while (i < *j)
-	{
+	if (!new_str)
+		return (perror("malloc"), NULL);
+	while (++i < *j)
 		new_str[i] = str[i];
-		i++;
-	}
 	while (str[i + 1] != c)
 	{
 		new_str[i] = str[i + 1];
@@ -185,7 +185,7 @@ char	*trim_double_quote(char *str, size_t *j, t_env *env_list, int *status)
 	size_t	i;
 
 	i = *j + 1;
-	while (str[i] != '"')
+	while (str && str[i] != '"')
 	{
 		if (str[i] == '$')
 			str = parse_env_var(str, &i, env_list, status);
@@ -201,10 +201,10 @@ void	expand_cmd(t_cmd *cmd, t_env *env_list, int *status)
 	t_token	*argv;
 
 	argv = cmd->argv;
-	while (cmd && argv)
+	while (cmd && argv && g_status == 0)
 	{
 		j = 0;
-		while (argv->value[j] != '\0')
+		while (argv->value && argv->value[j] != '\0')
 		{
 			if (argv->value[j] == '\'')
 				argv->value = trim_quote(argv->value, &j, '\'');
@@ -215,6 +215,8 @@ void	expand_cmd(t_cmd *cmd, t_env *env_list, int *status)
 				argv->value = parse_env_var(argv->value, &j, env_list, status);
 			else
 				j++;
+			if(argv->value == NULL)
+				g_status = 2;
 		}
 		argv = argv->next;
 	}
@@ -222,14 +224,14 @@ void	expand_cmd(t_cmd *cmd, t_env *env_list, int *status)
 
 void	expander(t_node *node, t_env *env_list, int *status)
 {
-	if (!node)
+	if (!node || g_status != 0)
 		return ;
-	if (node->type == NODE_CMD)
+	if (node->type == NODE_CMD && g_status == 0)
 		expand_cmd(node->cmd, env_list, status);
-	else
+	else if(g_status == 0)
 	{
 		expander(node->lhs, env_list, status);
-		if (node->type == NODE_PIPE)
+		if (node->type == NODE_PIPE && g_status == 0)
 			expander(node->rhs, env_list, status);
 	}
 }

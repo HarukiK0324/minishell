@@ -57,13 +57,13 @@ int	ft_heredoc(t_cmd *cmd)
 	cmd->heredoc_fd = fd[0];
 	waitpid(pid, &wstatus, 0);
 	if (WIFSIGNALED(wstatus))
-		return (-1);
+		return (close(fd[0]), -1);
 	return (0);
 }
 
 void	process_heredoc(t_cmd *cmd, int *status)
 {
-	if (!cmd->heredoc_delimiter)
+	if (!cmd->heredoc_delimiter || g_status != 0)
 		return ;
 	if (ft_heredoc(cmd) == -1)
 	{
@@ -75,10 +75,10 @@ void	process_heredoc(t_cmd *cmd, int *status)
 
 void	heredoc(t_node *ast, int *status)
 {
-	if (!ast)
+	if (!ast || g_status != 0)
 		return ;
-	if (ast->type == NODE_PIPE || ast->type == NODE_AND_IF
-		|| ast->type == NODE_OR_IF)
+	if ((ast->type == NODE_PIPE || ast->type == NODE_AND_IF
+		|| ast->type == NODE_OR_IF) && g_status == 0)
 	{
 		heredoc(ast->lhs, status);
 		heredoc(ast->rhs, status);
