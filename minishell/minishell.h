@@ -9,6 +9,7 @@
 # include <signal.h>
 # include <stdio.h>
 # include <stdlib.h>
+# include <string.h>
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <unistd.h>
@@ -125,6 +126,7 @@ void							parse_heredoc(t_fd *heredoc_delimiter,
 									int fd_in, int fd_out);
 int								ft_heredoc(t_cmd *cmd);
 void							err_msg(char *value, char *msg);
+void							err_msg_errno(char *value, char *msg);
 void							ft_open_heredoc(t_cmd *cmd, t_fd *current,
 									int heredoc_count);
 void							ft_open_fd_in(t_cmd *cmd, t_fd *current);

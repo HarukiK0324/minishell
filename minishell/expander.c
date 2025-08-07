@@ -220,6 +220,10 @@ void	expand_cmd(t_cmd *cmd, t_env *env_list, int *status)
 		}
 		argv = argv->next;
 	}
+	// if(expand_cmd_argv(cmd->argv, env_list, status) == -1 || 
+	// 	expand_cmd_fd(cmd->fd_in, env_list, status) == -1 || 
+	// 	expand_cmd_heredoc(cmd->heredoc_delimiter, env_list, status) == -1)
+	// 	g_status = 2;
 }
 
 void	expander(t_node *node, t_env *env_list, int *status)

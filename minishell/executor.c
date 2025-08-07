@@ -243,6 +243,15 @@ void	err_msg(char *value, char *msg)
 	write(STDERR_FILENO, msg, ft_strlen(msg));
 }
 
+void	err_msg_errno(char *value, char *msg)
+{
+	write(STDERR_FILENO, "minishell: ", 11);
+	write(STDERR_FILENO, value, ft_strlen(value));
+	write(STDERR_FILENO, ": ", 2);
+	write(STDERR_FILENO, msg, ft_strlen(msg));
+	write(STDERR_FILENO, "\n", 1);
+}
+
 void	ft_open_heredoc(t_cmd *cmd, t_fd *current, int heredoc_count)
 {
 	if (heredoc_count == cmd->heredoc_count)
@@ -258,12 +267,8 @@ void	ft_open_fd_in(t_cmd *cmd, t_fd *current)
 	if (cmd->fd_in != 0 && cmd->fd_in > 0)
 		close(cmd->fd_in);
 	current->fd = open(current->value, O_RDONLY);
-	if (errno == ENOENT)
-		err_msg(current->value, ": No such file or directory\n");
-	else if (errno == EACCES)
-		err_msg(current->value, ": Permission denied\n");
-	else if (current->fd < 0)
-		err_msg(current->value, ": Failed to open file\n");
+	if (current->fd < 0)
+		err_msg_errno(current->value, strerror(errno));
 	cmd->fd_in = current->fd;
 }
 
@@ -275,20 +280,18 @@ void	ft_open_fd_out(t_cmd *cmd, t_fd *current)
 		current->fd = open(current->value, O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	else if (current->type == TOKEN_APPEND)
 		current->fd = open(current->value, O_WRONLY | O_CREAT | O_APPEND, 0644);
-	if (errno == ENOENT)
-		err_msg(current->value, ": No such file or directory\n");
-	else if (errno == EACCES)
-		err_msg(current->value, ": Permission denied\n");
-	else if (current->fd < 0)
-		err_msg(current->value, ": Failed to open file\n");
+	if (current->fd < 0)
+		err_msg_errno(current->value, strerror(errno));
 	cmd->fd_out = current->fd;
 }
 
 int	process_redirections(t_cmd *cmd)
 {
 	int		heredoc_count;
+	int 	status;
 	t_fd	*current;
 
+	status = 0;
 	current = cmd->fds;
 	if (current == NULL)
 		return (0);
@@ -302,9 +305,11 @@ int	process_redirections(t_cmd *cmd)
 		else if (current->type == TOKEN_REDIR_OUT
 			|| current->type == TOKEN_APPEND)
 			ft_open_fd_out(cmd, current);
+		if(cmd->fd_in == -1 || cmd->fd_out == -1)
+			status = -1;
 		current = current->next;
 	}
-	return (0);
+	return (status);
 }
 
 void	exec_pipe(t_node *ast, t_env *env_list, int *status)
@@ -370,19 +375,13 @@ void	ft_execve(t_env *env_list, t_cmd *cmd, int *status)
 	if (cmd->fd_in != 0)
 	{
 		if (dup2(cmd->fd_in, STDIN_FILENO) == -1)
-		{
-			perror("dup2 input redirection failed");
-			exit(EXIT_FAILURE);
-		}
+			return (perror("dup2 input redirection failed"), exit(EXIT_FAILURE));
 		close(cmd->fd_in);
 	}
 	if (cmd->fd_out != 1)
 	{
 		if (dup2(cmd->fd_out, STDOUT_FILENO) == -1)
-		{
-			perror("dup2 output redirection failed");
-			exit(EXIT_FAILURE);
-		}
+			return (perror("dup2 output redirection failed"), exit(EXIT_FAILURE));
 		close(cmd->fd_out);
 	}
 	if (!cmd->argv || !cmd->argv->value)
@@ -400,18 +399,10 @@ void	ft_execve(t_env *env_list, t_cmd *cmd, int *status)
 	free_str_list(argv);
 	free_str_list(environ);
 	if (errno == ENOENT)
-	{
-		*status = 127;
-		err_msg(cmd->argv->value, ": command not found\n");
-		exit(*status);
-	}
-	else if (errno == EACCES)
-	{
-		*status = 126;
-		err_msg(cmd->argv->value, ": permission denied\n");
-		exit(*status);
-	}
-	err_msg(cmd->argv->value, ": command not found\n");
+		return (err_msg(cmd->argv->value, ": command not found\n"), exit(127));
+	err_msg_errno(cmd->argv->value, strerror(errno));
+	if (errno == EACCES)
+		exit(126);
 	exit(EXIT_FAILURE);
 }
 
