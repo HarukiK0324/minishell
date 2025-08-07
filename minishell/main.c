@@ -150,7 +150,7 @@ void	handle_interactive_sigint(int sig)
 	(void)sig;
 	write(STDOUT_FILENO, "\n", 1);
 	rl_on_new_line();
-	// rl_replace_line("", 0);
+	rl_replace_line("", 0);
 	rl_redisplay();
 	errno = EINTR;
 }
@@ -160,18 +160,18 @@ void	handle_sigint(int sig)
 	(void)sig;
 	write(STDOUT_FILENO, "\n", 1);
 	rl_on_new_line();
-	// rl_replace_line("", 0);
+	rl_replace_line("", 0);
 	rl_redisplay();
 	g_status = 2;
 	errno = EINTR;
 }
 
-void handle_sigquit(int sig)
+void	handle_sigquit(int sig)
 {
 	(void)sig;
 	write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
 	rl_on_new_line();
-	// rl_replace_line("", 0);
+	rl_replace_line("", 0);
 	rl_redisplay();
 	g_status = 3;
 	errno = EINTR;
@@ -321,7 +321,7 @@ int	main(int argc, char **argv, char **environ)
 			{
 				free(input);
 				err_msg("Unmatched quotes", ": Syntax error\n");
-				continue;
+				continue ;
 			}
 			tokens = tokenize(input);
 			saved_tokens = tokens;
@@ -373,7 +373,7 @@ int	main(int argc, char **argv, char **environ)
 				status = 2;
 			}
 			expander(ast, env_list, &status);
-			if(g_status != 0)
+			if (g_status != 0)
 				status = 2;
 			else
 				status = 0;

@@ -215,13 +215,13 @@ void	expand_cmd(t_cmd *cmd, t_env *env_list, int *status)
 				argv->value = parse_env_var(argv->value, &j, env_list, status);
 			else
 				j++;
-			if(argv->value == NULL)
+			if (argv->value == NULL)
 				g_status = 2;
 		}
 		argv = argv->next;
 	}
-	// if(expand_cmd_argv(cmd->argv, env_list, status) == -1 || 
-	// 	expand_cmd_fd(cmd->fd_in, env_list, status) == -1 || 
+	// if(expand_cmd_argv(cmd->argv, env_list, status) == -1 ||
+	// 	expand_cmd_fd(cmd->fd_in, env_list, status) == -1 ||
 	// 	expand_cmd_heredoc(cmd->heredoc_delimiter, env_list, status) == -1)
 	// 	g_status = 2;
 }
@@ -232,7 +232,7 @@ void	expander(t_node *node, t_env *env_list, int *status)
 		return ;
 	if (node->type == NODE_CMD && g_status == 0)
 		expand_cmd(node->cmd, env_list, status);
-	else if(g_status == 0)
+	else if (g_status == 0)
 	{
 		expander(node->lhs, env_list, status);
 		if (node->type == NODE_PIPE && g_status == 0)

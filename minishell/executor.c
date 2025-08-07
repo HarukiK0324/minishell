@@ -288,7 +288,7 @@ void	ft_open_fd_out(t_cmd *cmd, t_fd *current)
 int	process_redirections(t_cmd *cmd)
 {
 	int		heredoc_count;
-	int 	status;
+	int		status;
 	t_fd	*current;
 
 	status = 0;
@@ -305,7 +305,7 @@ int	process_redirections(t_cmd *cmd)
 		else if (current->type == TOKEN_REDIR_OUT
 			|| current->type == TOKEN_APPEND)
 			ft_open_fd_out(cmd, current);
-		if(cmd->fd_in == -1 || cmd->fd_out == -1)
+		if (cmd->fd_in == -1 || cmd->fd_out == -1)
 			status = -1;
 		current = current->next;
 	}
@@ -375,13 +375,15 @@ void	ft_execve(t_env *env_list, t_cmd *cmd, int *status)
 	if (cmd->fd_in != 0)
 	{
 		if (dup2(cmd->fd_in, STDIN_FILENO) == -1)
-			return (perror("dup2 input redirection failed"), exit(EXIT_FAILURE));
+			return (perror("dup2 input redirection failed"),
+				exit(EXIT_FAILURE));
 		close(cmd->fd_in);
 	}
 	if (cmd->fd_out != 1)
 	{
 		if (dup2(cmd->fd_out, STDOUT_FILENO) == -1)
-			return (perror("dup2 output redirection failed"), exit(EXIT_FAILURE));
+			return (perror("dup2 output redirection failed"),
+				exit(EXIT_FAILURE));
 		close(cmd->fd_out);
 	}
 	if (!cmd->argv || !cmd->argv->value)

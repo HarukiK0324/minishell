@@ -78,7 +78,7 @@ void	heredoc(t_node *ast, int *status)
 	if (!ast || g_status != 0)
 		return ;
 	if ((ast->type == NODE_PIPE || ast->type == NODE_AND_IF
-		|| ast->type == NODE_OR_IF) && g_status == 0)
+			|| ast->type == NODE_OR_IF) && g_status == 0)
 	{
 		heredoc(ast->lhs, status);
 		heredoc(ast->rhs, status);
