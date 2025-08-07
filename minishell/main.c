@@ -324,48 +324,48 @@ int	main(int argc, char **argv, char **environ)
 			}
 			tokens = tokenize(input);
 			saved_tokens = tokens;
-			// while (tokens)
+			// while (saved_tokens)
 			// {
-			// 	if (!tokens->type)
+			// 	if (!saved_tokens->type)
 			// 	{
 			// 		printf("Token type is not set.\n");
 			// 		break ;
 			// 	}
-			// 	if (tokens->type == TOKEN_WORD)
+			// 	if (saved_tokens->type == TOKEN_WORD)
 			// 		printf("Word:");
-			// 	else if (tokens->type == TOKEN_PIPE)
+			// 	else if (saved_tokens->type == TOKEN_PIPE)
 			// 		printf("Pipe:");
-			// 	else if (tokens->type == TOKEN_REDIR_IN)
+			// 	else if (saved_tokens->type == TOKEN_REDIR_IN)
 			// 		printf("Redirect In:");
-			// 	else if (tokens->type == TOKEN_REDIR_OUT)
+			// 	else if (saved_tokens->type == TOKEN_REDIR_OUT)
 			// 		printf("Redirect Out:");
-			// 	else if (tokens->type == TOKEN_HEREDOC)
+			// 	else if (saved_tokens->type == TOKEN_HEREDOC)
 			// 		printf("Heredoc:");
-			// 	else if (tokens->type == TOKEN_APPEND)
+			// 	else if (saved_tokens->type == TOKEN_APPEND)
 			// 		printf("Append:");
-			// 	else if (tokens->type == TOKEN_AND_IF)
+			// 	else if (saved_tokens->type == TOKEN_AND_IF)
 			// 		printf("And If:");
-			// 	else if (tokens->type == TOKEN_OR_IF)
+			// 	else if (saved_tokens->type == TOKEN_OR_IF)
 			// 		printf("Or If:");
-			// 	else if (tokens->type == TOKEN_OPEN_PAREN)
+			// 	else if (saved_tokens->type == TOKEN_OPEN_PAREN)
 			// 		printf("Open Parenthesis:");
-			// 	else if (tokens->type == TOKEN_CLOSE_PAREN)
+			// 	else if (saved_tokens->type == TOKEN_CLOSE_PAREN)
 			// 		printf("Close Parenthesis:");
-			// 	else if (tokens->type == TOKEN_END)
+			// 	else if (saved_tokens->type == TOKEN_END)
 			// 		printf("End of Tokens:");
-			// 	else if (tokens->type == TOKEN_NEWLINE)
+			// 	else if (saved_tokens->type == TOKEN_NEWLINE)
 			// 		printf("Newline:");
-			// 	else if (tokens->type == TOKEN_ERROR)
+			// 	else if (saved_tokens->type == TOKEN_ERROR)
 			// 		printf("Error:");
 			// 	else
 			// 		printf("Unknown Token:");
-			// 	if (!tokens->value)
+			// 	if (!saved_tokens->value)
 			// 		printf(" (No value)\n");
 			// 	else
-			// 		printf(" Token: %s\n", tokens->value);
-			// 	tokens = tokens->next;
+			// 		printf(" Token: %s\n", saved_tokens->value);
+			// 	saved_tokens = saved_tokens->next;
 			// }
-			ast = parse(saved_tokens);
+			ast = parse(tokens);
 			if (!ast)
 			{
 				printf("failed tokenizing/parsing\n");
@@ -379,6 +379,7 @@ int	main(int argc, char **argv, char **environ)
 			heredoc(ast, &status);
 			if (g_status == 0 && status == 0)
 				executor(ast, env_list, &status);
+			free_tokens(tokens);
 			free_ast(ast);
 			add_history(input);
 			free(input);

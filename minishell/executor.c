@@ -411,7 +411,7 @@ void	ft_execve(t_env *env_list, t_cmd *cmd, int *status)
 		err_msg(cmd->argv->value, ": permission denied\n");
 		exit(*status);
 	}
-	err_msg(cmd->argv->value, ": command not founds\n");
+	err_msg(cmd->argv->value, ": command not found\n");
 	exit(EXIT_FAILURE);
 }
 
