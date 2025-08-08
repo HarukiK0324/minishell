@@ -423,17 +423,16 @@ void	exec_cmd(t_env *env_list, t_cmd *cmd, int *status)
 	}
 	if (pid == 0)
 		ft_execve(env_list, cmd);
+	waitpid(pid, &wstatus, 0);
+	if (WIFEXITED(wstatus))
+		*status = WEXITSTATUS(wstatus);
 	else
 	{
-		if (waitpid(pid, &wstatus, 0) == -1 && g_status == 0)
-		{
-			*status = 1;
-			return (perror("waitpid"));
-		}
-		if (WIFEXITED(wstatus))
-			*status = WEXITSTATUS(wstatus);
-		else if (WIFSIGNALED(wstatus))
-			*status = 128 + WTERMSIG(wstatus);
+		if (WTERMSIG(wstatus) == SIGINT)
+			g_status = 2;
+		else
+			g_status = 3;
+		*status = 128 + g_status;
 	}
 }
 
