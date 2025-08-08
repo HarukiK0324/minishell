@@ -312,56 +312,56 @@ int	process_redirections(t_cmd *cmd)
 	return (status);
 }
 
-// void	exec_pipe(t_node *ast, t_env *env_list, int *status)
-// {
-// 	int		fd[2];
-// 	pid_t	pid1;
-// 	pid_t	pid2;
-// 	int		status1;
-// 	int		status2;
+void	exec_pipe(t_node *ast, t_env *env_list, int *status)
+{
+	int		fd[2];
+	pid_t	pid1;
+	pid_t	pid2;
+	int		status1;
+	int		status2;
 
-// 	if (pipe(fd) == -1)
-// 	{
-// 		*status = -1;
-// 		return (perror("pipe"));
-// 	}
-// 	pid1 = fork();
-// 	if (pid1 < 0)
-// 	{
-// 		*status = -1;
-// 		return (perror("fork"));
-// 	}
-// 	if (pid1 == 0)
-// 	{
-// 		dup2(fd[1], STDOUT_FILENO);
-// 		close(fd[0]);
-// 		close(fd[1]);
-// 		executor(ast->lhs, env_list, status);
-// 		exit(*status);
-// 	}
-// 	pid2 = fork();
-// 	if (pid2 < 0)
-// 	{
-// 		*status = -1;
-// 		return (perror("fork"));
-// 	}
-// 	if (pid2 == 0)
-// 	{
-// 		dup2(fd[0], STDIN_FILENO);
-// 		close(fd[0]);
-// 		close(fd[1]);
-// 		executor(ast->rhs, env_list, status);
-// 		exit(*status);
-// 	}
-// 	close(fd[0]);
-// 	close(fd[1]);
-// 	waitpid(pid1, &status1, 0);
-// 	waitpid(pid2, &status2, 0);
-// 	if (WIFEXITED(status2))
-// 		*status = WEXITSTATUS(status2);
-// 	else if (WIFSIGNALED(status2))
-// 		*status = 128 + WTERMSIG(status2);
-// }
+	if (pipe(fd) == -1)
+	{
+		*status = -1;
+		return (perror("pipe"));
+	}
+	pid1 = fork();
+	if (pid1 < 0)
+	{
+		*status = -1;
+		return (perror("fork"));
+	}
+	if (pid1 == 0)
+	{
+		dup2(fd[1], STDOUT_FILENO);
+		close(fd[0]);
+		close(fd[1]);
+		executor(ast->lhs, env_list, status);
+		exit(*status);
+	}
+	pid2 = fork();
+	if (pid2 < 0)
+	{
+		*status = -1;
+		return (perror("fork"));
+	}
+	if (pid2 == 0)
+	{
+		dup2(fd[0], STDIN_FILENO);
+		close(fd[0]);
+		close(fd[1]);
+		executor(ast->rhs, env_list, status);
+		exit(*status);
+	}
+	close(fd[0]);
+	close(fd[1]);
+	waitpid(pid1, &status1, 0);
+	waitpid(pid2, &status2, 0);
+	if (WIFEXITED(status2))
+		*status = WEXITSTATUS(status2);
+	else if (WIFSIGNALED(status2))
+		*status = 128 + WTERMSIG(status2);
+}
 
 void	ft_execve(t_env *env_list, t_cmd *cmd)
 {
@@ -386,7 +386,7 @@ void	ft_execve(t_env *env_list, t_cmd *cmd)
 				exit(EXIT_FAILURE));
 		close(cmd->fd_out);
 	}
-	if (!cmd->argv || !cmd->argv->value)
+	if (!cmd->argv || !cmd->argv->value || ft_strlen(cmd->argv->value) == 0)
 		exit(0);
 	path = get_path(cmd->argv->value, env_list);
 	if (!path || access(path, F_OK) == -1)
@@ -410,34 +410,6 @@ void	ft_execve(t_env *env_list, t_cmd *cmd)
 	exit(EXIT_FAILURE);
 }
 
-// void	exec_cmd(t_env *env_list, t_cmd *cmd, int *status)
-// {
-// 	pid_t	pid;
-// 	int		wstatus;
-
-// 	if (cmd->argv && is_builtin(cmd->argv->value))
-// 		return (exec_builtin(env_list, cmd, status));
-// 	pid = fork();
-// 	if (pid < 0)
-// 	{
-// 		*status = -1;
-// 		return (perror("fork"));
-// 	}
-// 	if (pid == 0)
-// 		ft_execve(env_list, cmd);
-// 	waitpid(pid, &wstatus, 0);
-// 	if (WIFEXITED(wstatus))
-// 		*status = WEXITSTATUS(wstatus);
-// 	else
-// 	{
-// 		if (WTERMSIG(wstatus) == SIGINT)
-// 			g_status = 2;
-// 		else
-// 			g_status = 3;
-// 		*status = 128 + g_status;
-// 	}
-// }
-
 void	exec_cmd(t_env *env_list, t_cmd *cmd, int *status)
 {
 	pid_t	pid;
@@ -445,121 +417,24 @@ void	exec_cmd(t_env *env_list, t_cmd *cmd, int *status)
 
 	if (cmd->argv && is_builtin(cmd->argv->value))
 		return (exec_builtin(env_list, cmd, status));
-	
 	pid = fork();
 	if (pid < 0)
 	{
 		*status = -1;
 		return (perror("fork"));
 	}
-	
 	if (pid == 0)
-	{
-		// Create new process group for child
-		setpgid(0, 0);
 		ft_execve(env_list, cmd);
-	}
+	waitpid(pid, &wstatus, 0);
+	if (WIFEXITED(wstatus))
+		*status = WEXITSTATUS(wstatus);
 	else
 	{
-		// Set child as process group leader
-		setpgid(pid, pid);
-		
-		if (waitpid(pid, &wstatus, 0) == -1)
-		{
-			if (g_status != 0)  // Signal was received
-			{
-				*status = g_status;
-				return;
-			}
-			*status = 1;
-			return (perror("waitpid"));
-		}
-		
-		if (WIFEXITED(wstatus))
-			*status = WEXITSTATUS(wstatus);
-		else if (WIFSIGNALED(wstatus))
-		{
-			int sig = WTERMSIG(wstatus);
-			if (sig == SIGINT)
-				*status = 130;
-			else if (sig == SIGQUIT)
-				*status = 131;
-			else
-				*status = 128 + sig;
-		}
-	}
-}
-
-void	exec_pipe(t_node *ast, t_env *env_list, int *status)
-{
-	int		fd[2];
-	pid_t	pid1;
-	pid_t	pid2;
-	int		status1;
-	int		status2;
-	pid_t	pgid;
-
-	if (pipe(fd) == -1)
-	{
-		*status = -1;
-		return (perror("pipe"));
-	}
-	
-	pid1 = fork();
-	if (pid1 < 0)
-	{
-		*status = -1;
-		return (perror("fork"));
-	}
-	
-	if (pid1 == 0)
-	{
-		setpgid(0, 0);  // Create new process group
-		dup2(fd[1], STDOUT_FILENO);
-		close(fd[0]);
-		close(fd[1]);
-		executor(ast->lhs, env_list, status);
-		exit(*status);
-	}
-	
-	pgid = pid1;  // Use first child's PID as group ID
-	setpgid(pid1, pgid);
-	
-	pid2 = fork();
-	if (pid2 < 0)
-	{
-		*status = -1;
-		return (perror("fork"));
-	}
-	
-	if (pid2 == 0)
-	{
-		setpgid(0, pgid);  // Join the same process group
-		dup2(fd[0], STDIN_FILENO);
-		close(fd[0]);
-		close(fd[1]);
-		executor(ast->rhs, env_list, status);
-		exit(*status);
-	}
-	
-	setpgid(pid2, pgid);  // Ensure second child is in same group
-	close(fd[0]);
-	close(fd[1]);
-	
-	waitpid(pid1, &status1, 0);
-	waitpid(pid2, &status2, 0);
-	
-	if (WIFEXITED(status2))
-		*status = WEXITSTATUS(status2);
-	else if (WIFSIGNALED(status2))
-	{
-		int sig = WTERMSIG(status2);
-		if (sig == SIGINT)
-			*status = 130;
-		else if (sig == SIGQUIT)
-			*status = 131;
+		if (WTERMSIG(wstatus) == SIGINT)
+			g_status = 2;
 		else
-			*status = 128 + sig;
+			g_status = 3;
+		*status = 128 + g_status;
 	}
 }
 

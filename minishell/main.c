@@ -128,91 +128,6 @@ t_env	*init_env(char **environ)
 	return (env_list);
 }
 
-// void	setup_signal_handlers(void)
-// {
-// 	struct sigaction	sa_int;
-// 	struct sigaction	sa_quit;
-
-// 	// Set up SIGINT handler (Ctrl+C)
-// 	sa_int.sa_handler = handle_interactive_sigint;
-// 	sigemptyset(&sa_int.sa_mask);
-// 	sa_int.sa_flags = 0;
-// 	sigaction(SIGINT, &sa_int, NULL);
-// 	// Ignore SIGQUIT (Ctrl+\)
-// 	sa_quit.sa_handler = SIG_IGN;
-// 	sigemptyset(&sa_quit.sa_mask);
-// 	sa_quit.sa_flags = 0;
-// 	sigaction(SIGQUIT, &sa_quit, NULL);
-// }
-
-// void	handle_interactive_sigint(int sig)
-// {
-// 	(void)sig;
-// 	write(STDOUT_FILENO, "\n", 1);
-// 	rl_on_new_line();
-// #if OS
-// 	rl_replace_line("", 0);
-// #endif
-// 	rl_redisplay();
-// 	errno = EINTR;
-// }
-
-// void	handle_sigint(int sig)
-// {
-// 	(void)sig;
-// 	write(STDOUT_FILENO, "\n", 1);
-// 	rl_on_new_line();
-// #if OS
-// 	rl_replace_line("", 0);
-// #endif
-// 	rl_redisplay();
-// 	g_status = 2;
-// 	errno = EINTR;
-// }
-
-// void	handle_sigquit(int sig)
-// {
-// 	(void)sig;
-// 	write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
-// 	rl_on_new_line();
-// #if OS
-// 	rl_replace_line("", 0);
-// #endif
-// 	rl_redisplay();
-// 	g_status = 3;
-// 	errno = EINTR;
-// }
-
-// void	reset_default_signal(void)
-// {
-// 	struct sigaction	sa_int;
-// 	struct sigaction	sa_quit;
-
-// 	// Reset to default behavior
-// 	// Set up SIGINT handler (Ctrl+C)
-// 	sa_int.sa_handler = handle_sigint;
-// 	sigemptyset(&sa_int.sa_mask);
-// 	sa_int.sa_flags = 0;
-// 	sigaction(SIGINT, &sa_int, NULL);
-// 	sa_quit.sa_handler = handle_sigquit;
-// 	sigemptyset(&sa_quit.sa_mask);
-// 	sa_quit.sa_flags = 0;
-// 	sigaction(SIGQUIT, &sa_quit, NULL);
-// }
-
-// void	reset_heredoc_signal(void)
-// {
-// 	struct sigaction	sa_int;
-
-// 	// Reset to default behavior
-// 	// Set up SIGINT handler (Ctrl+C)
-// 	sa_int.sa_handler = handle_sigint;
-// 	sigemptyset(&sa_int.sa_mask);
-// 	sa_int.sa_flags = 0;
-// 	sigaction(SIGINT, &sa_int, NULL);
-// 	signal(SIGQUIT, SIG_DFL);
-// }
-
 void	setup_signal_handlers(void)
 {
 	struct sigaction	sa_int;
@@ -223,7 +138,7 @@ void	setup_signal_handlers(void)
 	sigemptyset(&sa_int.sa_mask);
 	sa_int.sa_flags = 0;
 	sigaction(SIGINT, &sa_int, NULL);
-	// Ignore SIGQUIT (Ctrl+\) in interactive mode
+	// Ignore SIGQUIT (Ctrl+\)
 	sa_quit.sa_handler = SIG_IGN;
 	sigemptyset(&sa_quit.sa_mask);
 	sa_quit.sa_flags = 0;
@@ -239,57 +154,59 @@ void	handle_interactive_sigint(int sig)
 	rl_replace_line("", 0);
 #endif
 	rl_redisplay();
-	g_status = 130;  // Set to 130 as requested
 	errno = EINTR;
 }
 
-void	handle_execution_sigint(int sig)
+void	handle_sigint(int sig)
 {
 	(void)sig;
 	write(STDOUT_FILENO, "\n", 1);
-	g_status = 130;
-	// Kill the entire process group
-	kill(0, SIGTERM);
+	rl_on_new_line();
+#if OS
+	rl_replace_line("", 0);
+#endif
+	rl_redisplay();
+	g_status = 2;
+	errno = EINTR;
 }
 
-void	handle_execution_sigquit(int sig)
+void	handle_sigquit(int sig)
 {
 	(void)sig;
 	write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
-	g_status = 131;
-	// Kill the entire process group
-	kill(0, SIGTERM);
-}
-
-void	setup_execution_signal_handlers(void)
-{
-	struct sigaction	sa_int;
-	struct sigaction	sa_quit;
-
-	// Set up SIGINT handler for command execution
-	sa_int.sa_handler = handle_execution_sigint;
-	sigemptyset(&sa_int.sa_mask);
-	sa_int.sa_flags = 0;
-	sigaction(SIGINT, &sa_int, NULL);
-	
-	// Set up SIGQUIT handler for command execution
-	sa_quit.sa_handler = handle_execution_sigquit;
-	sigemptyset(&sa_quit.sa_mask);
-	sa_quit.sa_flags = 0;
-	sigaction(SIGQUIT, &sa_quit, NULL);
+	rl_on_new_line();
+#if OS
+	rl_replace_line("", 0);
+#endif
+	rl_redisplay();
+	g_status = 3;
+	errno = EINTR;
 }
 
 void	reset_default_signal(void)
 {
-	signal(SIGINT, SIG_DFL);
-	signal(SIGQUIT, SIG_DFL);
+	struct sigaction	sa_int;
+	struct sigaction	sa_quit;
+
+	// Reset to default behavior
+	// Set up SIGINT handler (Ctrl+C)
+	sa_int.sa_handler = handle_sigint;
+	sigemptyset(&sa_int.sa_mask);
+	sa_int.sa_flags = 0;
+	sigaction(SIGINT, &sa_int, NULL);
+	sa_quit.sa_handler = handle_sigquit;
+	sigemptyset(&sa_quit.sa_mask);
+	sa_quit.sa_flags = 0;
+	sigaction(SIGQUIT, &sa_quit, NULL);
 }
 
 void	reset_heredoc_signal(void)
 {
 	struct sigaction	sa_int;
 
-	sa_int.sa_handler = handle_execution_sigint;
+	// Reset to default behavior
+	// Set up SIGINT handler (Ctrl+C)
+	sa_int.sa_handler = handle_sigint;
 	sigemptyset(&sa_int.sa_mask);
 	sa_int.sa_flags = 0;
 	sigaction(SIGINT, &sa_int, NULL);
@@ -381,106 +298,6 @@ void	print_ast(t_node *ast)
 	print_ast(ast->rhs);
 }
 
-// int	main(int argc, char **argv, char **environ)
-// {
-// 	char	*input;
-// 	t_token	*tokens;
-// 	t_node	*ast;
-// 	t_env	*env_list;
-// 	int		status;
-// 	t_token	*saved_tokens;
-
-// 	(void)argc; // Unused parameter
-// 	(void)argv; // Unused parameter
-// 	status = 0;
-// 	env_list = init_env(environ);
-// 	if (!env_list)
-// 		return (perror("init_env failed"), 1);
-// 	// Exit if environment initialization fails
-// 	while (1)
-// 	{
-// 		setup_signal_handlers();
-// 		// Set up signal handlers for Ctrl+C and Ctrl+'\'
-// 		input = readline("minishell$ ");
-// 		if (!input)
-// 			break ; // Exit on EOF (Ctrl+D)
-// 		if (ft_strlen(input) > 0)
-// 		{
-// 			if (check_quote(input) == -1)
-// 			{
-// 				free(input);
-// 				err_msg("Unmatched quotes", ": Syntax error\n");
-// 				continue ;
-// 			}
-// 			tokens = tokenize(input);
-// 			saved_tokens = tokens;
-// 			// while (saved_tokens)
-// 			// {
-// 			// 	if (!saved_tokens->type)
-// 			// 	{
-// 			// 		printf("Token type is not set.\n");
-// 			// 		break ;
-// 			// 	}
-// 			// 	if (saved_tokens->type == TOKEN_WORD)
-// 			// 		printf("Word:");
-// 			// 	else if (saved_tokens->type == TOKEN_PIPE)
-// 			// 		printf("Pipe:");
-// 			// 	else if (saved_tokens->type == TOKEN_REDIR_IN)
-// 			// 		printf("Redirect In:");
-// 			// 	else if (saved_tokens->type == TOKEN_REDIR_OUT)
-// 			// 		printf("Redirect Out:");
-// 			// 	else if (saved_tokens->type == TOKEN_HEREDOC)
-// 			// 		printf("Heredoc:");
-// 			// 	else if (saved_tokens->type == TOKEN_APPEND)
-// 			// 		printf("Append:");
-// 			// 	else if (saved_tokens->type == TOKEN_AND_IF)
-// 			// 		printf("And If:");
-// 			// 	else if (saved_tokens->type == TOKEN_OR_IF)
-// 			// 		printf("Or If:");
-// 			// 	else if (saved_tokens->type == TOKEN_OPEN_PAREN)
-// 			// 		printf("Open Parenthesis:");
-// 			// 	else if (saved_tokens->type == TOKEN_CLOSE_PAREN)
-// 			// 		printf("Close Parenthesis:");
-// 			// 	else if (saved_tokens->type == TOKEN_END)
-// 			// 		printf("End of Tokens:");
-// 			// 	else if (saved_tokens->type == TOKEN_NEWLINE)
-// 			// 		printf("Newline:");
-// 			// 	else if (saved_tokens->type == TOKEN_ERROR)
-// 			// 		printf("Error:");
-// 			// 	else
-// 			// 		printf("Unknown Token:");
-// 			// 	if (!saved_tokens->value)
-// 			// 		printf(" (No value)\n");
-// 			// 	else
-// 			// 		printf(" Token: %s\n", saved_tokens->value);
-// 			// 	saved_tokens = saved_tokens->next;
-// 			// }
-// 			ast = parse(tokens);
-// 			if (!ast)
-// 			{
-// 				printf("failed tokenizing/parsing\n");
-// 				status = 2;
-// 			}
-// 			expander(ast, env_list, &status);
-// 			if (g_status != 0)
-// 				status = 2;
-// 			else
-// 				status = 0;
-// 			heredoc(ast, &status);
-// 			if (g_status == 0 && status == 0)
-// 				executor(ast, env_list, &status);
-// 			free_tokens(tokens);
-// 			free_ast(ast);
-// 			add_history(input);
-// 			free(input);
-// 			g_status = 0;
-// 		}
-// 	}
-// 	free_env(env_list);
-// 	printf("exit\n");
-// 	exit(status);
-// }
-
 int	main(int argc, char **argv, char **environ)
 {
 	char	*input;
@@ -488,77 +305,95 @@ int	main(int argc, char **argv, char **environ)
 	t_node	*ast;
 	t_env	*env_list;
 	int		status;
+	t_token	*saved_tokens;
 
-	(void)argc;
-	(void)argv;
+	(void)argc; // Unused parameter
+	(void)argv; // Unused parameter
 	status = 0;
 	env_list = init_env(environ);
 	if (!env_list)
 		return (perror("init_env failed"), 1);
-	
+	// Exit if environment initialization fails
 	while (1)
 	{
-		setup_signal_handlers();  // Interactive mode signals
+		setup_signal_handlers();
+		// Set up signal handlers for Ctrl+C and Ctrl+'\'
 		input = readline("minishell$ ");
-		
-		// Handle Ctrl+D (EOF)
 		if (!input)
-		{
-			printf("exit\n");
-			break;
-		}
-		
-		// Handle Ctrl+C in interactive mode
-		if (g_status == 130)
-		{
-			status = 130;
-			g_status = 0;  // Reset for next iteration
-			continue;
-		}
-		
+			break ; // Exit on EOF (Ctrl+D)
 		if (ft_strlen(input) > 0)
 		{
 			if (check_quote(input) == -1)
 			{
 				free(input);
 				err_msg("Unmatched quotes", ": Syntax error\n");
-				continue;
+				continue ;
 			}
-			
 			tokens = tokenize(input);
+			saved_tokens = tokens;
+			// while (saved_tokens)
+			// {
+			// 	if (!saved_tokens->type)
+			// 	{
+			// 		printf("Token type is not set.\n");
+			// 		break ;
+			// 	}
+			// 	if (saved_tokens->type == TOKEN_WORD)
+			// 		printf("Word:");
+			// 	else if (saved_tokens->type == TOKEN_PIPE)
+			// 		printf("Pipe:");
+			// 	else if (saved_tokens->type == TOKEN_REDIR_IN)
+			// 		printf("Redirect In:");
+			// 	else if (saved_tokens->type == TOKEN_REDIR_OUT)
+			// 		printf("Redirect Out:");
+			// 	else if (saved_tokens->type == TOKEN_HEREDOC)
+			// 		printf("Heredoc:");
+			// 	else if (saved_tokens->type == TOKEN_APPEND)
+			// 		printf("Append:");
+			// 	else if (saved_tokens->type == TOKEN_AND_IF)
+			// 		printf("And If:");
+			// 	else if (saved_tokens->type == TOKEN_OR_IF)
+			// 		printf("Or If:");
+			// 	else if (saved_tokens->type == TOKEN_OPEN_PAREN)
+			// 		printf("Open Parenthesis:");
+			// 	else if (saved_tokens->type == TOKEN_CLOSE_PAREN)
+			// 		printf("Close Parenthesis:");
+			// 	else if (saved_tokens->type == TOKEN_END)
+			// 		printf("End of Tokens:");
+			// 	else if (saved_tokens->type == TOKEN_NEWLINE)
+			// 		printf("Newline:");
+			// 	else if (saved_tokens->type == TOKEN_ERROR)
+			// 		printf("Error:");
+			// 	else
+			// 		printf("Unknown Token:");
+			// 	if (!saved_tokens->value)
+			// 		printf(" (No value)\n");
+			// 	else
+			// 		printf(" Token: %s\n", saved_tokens->value);
+			// 	saved_tokens = saved_tokens->next;
+			// }
 			ast = parse(tokens);
 			if (!ast)
 			{
 				printf("failed tokenizing/parsing\n");
 				status = 2;
 			}
+			expander(ast, env_list, &status);
+			if (g_status != 0)
+				status = 2;
 			else
-			{
-				expander(ast, env_list, &status);
-				if (g_status != 0)
-					status = 2;
-				else
-					status = 0;
-				
-				heredoc(ast, &status);
-				if (g_status == 0 && status == 0)
-				{
-					// Switch to execution signal handlers
-					setup_execution_signal_handlers();
-					executor(ast, env_list, &status);
-					// Switch back to interactive signal handlers
-					setup_signal_handlers();
-				}
-			}
-			
+				status = 0;
+			heredoc(ast, &status);
+			if (g_status == 0 && status == 0)
+				executor(ast, env_list, &status);
 			free_tokens(tokens);
 			free_ast(ast);
 			add_history(input);
 			free(input);
-			g_status = 0;  // Reset global status
+			g_status = 0;
 		}
 	}
-	
 	free_env(env_list);
+	printf("exit\n");
 	exit(status);
 }
