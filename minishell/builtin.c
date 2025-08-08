@@ -5,6 +5,8 @@ int	only_contains(char *str, char *chars)
 	int	i;
 	int	j;
 
+	if (!str || !chars || ft_strlen(str) == 0)
+		return (0);
 	i = 1;
 	while (str[i] != '\0')
 	{
@@ -103,20 +105,34 @@ static t_env	*find_env(t_env *env_list, char *key)
 static void	update_env(t_env *env_list, char *key, char *value)
 {
 	t_env	*node;
+	char	*new_value;
+	char	*new_key;
 
 	node = find_env(env_list, key);
 	if (node)
 	{
+		new_value = ft_strdup(value);
+		if (!new_value)
+			return ;
 		free(node->value);
-		node->value = ft_strdup(value);
+		node->value = new_value;
 	}
 	else
 	{
 		node = malloc(sizeof(t_env));
 		if (!node)
 			return ;
-		node->key = ft_strdup(key);
-		node->value = ft_strdup(value);
+		new_key = ft_strdup(key);
+		new_value = ft_strdup(value);
+		if (!new_key || !new_value)
+		{
+			free(node);
+			free(new_key);
+			free(new_value);
+			return ;
+		}
+		node->key = new_key;
+		node->value = new_value;
 		node->next = env_list->next;
 		env_list->next = node;
 	}
@@ -174,6 +190,8 @@ static void	remove_env(t_env **env_list, char *key)
 	t_env	*prev;
 	t_env	*current;
 
+	if (!env_list || !*env_list)
+		return ;
 	prev = NULL;
 	current = *env_list;
 	while (current)
@@ -182,6 +200,8 @@ static void	remove_env(t_env **env_list, char *key)
 		{
 			if (prev)
 				prev->next = current->next;
+			else
+				*env_list = current->next;
 			free(current->key);
 			free(current->value);
 			free(current);

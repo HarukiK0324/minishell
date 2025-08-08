@@ -30,6 +30,9 @@ void	free_cmd(t_cmd *cmd)
 		return ;
 	free_tokens(cmd->argv);
 	free_fds(cmd->fds);
+	free_fds(cmd->heredoc_delimiter);
+	if (cmd->heredoc_fd >= 0)
+		close(cmd->heredoc_fd);
 	free(cmd);
 }
 
@@ -112,9 +115,11 @@ t_cmd	*init_cmd(void)
 		return (perror("malloc"), NULL);
 	cmd->argv = NULL;
 	cmd->fds = NULL;
+	cmd->heredoc_delimiter = NULL;
+	cmd->heredoc_count = 0;
+	cmd->heredoc_fd = -1;
 	cmd->fd_in = 0;
 	cmd->fd_out = 1;
-	cmd->heredoc_delimiter = NULL;
 	return (cmd);
 }
 
