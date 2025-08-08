@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:24 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 00:57:25 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/09 01:19:04 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,14 +22,7 @@ void	print_synerr(t_TokenType expected)
 		write(2, "minishell: syntax error: unexpected token `newline'\n", 52);
 	else
 	{
-		if (expected == TOKEN_CLOSE_PAREN)
-			token = ")";
-		else if (expected == TOKEN_PIPE)
-			token = "|";
-		else if (expected == TOKEN_AND_IF)
-			token = "&&";
-		else if (expected == TOKEN_OR_IF)
-			token = "||";
+		token = get_token_str(expected);
 		write(2, "minishell: syntax error near unexpected token `", 47);
 		write(2, token, ft_strlen(token));
 		write(2, "'\n", 2);
