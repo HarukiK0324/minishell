@@ -161,20 +161,29 @@ char	*trim_quote(char *str, size_t *j, char c)
 {
 	size_t	i;
 	char	*new_str;
+	size_t	str_len;
 
-	i = -1;
-	new_str = (char *)malloc(ft_strlen(str) - 1);
+	if (!str || !j)
+		return (perror("trim_quote: invalid parameters"), NULL);
+	str_len = ft_strlen(str);
+	if (str_len < 2)
+		return (perror("trim_quote: string too short"), NULL);
+	new_str = (char *)malloc(str_len - 1);
 	if (!new_str)
 		return (perror("malloc"), NULL);
-	while (++i < *j)
+	i = 0;
+	while (i < *j && i < str_len)
+	{
 		new_str[i] = str[i];
-	while (str[i + 1] != c)
+		i++;
+	}
+	while (i + 1 < str_len && str[i + 1] != c)
 	{
 		new_str[i] = str[i + 1];
 		(*j)++;
 		i++;
 	}
-	while (str[i + 2] != '\0')
+	while (i + 2 < str_len && str[i + 2] != '\0')
 	{
 		new_str[i] = str[i + 2];
 		i++;
