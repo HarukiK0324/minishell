@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:32 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 00:57:32 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/09 01:34:30 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,8 +84,11 @@ char	*ft_env_join(t_env *env_list)
 		env[i] = env_list->key[i];
 	env[i++] = '=';
 	j = 0;
-	while (env_list->value[j] != '\0')
-		env[i++] = env_list->value[j++];
+	if (env_list->value)
+	{
+		while (env_list->value && env_list->value[j] != '\0')
+			env[i++] = env_list->value[j++];
+	}
 	env[i] = '\0';
 	return (env);
 }
