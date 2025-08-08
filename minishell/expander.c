@@ -41,10 +41,14 @@ char	*str_trim(char *str, size_t *j, size_t i)
 {
 	char	*new_str;
 	size_t	k;
+	size_t	str_len;
 
-	if (!str || *j < 0 || i < 0 || (*j + i >= ft_strlen(str)))
+	if (!str || !j || (*j + i >= ft_strlen(str)))
 		return (perror("str_trim failed"), NULL);
-	new_str = (char *)malloc(ft_strlen(str) - i);
+	str_len = ft_strlen(str);
+	if (i >= str_len || *j >= str_len)
+		return (perror("str_trim failed"), NULL);
+	new_str = (char *)malloc(str_len - i);
 	if (!new_str)
 		return (perror("malloc"), NULL);
 	k = 0;

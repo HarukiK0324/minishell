@@ -109,6 +109,8 @@ t_env	*init_env(char **environ)
 {
 	t_env	*env_list;
 	t_env	*new_node;
+	char	*key;
+	char	*value;
 	int		i;
 
 	env_list = NULL;
@@ -118,9 +120,17 @@ t_env	*init_env(char **environ)
 		new_node = (t_env *)malloc(sizeof(t_env));
 		if (!new_node)
 			return (perror("malloc"), free_env(env_list), NULL);
-		new_node->key = ft_strndup(environ[i], ft_strchar(environ[i], '='));
-		new_node->value = ft_strdup(environ[i] + ft_strchar(environ[i], '=')
-				+ 1);
+		key = ft_strndup(environ[i], ft_strchar(environ[i], '='));
+		value = ft_strdup(environ[i] + ft_strchar(environ[i], '=') + 1);
+		if (!key || !value)
+		{
+			free(new_node);
+			free(key);
+			free(value);
+			return (perror("strdup"), free_env(env_list), NULL);
+		}
+		new_node->key = key;
+		new_node->value = value;
 		new_node->next = env_list;
 		env_list = new_node;
 		i++;
@@ -150,67 +160,25 @@ void	handle_interactive_sigint(int sig)
 	(void)sig;
 	write(STDOUT_FILENO, "\n", 1);
 	rl_on_new_line();
-#if HAVE_RL_REPLACE_LINE
-	rl_replace_line("", 0);
-#endif
 	rl_redisplay();
-	errno = EINTR;
 }
 
 void	handle_sigint(int sig)
 {
 	(void)sig;
-	write(STDOUT_FILENO, "\n", 1);
-	rl_on_new_line();
-#if HAVE_RL_REPLACE_LINE
-	rl_replace_line("", 0);
-#endif
-	rl_redisplay();
-	g_status = 2;
-	errno = EINTR;
-}
-
-void	handle_sigquit(int sig)
-{
-	(void)sig;
-	write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
-	rl_on_new_line();
-#if HAVE_RL_REPLACE_LINE
-	rl_replace_line("", 0);
-#endif
-	rl_redisplay();
-	g_status = 3;
-	errno = EINTR;
+	g_status = 130;
 }
 
 void	reset_default_signal(void)
 {
-	struct sigaction	sa_int;
-	struct sigaction	sa_quit;
-
-	// Reset to default behavior
-	// Set up SIGINT handler (Ctrl+C)
-	sa_int.sa_handler = handle_sigint;
-	sigemptyset(&sa_int.sa_mask);
-	sa_int.sa_flags = 0;
-	sigaction(SIGINT, &sa_int, NULL);
-	sa_quit.sa_handler = handle_sigquit;
-	sigemptyset(&sa_quit.sa_mask);
-	sa_quit.sa_flags = 0;
-	sigaction(SIGQUIT, &sa_quit, NULL);
+	signal(SIGINT, SIG_DFL);
+	signal(SIGQUIT, SIG_DFL);
 }
 
 void	reset_heredoc_signal(void)
 {
-	struct sigaction	sa_int;
-
-	// Reset to default behavior
-	// Set up SIGINT handler (Ctrl+C)
-	sa_int.sa_handler = handle_sigint;
-	sigemptyset(&sa_int.sa_mask);
-	sa_int.sa_flags = 0;
-	sigaction(SIGINT, &sa_int, NULL);
-	signal(SIGQUIT, SIG_DFL);
+	signal(SIGINT, handle_sigint);
+	signal(SIGQUIT, SIG_IGN);
 }
 
 void	free_ast(t_node *ast)

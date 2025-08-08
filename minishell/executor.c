@@ -20,6 +20,10 @@ void	exec_builtin(t_env *env_list, t_cmd *cmd, int *status)
 	if (original_stdin == -1 || original_stdout == -1)
 	{
 		perror("dup");
+		if (original_stdin != -1)
+			close(original_stdin);
+		if (original_stdout != -1)
+			close(original_stdout);
 		*status = 1;
 		return ;
 	}
@@ -171,18 +175,24 @@ char	**to_list(t_token *argv)
 {
 	char	**list;
 	size_t	i;
+	size_t	size;
 
 	if (!argv)
 		return (NULL);
-	list = (char **)malloc(sizeof(char *) * (ft_token_size(argv) + 1));
+	size = ft_token_size(argv);
+	list = (char **)malloc(sizeof(char *) * (size + 1));
 	if (!list)
 		return (perror("malloc"), NULL);
 	i = 0;
-	while (argv)
+	while (argv && i < size)
 	{
 		list[i] = ft_strdup(argv->value);
 		if (!list[i])
-			return (perror("strdup"), free_argv(list, i), NULL);
+		{
+			perror("strdup");
+			free_argv(list, i);
+			return (NULL);
+		}
 		argv = argv->next;
 		i++;
 	}
@@ -217,18 +227,23 @@ char	**env_to_environ(t_env *env_list)
 {
 	char	**environ;
 	size_t	i;
+	size_t	size;
 
 	if (!env_list)
 		return (NULL);
-	environ = (char **)malloc(sizeof(char *) * (ft_env_size(env_list) + 1));
+	size = ft_env_size(env_list);
+	environ = (char **)malloc(sizeof(char *) * (size + 1));
 	if (!environ)
 		return (perror("malloc"), NULL);
 	i = 0;
-	while (env_list)
+	while (env_list && i < size)
 	{
 		environ[i] = ft_env_join(env_list);
 		if (!environ[i])
-			return (free_argv(environ, i), NULL);
+		{
+			free_argv(environ, i);
+			return (NULL);
+		}
 		env_list = env_list->next;
 		i++;
 	}
@@ -392,12 +407,15 @@ void	ft_execve(t_env *env_list, t_cmd *cmd, int *status)
 	argv = to_list(cmd->argv);
 	environ = env_to_environ(env_list);
 	if (g_status != 0)
-		return (free(path), free_str_list(argv), free_str_list(environ),
-			exit(128 + g_status));
+	{
+		free(path);
+		free_str_list(argv);
+		free_str_list(environ);
+		exit(128 + g_status);
+	}
 	if (path && argv && environ)
 		execve(path, argv, environ);
-	if (path)
-		free(path);
+	free(path);
 	free_str_list(argv);
 	free_str_list(environ);
 	if (errno == ENOENT)

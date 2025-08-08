@@ -1,0 +1,17 @@
+# Build artifacts
+obj/
+*.o
+minishell
+
+# Test files
+test_result
+a.out
+
+# Editor files
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
