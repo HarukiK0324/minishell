@@ -339,6 +339,8 @@ int	main(int argc, char **argv, char **environ)
 				status = 2;
 			if (g_status != 0)
 				status = 128 + g_status;
+			else
+				status = 0;
 			heredoc(ast, &status);
 			if (g_status == 0 && status == 0)
 				executor(ast, env_list, &status);
