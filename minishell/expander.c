@@ -147,6 +147,7 @@ char	*parse_env_var(char *str, size_t *j, t_env *env_list, int *status)
 			env_var[k] = str[*j + 1 + k];
 		env_var[k] = '\0';
 		str = replace_env_var(str, j, i, env_var, env_list);
+		free(env_var);
 	}
 	else
 		(*j)++;
