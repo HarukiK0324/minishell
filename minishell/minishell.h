@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:46 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 01:20:35 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/09 01:30:30 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,7 +184,7 @@ int								expander(t_node *node, t_env *env_list,
 char							*str_trim(char *str, size_t *j, size_t i);
 char							*str_insert(char *str, size_t *j, char *value);
 char							*replace_env_var(char *str, size_t *j, size_t i,
-									char *env_var, t_env *env_list);
+									char *value);
 char							*replace_status(char *str, size_t *j,
 									int *status);
 char							*trim_quote(char *str, size_t *j, char c);
@@ -192,6 +192,7 @@ char							*trim_double_quote(char *str, size_t *j,
 									t_env *env_list, int *status);
 char							*parse_env_var(char *str, size_t *j,
 									t_env *env_list, int *status);
+char							*find_env_value(char *env_var, t_env *env_list);
 
 /* ft_split.c */
 size_t							count_words(const char *s, char c);
