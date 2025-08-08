@@ -389,6 +389,8 @@ void	ft_execve(t_env *env_list, t_cmd *cmd)
 	if (!cmd->argv || !cmd->argv->value)
 		exit(0);
 	path = get_path(cmd->argv->value, env_list);
+	if (!path || access(path, F_OK) == -1)
+		return (err_msg(cmd->argv->value, ": command not found\n"), exit(127));
 	argv = to_list(cmd->argv);
 	environ = env_to_environ(env_list);
 	if (g_status != 0)
