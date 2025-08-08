@@ -157,7 +157,7 @@ void	reset_default_signal(void)
 {
 	// Reset to default behavior
 	// Set up SIGINT handler (Ctrl+C)
-	signal(SIGQUIT, SIG_DFL);
+	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
 }
 
