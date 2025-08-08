@@ -16,11 +16,11 @@
 
 extern volatile sig_atomic_t	g_status;
 
-#if defined(__APPLE__)
-#define OS 0
-#else
-#define OS 1
-#endif
+# if defined(__APPLE__)
+#  define OS 0
+# else
+#  define OS 1
+# endif
 
 typedef enum t_TokenType
 {
@@ -162,8 +162,10 @@ char							*parse_env_var(char *str, size_t *j,
 char							*trim_quote(char *str, size_t *j, char c);
 char							*trim_double_quote(char *str, size_t *j,
 									t_env *env_list, int *status);
-int								expand_cmd_argv(t_token *argv, t_env *env_list, int *status);
-int								expand_cmd_fd(t_fd *fd, t_env *env_list, int *status);
+int								expand_cmd_argv(t_token *argv, t_env *env_list,
+									int *status);
+int								expand_cmd_fd(t_fd *fd, t_env *env_list,
+									int *status);
 void							expand_cmd(t_cmd *cmd, t_env *env_list,
 									int *status);
 void							expander(t_node *node, t_env *env_list,

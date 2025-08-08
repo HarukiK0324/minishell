@@ -195,7 +195,7 @@ char	*trim_double_quote(char *str, size_t *j, t_env *env_list, int *status)
 	return (trim_quote(str, j, '"'));
 }
 
-int expand_cmd_argv(t_token *argv, t_env *env_list, int *status)
+int	expand_cmd_argv(t_token *argv, t_env *env_list, int *status)
 {
 	size_t	j;
 
@@ -214,14 +214,14 @@ int expand_cmd_argv(t_token *argv, t_env *env_list, int *status)
 			else
 				j++;
 			if (argv->value == NULL)
-				return -1;
+				return (-1);
 		}
 		argv = argv->next;
 	}
-	return 0;
+	return (0);
 }
 
-int expand_cmd_fd(t_fd *fd, t_env *env_list, int *status)
+int	expand_cmd_fd(t_fd *fd, t_env *env_list, int *status)
 {
 	size_t	j;
 
@@ -239,18 +239,18 @@ int expand_cmd_fd(t_fd *fd, t_env *env_list, int *status)
 			else
 				j++;
 			if (fd->value == NULL)
-				return -1;
+				return (-1);
 		}
 		fd = fd->next;
 	}
-	return 0;
+	return (0);
 }
 
 void	expand_cmd(t_cmd *cmd, t_env *env_list, int *status)
 {
-	if(expand_cmd_argv(cmd->argv, env_list, status) == -1 ||
-		expand_cmd_fd(cmd->fds, env_list, status) == -1 ||
-		expand_cmd_fd(cmd->heredoc_delimiter, env_list, status) == -1)
+	if (expand_cmd_argv(cmd->argv, env_list, status) == -1
+		|| expand_cmd_fd(cmd->fds, env_list, status) == -1
+		|| expand_cmd_fd(cmd->heredoc_delimiter, env_list, status) == -1)
 		g_status = 2;
 }
 
