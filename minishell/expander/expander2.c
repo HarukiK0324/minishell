@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:13 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 00:57:14 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/09 01:28:53 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,10 +47,27 @@ char	*parse_env_var(char *str, size_t *j, t_env *env_list, int *status)
 		while (++k < i)
 			env_var[k] = str[*j + 1 + k];
 		env_var[k] = '\0';
-		str = replace_env_var(str, j, i, env_var, env_list);
+		str = replace_env_var(str, j, i, find_env_value(env_var, env_list));
 		free(env_var);
 	}
 	else
 		(*j)++;
 	return (str);
+}
+
+char	*find_env_value(char *env_var, t_env *env_list)
+{
+	char	*value;
+
+	value = NULL;
+	while (env_list)
+	{
+		if (ft_strcmp(env_var, env_list->key) == 0)
+		{
+			value = env_list->value;
+			break ;
+		}
+		env_list = env_list->next;
+	}
+	return (value);
 }

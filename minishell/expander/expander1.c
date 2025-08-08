@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:11 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 00:57:12 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/09 01:27:55 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,21 +66,8 @@ char	*str_insert(char *str, size_t *j, char *value)
 	return (new_str);
 }
 
-char	*replace_env_var(char *str, size_t *j, size_t i, char *env_var,
-		t_env *env_list)
+char	*replace_env_var(char *str, size_t *j, size_t i, char *value)
 {
-	char	*value;
-
-	value = NULL;
-	while (env_list)
-	{
-		if (ft_strcmp(env_var, env_list->key) == 0)
-		{
-			value = env_list->value;
-			break ;
-		}
-		env_list = env_list->next;
-	}
 	str = str_trim(str, j, i);
 	if (str && value && ft_strlen(value))
 		str = str_insert(str, j, value);
