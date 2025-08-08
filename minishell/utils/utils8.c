@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 01:13:43 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 01:19:20 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/09 01:22:54 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,4 +34,5 @@ char	*get_token_str(t_TokenType token)
 		return ("||");
 	else if (token == TOKEN_WORD)
 		return ("TOKEN_WORD");
+	return (NULL);
 }

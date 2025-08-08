@@ -10,7 +10,7 @@ BUILTIN   = builtin builtin1 builtin2 builtin3 builtin4 builtin5 builtin6 builti
 EXECUTOR  = executor executor1
 EXPANDER  = expander expander1 expander2
 PARSER    = parser parser1
-UTILS     = utils utils1 utils2 utils3 utils4 utils5 utils6 utils7
+UTILS     = utils utils1 utils2 utils3 utils4 utils5 utils6 utils7 utils8
 
 SRC = \
 	$(addprefix builtin/, $(addsuffix .c, $(BUILTIN))) \

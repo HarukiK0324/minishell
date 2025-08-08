@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:46 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 00:57:47 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/09 01:20:35 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -278,5 +278,6 @@ void							err_msg_errno(char *value, char *msg);
 void							ft_open_heredoc(t_cmd *cmd, int heredoc_count);
 void							ft_open_fd_in(t_cmd *cmd, t_fd *current);
 void							ft_open_fd_out(t_cmd *cmd, t_fd *current);
+char							*get_token_str(t_TokenType token);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:15 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 00:57:16 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/09 01:01:48 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,7 +91,6 @@ t_node	*create_cmd(t_token **tokens)
 t_node	*parse_cmd(t_token **tokens)
 {
 	t_node	*node;
-	t_cmd	*cmd;
 
 	if (!*tokens)
 		return (print_synerr(TOKEN_END), NULL);
