@@ -16,10 +16,17 @@ void	exec_builtin(t_env *env_list, t_cmd *cmd, int *status)
 	int	original_stdout;
 
 	original_stdin = dup(STDIN_FILENO);
-	original_stdout = dup(STDOUT_FILENO);
-	if (original_stdin == -1 || original_stdout == -1)
+	if (original_stdin == -1)
 	{
 		perror("dup");
+		*status = 1;
+		return ;
+	}
+	original_stdout = dup(STDOUT_FILENO);
+	if (original_stdout == -1)
+	{
+		perror("dup");
+		close(original_stdin);
 		*status = 1;
 		return ;
 	}

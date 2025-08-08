@@ -44,7 +44,11 @@ int	ft_heredoc(t_cmd *cmd)
 		return (perror("pipe"), -1);
 	pid = fork();
 	if (pid < 0)
+	{
+		close(fd[0]);
+		close(fd[1]);
 		return (perror("fork"), -1);
+	}
 	if (pid == 0)
 	{
 		reset_heredoc_signal();

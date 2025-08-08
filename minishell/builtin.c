@@ -5,6 +5,8 @@ int	only_contains(char *str, char *chars)
 	int	i;
 	int	j;
 
+	if (!str || !chars || ft_strlen(str) == 0)
+		return (0);
 	i = 1;
 	while (str[i] != '\0')
 	{
@@ -103,12 +105,16 @@ static t_env	*find_env(t_env *env_list, char *key)
 static void	update_env(t_env *env_list, char *key, char *value)
 {
 	t_env	*node;
+	char	*new_value;
 
 	node = find_env(env_list, key);
 	if (node)
 	{
+		new_value = ft_strdup(value);
+		if (!new_value)
+			return ;
 		free(node->value);
-		node->value = ft_strdup(value);
+		node->value = new_value;
 	}
 	else
 	{
@@ -117,6 +123,13 @@ static void	update_env(t_env *env_list, char *key, char *value)
 			return ;
 		node->key = ft_strdup(key);
 		node->value = ft_strdup(value);
+		if (!node->key || !node->value)
+		{
+			free(node->key);
+			free(node->value);
+			free(node);
+			return ;
+		}
 		node->next = env_list->next;
 		env_list->next = node;
 	}
@@ -182,6 +195,8 @@ static void	remove_env(t_env **env_list, char *key)
 		{
 			if (prev)
 				prev->next = current->next;
+			else
+				*env_list = current->next;
 			free(current->key);
 			free(current->value);
 			free(current);
