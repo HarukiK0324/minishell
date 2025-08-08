@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   parser.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/09 00:57:15 by hkasamat          #+#    #+#             */
+/*   Updated: 2025/08/09 00:57:16 by hkasamat         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 t_node	*parse_condition(t_token **tokens)
@@ -48,7 +60,7 @@ t_node	*parse_pipe(t_token **tokens)
 	return (node);
 }
 
-t_node *create_cmd(t_token **tokens)
+t_node	*create_cmd(t_token **tokens)
 {
 	t_node	*node;
 	t_cmd	*cmd;

@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/09 00:57:42 by hkasamat          #+#    #+#             */
+/*   Updated: 2025/08/09 00:59:00 by hkasamat         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
 volatile sig_atomic_t	g_status = 0;
@@ -33,20 +45,18 @@ int	main(int argc, char **argv, char **environ)
 	t_env	*env_list;
 	int		status;
 
-	(void)argc; // Unused parameter
-	(void)argv; // Unused parameter
+	(void)argc;
+	(void)argv;
 	status = 0;
 	env_list = init_env(environ);
 	if (!env_list)
 		return (perror("init_env failed"), 1);
-	// Exit if environment initialization fails
 	while (1)
 	{
 		setup_signal_handlers();
-		// Set up signal handlers for Ctrl+C and Ctrl+'\'
 		input = readline("minishell$ ");
 		if (!input)
-			break ; // Exit on EOF (Ctrl+D)
+			break ;
 		if (g_status != 0)
 		{
 			status = 128 + g_status;

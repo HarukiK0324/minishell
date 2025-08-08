@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minishell.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/09 00:57:46 by hkasamat          #+#    #+#             */
+/*   Updated: 2025/08/09 00:57:47 by hkasamat         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
@@ -202,7 +214,7 @@ int								main(int argc, char **argv, char **environ);
 /* parser.c */
 t_node							*parse_condition(t_token **tokens);
 t_node							*parse_pipe(t_token **tokens);
-t_node 							*create_cmd(t_token **tokens);
+t_node							*create_cmd(t_token **tokens);
 t_node							*parse_cmd(t_token **tokens);
 t_node							*parse(t_token *tokens);
 int								add_fd(t_cmd *cmd, t_token **tokens);
@@ -217,7 +229,7 @@ void							reset_heredoc_signal(void);
 
 /* tokenizer.c */
 t_token							*init_token(t_TokenType type, const char *value,
-								 size_t len);
+									size_t len);
 t_TokenType						get_meta_type(const char *s);
 size_t							add_word(const char *input, t_token **list);
 size_t							add_metachar(const char *input, t_token **list);

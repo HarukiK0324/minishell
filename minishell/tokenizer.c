@@ -1,8 +1,20 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   tokenizer.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/08/09 00:57:50 by hkasamat          #+#    #+#             */
+/*   Updated: 2025/08/09 00:57:52 by hkasamat         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-t_token *init_token(t_TokenType type, const char *value, size_t value_len)
+t_token	*init_token(t_TokenType type, const char *value, size_t value_len)
 {
-	t_token *token;
+	t_token	*token;
 
 	token = (t_token *)malloc(sizeof(t_token));
 	if (!token)
@@ -63,7 +75,7 @@ size_t	add_word(const char *input, t_token **list)
 		len++;
 	}
 	token = init_token(TOKEN_WORD, input, len);
-	if(token == NULL)
+	if (token == NULL)
 		return (0);
 	append_token(list, token);
 	return (len);
