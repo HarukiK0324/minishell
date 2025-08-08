@@ -7,8 +7,9 @@ SRC_DIR = .
 OBJ_DIR = obj
 
 BUILTIN   = builtin builtin1 builtin2 builtin3 builtin4 builtin5 builtin6 builtin7
-EXECUTOR  = executor executor1 executor2
+EXECUTOR  = executor executor1 executor2 executor3
 EXPANDER  = expander expander1 expander2
+HEREDOC = heredoc heredoc1
 PARSER    = parser parser1
 UTILS     = utils utils1 utils2 utils3 utils4 utils5 utils6 utils7 utils8
 
@@ -16,10 +17,10 @@ SRC = \
 	$(addprefix builtin/, $(addsuffix .c, $(BUILTIN))) \
 	$(addprefix executor/, $(addsuffix .c, $(EXECUTOR))) \
 	$(addprefix expander/, $(addsuffix .c, $(EXPANDER))) \
+	$(addprefix heredoc/, $(addsuffix .c, $(HEREDOC))) \
 	$(addprefix parser/, $(addsuffix .c, $(PARSER))) \
 	$(addprefix utils/, $(addsuffix .c, $(UTILS))) \
 	ft_split.c \
-	heredoc.c \
 	main.c \
 	signal.c \
 	tokenizer.c \

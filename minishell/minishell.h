@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:46 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 02:27:55 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/09 03:43:14 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,12 +84,16 @@ typedef struct s_cmd
 	int							heredoc_fd;
 	int							fd_in;
 	int							fd_out;
+	void						(*old_sigint)(int);
+	void						(*old_sigquit)(int);
 }								t_cmd;
 
 typedef struct s_node
 {
 	t_NodeType					type;
 	t_cmd						*cmd;
+	void						(*old_sigint)(int);
+	void						(*old_sigquit)(int);
 	struct s_node				*lhs;
 	struct s_node				*rhs;
 }								t_node;
@@ -174,6 +178,8 @@ void							run_builtin(t_env *env_list, t_cmd *cmd,
 void							handle_builtin_fd(t_cmd *cmd, int *status,
 									int original_stdin, int original_stdout);
 void							handle_status(int wstatus, int *status);
+void							signal_pipe_hold(t_node *ast);
+void							signal_pipe_revert(t_node *ast);
 
 /* expander */
 int								expand_cmd_argv(t_token *argv, t_env *env_list,
@@ -203,13 +209,15 @@ char							*substring(char const *s, size_t index, char c);
 void							free_all(char **arr, size_t i);
 char							**ft_split(char const *s, char c);
 
-/* heredoc.c */
+/* heredoc */
 void							read_heredoc(t_fd *heredoc_delimiter, int fd);
 void							parse_heredoc(t_fd *heredoc_delimiter,
 									int fd_in, int fd_out);
 int								ft_heredoc(t_cmd *cmd);
 void							process_heredoc(t_cmd *cmd, int *status);
 void							heredoc(t_node *ast, int *status);
+void							heredoc_signal_hold(t_cmd *cmd);
+void							heredoc_signal_revert(t_cmd *cmd);
 
 /* main.c	*/
 t_env							*init_env(char **environ);
