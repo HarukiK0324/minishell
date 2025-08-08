@@ -246,24 +246,27 @@ int	expand_cmd_fd(t_fd *fd, t_env *env_list, int *status)
 	return (0);
 }
 
-void	expand_cmd(t_cmd *cmd, t_env *env_list, int *status)
+int	expand_cmd(t_cmd *cmd, t_env *env_list, int *status)
 {
 	if (expand_cmd_argv(cmd->argv, env_list, status) == -1
 		|| expand_cmd_fd(cmd->fds, env_list, status) == -1
 		|| expand_cmd_fd(cmd->heredoc_delimiter, env_list, status) == -1)
-		g_status = 2;
+		return (-1);
 }
 
-void	expander(t_node *node, t_env *env_list, int *status)
+int	expander(t_node *node, t_env *env_list, int *status)
 {
-	if (!node || g_status != 0)
-		return ;
-	if (node->type == NODE_CMD && g_status == 0)
-		expand_cmd(node->cmd, env_list, status);
-	else if (g_status == 0)
-	{
-		expander(node->lhs, env_list, status);
-		if (node->type == NODE_PIPE && g_status == 0)
-			expander(node->rhs, env_list, status);
-	}
+	if (!node)
+		return (0);
+	if (node->type == NODE_CMD)
+		if (expand_cmd(node->cmd, env_list, status) == -1)
+			return (-1);
+		else
+		{
+			if (expander(node->lhs, env_list, status) == -1)
+				return (-1);
+			if (node->type == NODE_PIPE)
+				if (expander(node->rhs, env_list, status) == -1)
+					return (-1);
+		}
 }

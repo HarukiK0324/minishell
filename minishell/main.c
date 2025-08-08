@@ -378,11 +378,10 @@ int	main(int argc, char **argv, char **environ)
 				printf("failed tokenizing/parsing\n");
 				status = 2;
 			}
-			expander(ast, env_list, &status);
-			if (g_status != 0)
+			if (expander(ast, env_list, &status) == -1)
 				status = 2;
-			else
-				status = 0;
+			if (g_status != 0)
+				status = g_status;
 			heredoc(ast, &status);
 			if (g_status == 0 && status == 0)
 				executor(ast, env_list, &status);
