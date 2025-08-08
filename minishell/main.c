@@ -318,6 +318,8 @@ int	main(int argc, char **argv, char **environ)
 		input = readline("minishell$ ");
 		if (!input)
 			break ; // Exit on EOF (Ctrl+D)
+		if (g_status == 2)
+			status = 130;
 		if (ft_strlen(input) > 0)
 		{
 			if (check_quote(input) == -1)
@@ -336,7 +338,7 @@ int	main(int argc, char **argv, char **environ)
 			if (expander(ast, env_list, &status) == -1)
 				status = 2;
 			if (g_status != 0)
-				status = g_status;
+				status = 128 + g_status;
 			heredoc(ast, &status);
 			if (g_status == 0 && status == 0)
 				executor(ast, env_list, &status);
@@ -349,7 +351,7 @@ int	main(int argc, char **argv, char **environ)
 	}
 	free_env(env_list);
 	printf("exit\n");
-	if(g_status != 0)
+	if (g_status != 0)
 		status = 128 + g_status;
 	exit(status);
 }
