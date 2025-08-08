@@ -261,6 +261,7 @@ void	err_msg_errno(char *value, char *msg)
 
 void	ft_open_heredoc(t_cmd *cmd, t_fd *current, int heredoc_count)
 {
+	(void)current;
 	if (heredoc_count == cmd->heredoc_count)
 	{
 		if (cmd->fd_in != 0 && cmd->fd_in > 0)
@@ -376,6 +377,7 @@ void	ft_execve(t_env *env_list, t_cmd *cmd, int *status)
 	char	**environ;
 	char	**argv;
 
+	(void)status;
 	reset_default_signal();
 	if (process_redirections(cmd) == -1)
 		exit(EXIT_FAILURE);

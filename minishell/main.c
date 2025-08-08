@@ -288,7 +288,6 @@ int	main(int argc, char **argv, char **environ)
 	t_node	*ast;
 	t_env	*env_list;
 	int		status;
-	t_token	*saved_tokens;
 
 	(void)argc; // Unused parameter
 	(void)argv; // Unused parameter
@@ -313,7 +312,6 @@ int	main(int argc, char **argv, char **environ)
 				continue ;
 			}
 			tokens = tokenize(input);
-			saved_tokens = tokens;
 			// while (saved_tokens)
 			// {
 			// 	if (!saved_tokens->type)
