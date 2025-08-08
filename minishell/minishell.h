@@ -215,6 +215,8 @@ void							reset_default_signal(void);
 void							reset_heredoc_signal(void);
 
 /* tokenizer.c */
+t_token							*init_token(t_TokenType type, const char *value,
+								 size_t len);
 t_TokenType						get_meta_type(const char *s);
 size_t							add_word(const char *input, t_token **list);
 size_t							add_metachar(const char *input, t_token **list);

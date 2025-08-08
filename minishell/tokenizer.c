@@ -1,5 +1,23 @@
 #include "minishell.h"
 
+t_token *init_token(t_TokenType type, const char *value, size_t value_len)
+{
+	t_token *token;
+
+	token = (t_token *)malloc(sizeof(t_token));
+	if (!token)
+		return (write(STDERR_FILENO, "minishell: token creation\n", 26), NULL);
+	token->type = type;
+	token->value = ft_strndup(value, value_len);
+	if (!token->value)
+	{
+		free(token);
+		return (perror("strndup"), NULL);
+	}
+	token->next = NULL;
+	return (token);
+}
+
 t_TokenType	get_meta_type(const char *s)
 {
 	if (ft_strncmp(s, "<<", 2) == 0)
@@ -44,12 +62,9 @@ size_t	add_word(const char *input, t_token **list)
 		}
 		len++;
 	}
-	token = (t_token *)malloc(sizeof(t_token));
-	if (!token)
-		return (write(STDERR_FILENO, "minishell: token creation\n", 26), 0);
-	token->type = TOKEN_WORD;
-	token->next = NULL;
-	token->value = ft_strndup(input, len);
+	token = init_token(TOKEN_WORD, input, len);
+	if(token == NULL)
+		return (0);
 	append_token(list, token);
 	return (len);
 }
@@ -68,12 +83,9 @@ size_t	add_metachar(const char *input, t_token **list)
 		len = 2;
 	else
 		len = 1;
-	token = (t_token *)malloc(sizeof(t_token));
+	token = init_token(type, input, len);
 	if (!token)
-		return (write(STDERR_FILENO, "minishell: token creation\n", 26), 0);
-	token->type = type;
-	token->next = NULL;
-	token->value = ft_strndup(input, len);
+		return (0);
 	append_token(list, token);
 	return (len);
 }
