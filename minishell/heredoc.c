@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:37 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 01:01:32 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/09 02:55:51 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,32 +49,45 @@ void	parse_heredoc(t_fd *heredoc_delimiter, int fd_in, int fd_out)
 	close(fd_in);
 }
 
-int	ft_heredoc(t_cmd *cmd)
+int  ft_heredoc(t_cmd *cmd)
 {
-	int		fd[2];
-	int		wstatus;
-	pid_t	pid;
+    int     fd[2];
+    int     wstatus;
+    pid_t   pid;
+    void    (*old_sigint)(int);
+    void    (*old_sigquit)(int);
 
-	if (pipe(fd) == -1)
-		return (perror("pipe"), -1);
-	pid = fork();
-	if (pid < 0)
-		return (perror("fork"), -1);
-	if (pid == 0)
-	{
-		parse_heredoc(cmd->heredoc_delimiter, fd[1], fd[0]);
-		exit(EXIT_SUCCESS);
-	}
-	close(fd[1]);
-	cmd->heredoc_fd = fd[0];
-	waitpid(pid, &wstatus, 0);
-	if (WTERMSIG(wstatus) == SIGINT)
-	{
-		g_status = 2;
-		write(STDOUT_FILENO, "\n", 1);
-		return (close(fd[0]), -1);
-	}
-	return (0);
+    if (pipe(fd) == -1)
+        return (perror("pipe"), -1);
+    
+    // Save and ignore signals in parent
+    old_sigint = signal(SIGINT, SIG_IGN);
+    old_sigquit = signal(SIGQUIT, SIG_IGN);
+    
+    pid = fork();
+    if (pid < 0)
+        return (perror("fork"), -1);
+    if (pid == 0)
+    {
+        reset_heredoc_signal();
+        parse_heredoc(cmd->heredoc_delimiter, fd[1], fd[0]);
+        exit(EXIT_SUCCESS);
+    }
+    close(fd[1]);
+    cmd->heredoc_fd = fd[0];
+    waitpid(pid, &wstatus, 0);
+    
+    // Restore signal handlers
+    signal(SIGINT, old_sigint);
+    signal(SIGQUIT, old_sigquit);
+    
+    if (WTERMSIG(wstatus) == SIGINT)
+    {
+        g_status = 2;
+        write(STDOUT_FILENO, "\n", 1);
+        return (close(fd[0]), -1);
+    }
+    return (0);
 }
 
 void	process_heredoc(t_cmd *cmd, int *status)

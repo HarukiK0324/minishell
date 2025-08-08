@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:03 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 02:07:21 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/09 02:56:15 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,20 +57,32 @@ void	exec_pipe(t_node *ast, t_env *env_list, int *status)
 	handle_status(status2, status);
 }
 
-void	exec_cmd(t_env *env_list, t_cmd *cmd, int *status)
+void  exec_cmd(t_env *env_list, t_cmd *cmd, int *status)
 {
-	pid_t	pid;
-	int		wstatus;
+    pid_t   pid;
+    int     wstatus;
+    void    (*old_sigint)(int);
+    void    (*old_sigquit)(int);
 
-	if (cmd->argv && is_builtin(cmd->argv->value))
-		return (exec_builtin(env_list, cmd, status));
-	pid = fork();
-	if (pid < 0)
-		exec_error(status, "fork");
-	if (pid == 0)
-		ft_execve(env_list, cmd);
-	waitpid(pid, &wstatus, 0);
-	handle_status(wstatus, status);
+    if (cmd->argv && is_builtin(cmd->argv->value))
+        return (exec_builtin(env_list, cmd, status));
+    
+    // Save and ignore signals in parent
+    old_sigint = signal(SIGINT, SIG_IGN);
+    old_sigquit = signal(SIGQUIT, SIG_IGN);
+    
+    pid = fork();
+    if (pid < 0)
+        exec_error(status, "fork");
+    if (pid == 0)
+        ft_execve(env_list, cmd);
+    waitpid(pid, &wstatus, 0);
+    
+    // Restore signal handlers
+    signal(SIGINT, old_sigint);
+    signal(SIGQUIT, old_sigquit);
+    
+    handle_status(wstatus, status);
 }
 
 void	executor(t_node *ast, t_env *env_list, int *status)
