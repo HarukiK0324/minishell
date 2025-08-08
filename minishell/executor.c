@@ -364,6 +364,11 @@ void	exec_pipe(t_node *ast, t_env *env_list, int *status)
 		write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
 		g_status = 3;
 	}
+	else if (WTERMSIG(status2) == SIGINT)
+	{
+		write(STDOUT_FILENO, "\b\n", 1);
+		g_status = 2;
+	}
 	if (g_status != 0)
 		*status = 128 + g_status;
 }
@@ -437,6 +442,11 @@ void	exec_cmd(t_env *env_list, t_cmd *cmd, int *status)
 	{
 		write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
 		g_status = 3;
+	}
+	else if (WTERMSIG(wstatus) == SIGINT)
+	{
+		write(STDOUT_FILENO, "\b\n", 1);
+		g_status = 2;
 	}
 	if (g_status != 0)
 		*status = 128 + g_status;

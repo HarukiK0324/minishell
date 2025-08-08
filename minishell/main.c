@@ -131,7 +131,6 @@ t_env	*init_env(char **environ)
 void	setup_signal_handlers(void)
 {
 	struct sigaction	sa_int;
-	struct sigaction	sa_quit;
 
 	// Set up SIGINT handler (Ctrl+C)
 	sa_int.sa_handler = handle_interactive_sigint;
@@ -139,40 +138,15 @@ void	setup_signal_handlers(void)
 	sa_int.sa_flags = 0;
 	sigaction(SIGINT, &sa_int, NULL);
 	// Ignore SIGQUIT (Ctrl+\)
-	sa_quit.sa_handler = SIG_IGN;
-	sigemptyset(&sa_quit.sa_mask);
-	sa_quit.sa_flags = 0;
-	sigaction(SIGQUIT, &sa_quit, NULL);
+	signal(SIGQUIT, SIG_IGN);
 }
 
 void	handle_interactive_sigint(int sig)
 {
 	(void)sig;
 	g_status = 2;
+	rl_on_new_line();
 	write(STDOUT_FILENO, "\n", 1);
-	rl_on_new_line();
-#if OS
-	rl_replace_line("", 0);
-#endif
-	rl_redisplay();
-}
-
-void	handle_sigint(int sig)
-{
-	(void)sig;
-	g_status = 2;
-	write(STDOUT_FILENO, "\n", 1);
-	rl_on_new_line();
-#if OS
-	rl_replace_line("", 0);
-#endif
-	rl_redisplay();
-}
-
-void	handle_sigquit(int sig)
-{
-	(void)sig;
-	rl_on_new_line();
 #if OS
 	rl_replace_line("", 0);
 #endif
@@ -181,34 +155,17 @@ void	handle_sigquit(int sig)
 
 void	reset_default_signal(void)
 {
-	struct sigaction	sa_int;
-
 	// Reset to default behavior
 	// Set up SIGINT handler (Ctrl+C)
-	sa_int.sa_handler = handle_sigint;
-	sigemptyset(&sa_int.sa_mask);
-	sa_int.sa_flags = 0;
-	sigaction(SIGINT, &sa_int, NULL);
 	signal(SIGQUIT, SIG_DFL);
-}
-
-void	handle_heredoc_sigint(int sig)
-{
-	(void)sig;
-	g_status = 2;
-	write(STDOUT_FILENO, "\b\n", 2);
+	signal(SIGQUIT, SIG_DFL);
 }
 
 void	reset_heredoc_signal(void)
 {
-	// struct sigaction	sa_int;
 	// Reset to default behavior
 	// Set up SIGINT handler (Ctrl+C)
-	// sa_int.sa_handler = handle_heredoc_sigint;
-	// sigemptyset(&sa_int.sa_mask);
-	// sa_int.sa_flags = 0;
-	// sigaction(SIGINT, &sa_int, NULL);
-	signal(SIGINT, handle_heredoc_sigint);
+	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_IGN);
 }
 

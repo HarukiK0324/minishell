@@ -56,8 +56,12 @@ int	ft_heredoc(t_cmd *cmd)
 	close(fd[1]);
 	cmd->heredoc_fd = fd[0];
 	waitpid(pid, &wstatus, 0);
-	if (g_status == 2)
+	if (WTERMSIG(wstatus) == SIGINT)
+	{
+		g_status = 2;
+		write(STDOUT_FILENO, "\n", 1);
 		return (close(fd[0]), -1);
+	}
 	return (0);
 }
 
