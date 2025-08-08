@@ -56,7 +56,7 @@ int	ft_heredoc(t_cmd *cmd)
 	close(fd[1]);
 	cmd->heredoc_fd = fd[0];
 	waitpid(pid, &wstatus, 0);
-	if (WIFSIGNALED(wstatus))
+	if (g_status == 2)
 		return (close(fd[0]), -1);
 	return (0);
 }
@@ -68,7 +68,6 @@ void	process_heredoc(t_cmd *cmd, int *status)
 	if (ft_heredoc(cmd) == -1)
 	{
 		*status = 130;
-		g_status = 2;
 		return ;
 	}
 }

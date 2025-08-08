@@ -172,8 +172,6 @@ void	handle_sigint(int sig)
 void	handle_sigquit(int sig)
 {
 	(void)sig;
-	g_status = 3;
-	write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
 	rl_on_new_line();
 #if OS
 	rl_replace_line("", 0);
@@ -184,23 +182,6 @@ void	handle_sigquit(int sig)
 void	reset_default_signal(void)
 {
 	struct sigaction	sa_int;
-	struct sigaction	sa_quit;
-
-	// Reset to default behavior
-	// Set up SIGINT handler (Ctrl+C)
-	sa_int.sa_handler = handle_sigint;
-	sigemptyset(&sa_int.sa_mask);
-	sa_int.sa_flags = 0;
-	sigaction(SIGINT, &sa_int, NULL);
-	sa_quit.sa_handler = handle_sigquit;
-	sigemptyset(&sa_quit.sa_mask);
-	sa_quit.sa_flags = 0;
-	sigaction(SIGQUIT, &sa_quit, NULL);
-}
-
-void	reset_heredoc_signal(void)
-{
-	struct sigaction	sa_int;
 
 	// Reset to default behavior
 	// Set up SIGINT handler (Ctrl+C)
@@ -209,6 +190,26 @@ void	reset_heredoc_signal(void)
 	sa_int.sa_flags = 0;
 	sigaction(SIGINT, &sa_int, NULL);
 	signal(SIGQUIT, SIG_DFL);
+}
+
+void	handle_heredoc_sigint(int sig)
+{
+	(void)sig;
+	g_status = 2;
+	write(STDOUT_FILENO, "\b\n", 2);
+}
+
+void	reset_heredoc_signal(void)
+{
+	// struct sigaction	sa_int;
+	// Reset to default behavior
+	// Set up SIGINT handler (Ctrl+C)
+	// sa_int.sa_handler = handle_heredoc_sigint;
+	// sigemptyset(&sa_int.sa_mask);
+	// sa_int.sa_flags = 0;
+	// sigaction(SIGINT, &sa_int, NULL);
+	signal(SIGINT, handle_heredoc_sigint);
+	signal(SIGQUIT, SIG_IGN);
 }
 
 void	free_ast(t_node *ast)

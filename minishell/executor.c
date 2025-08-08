@@ -359,7 +359,12 @@ void	exec_pipe(t_node *ast, t_env *env_list, int *status)
 	waitpid(pid2, &status2, 0);
 	if (WIFEXITED(status2))
 		*status = WEXITSTATUS(status2);
-	else if (WIFSIGNALED(status2))
+	else if (WTERMSIG(status2) == SIGQUIT)
+	{
+		write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
+		g_status = 3;
+	}
+	if (g_status != 0)
 		*status = 128 + g_status;
 }
 
@@ -428,7 +433,12 @@ void	exec_cmd(t_env *env_list, t_cmd *cmd, int *status)
 	waitpid(pid, &wstatus, 0);
 	if (WIFEXITED(wstatus))
 		*status = WEXITSTATUS(wstatus);
-	else
+	else if (WTERMSIG(wstatus) == SIGQUIT)
+	{
+		write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
+		g_status = 3;
+	}
+	if (g_status != 0)
 		*status = 128 + g_status;
 }
 
