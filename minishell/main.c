@@ -150,7 +150,9 @@ void	handle_interactive_sigint(int sig)
 	(void)sig;
 	write(STDOUT_FILENO, "\n", 1);
 	rl_on_new_line();
-	rl_replace_line("", 0);
+#if HAVE_RL_REPLACE_LINE
+    rl_replace_line("", 0);
+#endif
 	rl_redisplay();
 	errno = EINTR;
 }
@@ -160,7 +162,9 @@ void	handle_sigint(int sig)
 	(void)sig;
 	write(STDOUT_FILENO, "\n", 1);
 	rl_on_new_line();
-	rl_replace_line("", 0);
+#if HAVE_RL_REPLACE_LINE
+    rl_replace_line("", 0);
+#endif
 	rl_redisplay();
 	g_status = 2;
 	errno = EINTR;
@@ -171,7 +175,9 @@ void	handle_sigquit(int sig)
 	(void)sig;
 	write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
 	rl_on_new_line();
-	rl_replace_line("", 0);
+#if HAVE_RL_REPLACE_LINE
+    rl_replace_line("", 0);
+#endif
 	rl_redisplay();
 	g_status = 3;
 	errno = EINTR;
