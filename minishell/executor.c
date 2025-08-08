@@ -252,7 +252,7 @@ void	err_msg_errno(char *value, char *msg)
 	write(STDERR_FILENO, "\n", 1);
 }
 
-void	ft_open_heredoc(t_cmd *cmd, t_fd *current, int heredoc_count)
+void	ft_open_heredoc(t_cmd *cmd, int heredoc_count)
 {
 	if (heredoc_count == cmd->heredoc_count)
 	{
@@ -301,7 +301,7 @@ int	process_redirections(t_cmd *cmd)
 		if (current->type == TOKEN_REDIR_IN)
 			ft_open_fd_in(cmd, current);
 		else if (current->type == TOKEN_HEREDOC)
-			ft_open_heredoc(cmd, current, ++heredoc_count);
+			ft_open_heredoc(cmd, ++heredoc_count);
 		else if (current->type == TOKEN_REDIR_OUT
 			|| current->type == TOKEN_APPEND)
 			ft_open_fd_out(cmd, current);
@@ -363,7 +363,7 @@ void	exec_pipe(t_node *ast, t_env *env_list, int *status)
 		*status = 128 + WTERMSIG(status2);
 }
 
-void	ft_execve(t_env *env_list, t_cmd *cmd, int *status)
+void	ft_execve(t_env *env_list, t_cmd *cmd)
 {
 	char	*path;
 	char	**environ;
@@ -422,7 +422,7 @@ void	exec_cmd(t_env *env_list, t_cmd *cmd, int *status)
 		return (perror("fork"));
 	}
 	if (pid == 0)
-		ft_execve(env_list, cmd, status);
+		ft_execve(env_list, cmd);
 	else
 	{
 		if (waitpid(pid, &wstatus, 0) == -1 && g_status == 0)

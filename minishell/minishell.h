@@ -133,8 +133,7 @@ void							parse_heredoc(t_fd *heredoc_delimiter,
 int								ft_heredoc(t_cmd *cmd);
 void							err_msg(char *value, char *msg);
 void							err_msg_errno(char *value, char *msg);
-void							ft_open_heredoc(t_cmd *cmd, t_fd *current,
-									int heredoc_count);
+void							ft_open_heredoc(t_cmd *cmd, int heredoc_count);
 void							ft_open_fd_in(t_cmd *cmd, t_fd *current);
 void							ft_open_fd_out(t_cmd *cmd, t_fd *current);
 int								process_redirections(t_cmd *cmd);
@@ -144,8 +143,7 @@ void							exec_pipe(t_node *ast, t_env *env_list,
 									int *status);
 void							exec_cmd(t_env *env_list, t_cmd *cmd,
 									int *status);
-void							ft_execve(t_env *env_list, t_cmd *cmd,
-									int *status);
+void							ft_execve(t_env *env_list, t_cmd *cmd);
 
 /* expander.c */
 int								is_char(char c);
