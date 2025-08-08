@@ -202,6 +202,7 @@ int								main(int argc, char **argv, char **environ);
 /* parser.c */
 t_node							*parse_condition(t_token **tokens);
 t_node							*parse_pipe(t_token **tokens);
+t_node 							*create_cmd(t_token **tokens);
 t_node							*parse_cmd(t_token **tokens);
 t_node							*parse(t_token *tokens);
 int								add_fd(t_cmd *cmd, t_token **tokens);

@@ -48,6 +48,34 @@ t_node	*parse_pipe(t_token **tokens)
 	return (node);
 }
 
+t_node *create_cmd(t_token **tokens)
+{
+	t_node	*node;
+	t_cmd	*cmd;
+
+	node = init_node();
+	if (!node)
+		return (NULL);
+	cmd = init_cmd();
+	if (!cmd)
+		return (free_node(node), NULL);
+	while (*tokens && token_cmd(*tokens))
+	{
+		if ((*tokens)->type == TOKEN_WORD)
+		{
+			if (!add_argv(&cmd->argv, tokens))
+				return (free_cmd(cmd), NULL);
+		}
+		else
+		{
+			if (!add_fd(cmd, tokens))
+				return (free_cmd(cmd), NULL);
+		}
+	}
+	node->cmd = cmd;
+	return (node);
+}
+
 t_node	*parse_cmd(t_token **tokens)
 {
 	t_node	*node;
@@ -70,25 +98,7 @@ t_node	*parse_cmd(t_token **tokens)
 	}
 	else if (!token_cmd(*tokens))
 		return (print_synerr((*tokens)->type), NULL);
-	node = init_node();
-	cmd = init_cmd();
-	if (!cmd || !node)
-		return (perror("malloc"), free_cmd(cmd), free_node(node), NULL);
-	while (*tokens && token_cmd(*tokens))
-	{
-		if ((*tokens)->type == TOKEN_WORD)
-		{
-			if (!add_argv(&cmd->argv, tokens))
-				return (free_cmd(cmd), NULL);
-		}
-		else
-		{
-			if (!add_fd(cmd, tokens))
-				return (free_cmd(cmd), NULL);
-		}
-	}
-	node->cmd = cmd;
-	return (node);
+	return (create_cmd(tokens));
 }
 
 t_node	*parse(t_token *tokens)

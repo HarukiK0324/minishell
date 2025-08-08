@@ -22,6 +22,8 @@ void	read_heredoc(t_fd *heredoc_delimiter, int fd)
 
 void	parse_heredoc(t_fd *heredoc_delimiter, int fd_in, int fd_out)
 {
+	reset_heredoc_signal();
+	close(fd_out);
 	if (!heredoc_delimiter)
 		return ;
 	while (heredoc_delimiter->next)
@@ -32,6 +34,7 @@ void	parse_heredoc(t_fd *heredoc_delimiter, int fd_in, int fd_out)
 	}
 	read_heredoc(heredoc_delimiter, fd_in);
 	heredoc_delimiter->fd = fd_out;
+	close(fd_in);
 }
 
 int	ft_heredoc(t_cmd *cmd)
@@ -47,10 +50,7 @@ int	ft_heredoc(t_cmd *cmd)
 		return (perror("fork"), -1);
 	if (pid == 0)
 	{
-		reset_heredoc_signal();
-		close(fd[0]);
 		parse_heredoc(cmd->heredoc_delimiter, fd[1], fd[0]);
-		close(fd[1]);
 		exit(EXIT_SUCCESS);
 	}
 	close(fd[1]);
