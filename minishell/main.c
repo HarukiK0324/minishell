@@ -148,37 +148,37 @@ void	setup_signal_handlers(void)
 void	handle_interactive_sigint(int sig)
 {
 	(void)sig;
+	g_status = 2;
 	write(STDOUT_FILENO, "\n", 1);
 	rl_on_new_line();
 #if OS
 	rl_replace_line("", 0);
 #endif
 	rl_redisplay();
-	g_status = 2;
 }
 
 void	handle_sigint(int sig)
 {
 	(void)sig;
+	g_status = 2;
 	write(STDOUT_FILENO, "\n", 1);
 	rl_on_new_line();
 #if OS
 	rl_replace_line("", 0);
 #endif
 	rl_redisplay();
-	g_status = 2;
 }
 
 void	handle_sigquit(int sig)
 {
 	(void)sig;
+	g_status = 3;
 	write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
 	rl_on_new_line();
 #if OS
 	rl_replace_line("", 0);
 #endif
 	rl_redisplay();
-	g_status = 3;
 }
 
 void	reset_default_signal(void)
@@ -318,8 +318,11 @@ int	main(int argc, char **argv, char **environ)
 		input = readline("minishell$ ");
 		if (!input)
 			break ; // Exit on EOF (Ctrl+D)
-		if (g_status == 2)
-			status = 130;
+		if (g_status != 0)
+		{
+			status = 128 + g_status;
+			g_status = 0;
+		}
 		if (ft_strlen(input) > 0)
 		{
 			if (check_quote(input) == -1)
@@ -335,15 +338,16 @@ int	main(int argc, char **argv, char **environ)
 				printf("failed tokenizing/parsing\n");
 				status = 2;
 			}
-			if (expander(ast, env_list, &status) == -1)
-				status = 2;
-			if (g_status != 0)
-				status = 128 + g_status;
 			else
-				status = 0;
-			heredoc(ast, &status);
-			if (g_status == 0 && status == 0)
-				executor(ast, env_list, &status);
+			{
+				if (expander(ast, env_list, &status) == -1)
+					status = 2;
+				else
+					status = 0;
+				heredoc(ast, &status);
+				if (g_status == 0 && status == 0)
+					executor(ast, env_list, &status);
+			}
 			free_tokens(tokens);
 			free_ast(ast);
 			add_history(input);

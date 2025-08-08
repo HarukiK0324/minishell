@@ -360,7 +360,7 @@ void	exec_pipe(t_node *ast, t_env *env_list, int *status)
 	if (WIFEXITED(status2))
 		*status = WEXITSTATUS(status2);
 	else if (WIFSIGNALED(status2))
-		*status = 128 + WTERMSIG(status2);
+		*status = 128 + g_status;
 }
 
 void	ft_execve(t_env *env_list, t_cmd *cmd)
@@ -429,13 +429,7 @@ void	exec_cmd(t_env *env_list, t_cmd *cmd, int *status)
 	if (WIFEXITED(wstatus))
 		*status = WEXITSTATUS(wstatus);
 	else
-	{
-		if (WTERMSIG(wstatus) == SIGINT)
-			g_status = 2;
-		else
-			g_status = 3;
 		*status = 128 + g_status;
-	}
 }
 
 void	executor(t_node *ast, t_env *env_list, int *status)

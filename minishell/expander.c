@@ -199,7 +199,7 @@ int	expand_cmd_argv(t_token *argv, t_env *env_list, int *status)
 {
 	size_t	j;
 
-	while (argv && g_status == 0)
+	while (argv)
 	{
 		j = 0;
 		while (argv->value && argv->value[j] != '\0')
@@ -225,7 +225,7 @@ int	expand_cmd_fd(t_fd *fd, t_env *env_list, int *status)
 {
 	size_t	j;
 
-	while (fd && g_status == 0)
+	while (fd)
 	{
 		j = 0;
 		while (fd->value && fd->value[j] != '\0')
