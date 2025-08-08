@@ -34,7 +34,7 @@ int	is_char(char c)
 
 int	is_numchar(char c)
 {
-	return (c >= '0' && c <= '9') || is_char(c);
+	return ((c >= '0' && c <= '9') || is_char(c));
 }
 
 char	*to_str(size_t n)

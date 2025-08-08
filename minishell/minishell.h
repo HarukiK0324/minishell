@@ -104,67 +104,82 @@ void							reset_default_signal(void);
 void							reset_heredoc_signal(void);
 
 /* builtin */
-int	is_valid_identifier(char *str);
-int	validate_digit_sequence(char *str, int start);
-int	validate_negative_long(char *str, int i);
-int	validate_positive_long(char *str, int i);
-int	is_valid_long(char *str);
-void remove_env(t_env **env_list, char *key);
-int exec_unset(t_token *argv, t_env *env_list);
-int exec_env(t_env *env_list);
-long ft_atol(const char *str);
-int exec_exit(t_token *argv);
-void print_export(t_env *env_list);
-void print_export_error(char *value);
-int handle_export_with_equals(t_token *tmp, t_env *env_list);
-int handle_export_without_equals(t_token *tmp, t_env *env_list);
-int exec_export(t_token *argv, t_env *env_list);
-int count_env(t_env *env_list);
-void swap_env(t_env **a, t_env **b);
-void sort_env_array(t_env **arr, int n);
-t_env **create_env_array(t_env *env_list, int count);
-void print_sorted_env(t_env **arr, int count);
-t_env *find_env(t_env *env_list, char *key);
-void update_existing_env(t_env *node, char *value);
-void add_new_env(t_env *env_list, char *key, char *value);
-void update_env(t_env *env_list, char *key, char *value);
-char *ft_strchr(const char *s, int c);
-int handle_cd_parent_dir(t_env *env_list);
-int handle_cd_regular(char *path, t_env *env_list);
-int handle_cd_oldpwd(t_env *env_list);
-int exec_cd(t_token *argv, t_env *env_list);
-int exec_pwd(void);
-char *find_pwd_value(t_env *env_list);
-void copy_parent_path(char *parent, char *pwd, int i);
-char *get_parent_from_pwd(t_env *env_list);
-char *get_cd_path(t_token *argv, t_env *env_list);
-void update_pwd(t_env *env_list, char *new_pwd);
-int only_contains(char *str, char *chars);
-int exec_echo(t_token *argv);
+int								is_valid_identifier(char *str);
+int								validate_digit_sequence(char *str, int start);
+int								validate_negative_long(char *str, int i);
+int								validate_positive_long(char *str, int i);
+int								is_valid_long(char *str);
+void							remove_env(t_env **env_list, char *key);
+int								exec_unset(t_token *argv, t_env *env_list);
+int								exec_env(t_env *env_list);
+long							ft_atol(const char *str);
+int								exec_exit(t_token *argv);
+void							print_export(t_env *env_list);
+void							print_export_error(char *value);
+int								handle_export_with_equals(t_token *tmp,
+									t_env *env_list);
+int								handle_export_without_equals(t_token *tmp,
+									t_env *env_list);
+int								exec_export(t_token *argv, t_env *env_list);
+int								count_env(t_env *env_list);
+void							swap_env(t_env **a, t_env **b);
+void							sort_env_array(t_env **arr, int n);
+t_env							**create_env_array(t_env *env_list, int count);
+void							print_sorted_env(t_env **arr, int count);
+t_env							*find_env(t_env *env_list, char *key);
+void							update_existing_env(t_env *node, char *value);
+void							add_new_env(t_env *env_list, char *key,
+									char *value);
+void							update_env(t_env *env_list, char *key,
+									char *value);
+char							*ft_strchr(const char *s, int c);
+int								handle_cd_parent_dir(t_env *env_list);
+int								handle_cd_regular(char *path, t_env *env_list);
+int								handle_cd_oldpwd(t_env *env_list);
+int								exec_cd(t_token *argv, t_env *env_list);
+int								exec_pwd(void);
+char							*find_pwd_value(t_env *env_list);
+void							copy_parent_path(char *parent, char *pwd,
+									int i);
+char							*get_parent_from_pwd(t_env *env_list);
+char							*get_cd_path(t_token *argv, t_env *env_list);
+void							update_pwd(t_env *env_list, char *new_pwd);
+int								only_contains(char *str, char *chars);
+int								exec_echo(t_token *argv);
 
 /* executor.c */
-void	exec_pipe(t_node *ast, t_env *env_list, int *status);
-void	exec_cmd(t_env *env_list, t_cmd *cmd, int *status);
-void	executor(t_node *ast, t_env *env_list, int *status);
-int		is_builtin(char *cmd);
-void	exec_builtin(t_env *env_list, t_cmd *cmd, int *status);
-int		process_redirections(t_cmd *cmd);
-void	ft_execve(t_env *env_list, t_cmd *cmd);
+void							exec_pipe(t_node *ast, t_env *env_list,
+									int *status);
+void							exec_cmd(t_env *env_list, t_cmd *cmd,
+									int *status);
+void							executor(t_node *ast, t_env *env_list,
+									int *status);
+int								is_builtin(char *cmd);
+void							exec_builtin(t_env *env_list, t_cmd *cmd,
+									int *status);
+int								process_redirections(t_cmd *cmd);
+void							ft_execve(t_env *env_list, t_cmd *cmd);
 
 /* expander.c */
-int	expand_cmd_argv(t_token *argv, t_env *env_list, int *status);
-int	expand_cmd_fd(t_fd *fd, t_env *env_list, int *status);
-int	expand_cmd(t_cmd *cmd, t_env *env_list, int *status);
-int	expander(t_node *node, t_env *env_list, int *status);
-char	*str_trim(char *str, size_t *j, size_t i);
-char	*str_insert(char *str, size_t *j, char *value);
-char	*replace_env_var(char *str, size_t *j, size_t i,
-		char *env_var, t_env *env_list);
-char	*replace_status(char *str, size_t *j, int *status);
-char    *trim_quote(char *str, size_t *j, char c);
-char    *trim_double_quote(char *str, size_t *j, t_env *env_list, int *status);
-char	*parse_env_var(char *str, size_t *j,
-		t_env *env_list, int *status);
+int								expand_cmd_argv(t_token *argv, t_env *env_list,
+									int *status);
+int								expand_cmd_fd(t_fd *fd, t_env *env_list,
+									int *status);
+int								expand_cmd(t_cmd *cmd, t_env *env_list,
+									int *status);
+int								expander(t_node *node, t_env *env_list,
+									int *status);
+char							*str_trim(char *str, size_t *j, size_t i);
+char							*str_insert(char *str, size_t *j, char *value);
+char							*replace_env_var(char *str, size_t *j, size_t i,
+									char *env_var, t_env *env_list);
+char							*replace_status(char *str, size_t *j,
+									int *status);
+char							*trim_quote(char *str, size_t *j, char c);
+char							*trim_double_quote(char *str, size_t *j,
+									t_env *env_list, int *status);
+char							*parse_env_var(char *str, size_t *j,
+									t_env *env_list, int *status);
 
 /* ft_split.c */
 size_t							count_words(const char *s, char c);
@@ -206,7 +221,7 @@ size_t							add_metachar(const char *input, t_token **list);
 t_token							*tokenize(const char *input);
 
 /* utils */
-int 							ft_isblank(char c);
+int								ft_isblank(char c);
 int								ismetachar(char c);
 int								ft_strncmp(const char *s1, const char *s2,
 									size_t n);
@@ -225,13 +240,13 @@ t_node							*init_node(void);
 t_cmd							*init_cmd(void);
 size_t							ft_strlen(const char *s);
 int								ft_strcmp(const char *s1, const char *s2);
-int 							check_quote(char *input);
+int								check_quote(char *input);
 char							*append(char *s1, char *s2, char c);
 void							free_env(t_env *env_list);
 size_t							ft_strchar(const char *s, char c);
-void 							free_ast(t_node *ast);
-int 							is_char(char c);
-int 							is_numchar(char c);
+void							free_ast(t_node *ast);
+int								is_char(char c);
+int								is_numchar(char c);
 char							*to_str(size_t n);
 size_t							ft_token_size(t_token *tokens);
 size_t							ft_env_size(t_env *env_list);
