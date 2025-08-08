@@ -1,82 +1,5 @@
 #include "minishell.h"
 
-int	ft_isblank(char c)
-{
-	return (c == ' ' || c == '\t' || c == '\n');
-}
-
-int	ismetachar(char c)
-{
-	return (c == '|' || c == '<' || c == '>' || c == '(' || c == ')' || c == ';'
-		|| c == '&' || c == '`' || c == '\\');
-}
-
-int	ft_strncmp(const char *s1, const char *s2, size_t n)
-{
-	while (n-- && *s1 && (*s1 == *s2))
-	{
-		s1++;
-		s2++;
-	}
-	if (n == (size_t)-1)
-		return (0);
-	return (*(const unsigned char *)s1 - *(const unsigned char *)s2);
-}
-
-char	*ft_strdup(const char *s)
-{
-	char	*str;
-	size_t	i;
-
-	if (!s)
-		return (NULL);
-	i = 0;
-	str = (char *)malloc(ft_strlen(s) + 1);
-	if (!str)
-		return (perror("malloc"), NULL);
-	while (s[i] != '\0')
-	{
-		str[i] = s[i];
-		i++;
-	}
-	str[i] = '\0';
-	return (str);
-}
-
-char	*ft_strndup(const char *s, size_t n)
-{
-	char	*str;
-	size_t	i;
-
-	i = 0;
-	str = (char *)malloc(n + 1);
-	if (!str)
-		return (perror("malloc"), NULL);
-	while (i < n && s[i] != '\0')
-	{
-		str[i] = s[i];
-		i++;
-	}
-	str[i] = '\0';
-	return (str);
-}
-
-void	append_token(t_token **list, t_token *new_token)
-{
-	t_token	*current;
-
-	if (!*list)
-		*list = new_token;
-	else
-	{
-		current = *list;
-		while (current->next)
-			current = current->next;
-		current->next = new_token;
-		new_token->next = NULL;
-	}
-}
-
 t_TokenType	get_meta_type(const char *s)
 {
 	if (ft_strncmp(s, "<<", 2) == 0)
@@ -153,34 +76,6 @@ size_t	add_metachar(const char *input, t_token **list)
 	token->value = ft_strndup(input, len);
 	append_token(list, token);
 	return (len);
-}
-
-void	free_tokens(t_token *head)
-{
-	t_token	*tmp;
-
-	while (head)
-	{
-		tmp = head->next;
-		if (head->value)
-			free(head->value);
-		free(head);
-		head = tmp;
-	}
-}
-
-void	free_fds(t_fd *head)
-{
-	t_fd	*tmp;
-
-	while (head)
-	{
-		tmp = head->next;
-		if (head->value)
-			free(head->value);
-		free(head);
-		head = tmp;
-	}
 }
 
 t_token	*tokenize(const char *input)

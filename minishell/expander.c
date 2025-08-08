@@ -1,42 +1,5 @@
 #include "minishell.h"
 
-int	is_char(char c)
-{
-	return ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_');
-}
-
-int	is_numchar(char c)
-{
-	return (c >= '0' && c <= '9') || is_char(c);
-}
-
-char	*to_str(size_t n)
-{
-	char	*str;
-	size_t	len;
-	size_t	temp;
-
-	len = 0;
-	temp = n;
-	if (n == 0)
-		return (ft_strdup("0"));
-	while (temp > 0)
-	{
-		temp /= 10;
-		len++;
-	}
-	str = (char *)malloc(len + 1);
-	if (!str)
-		return (perror("malloc"), NULL);
-	str[len] = '\0';
-	while (n > 0)
-	{
-		str[--len] = (n % 10) + '0';
-		n /= 10;
-	}
-	return (str);
-}
-
 char	*str_trim(char *str, size_t *j, size_t i)
 {
 	char	*new_str;
