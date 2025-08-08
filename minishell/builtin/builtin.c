@@ -1,8 +1,6 @@
 #include "minishell.h"
 
-static t_env	*find_env(t_env *env_list, char *key);
-
-static int	is_valid_identifier(char *str)
+int	is_valid_identifier(char *str)
 {
 	int	i;
 
@@ -23,7 +21,7 @@ static int	is_valid_identifier(char *str)
 	return (1);
 }
 
-static int	validate_digit_sequence(char *str, int start)
+int	validate_digit_sequence(char *str, int start)
 {
 	int	i;
 
@@ -37,7 +35,7 @@ static int	validate_digit_sequence(char *str, int start)
 	return (1);
 }
 
-static int	validate_negative_long(char *str, int i)
+int	validate_negative_long(char *str, int i)
 {
 	int		len;
 	char	*long_min_str;
@@ -53,7 +51,7 @@ static int	validate_negative_long(char *str, int i)
 	return (validate_digit_sequence(str, i));
 }
 
-static int	validate_positive_long(char *str, int i)
+int	validate_positive_long(char *str, int i)
 {
 	int		len;
 	char	*long_max_str;
@@ -69,7 +67,7 @@ static int	validate_positive_long(char *str, int i)
 	return (validate_digit_sequence(str, i));
 }
 
-static int	is_valid_long(char *str)
+int	is_valid_long(char *str)
 {
 	int	i;
 

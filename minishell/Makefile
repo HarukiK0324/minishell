@@ -6,7 +6,24 @@ NAME = minishell
 SRC_DIR = .
 OBJ_DIR = obj
 
-SRC = builtin.c executor.c expander.c ft_split.c main.c parser.c tokenizer.c heredoc.c
+BUILTIN   = builtin builtin1 builtin2 builtin3 builtin4 builtin5 builtin6 builtin7
+EXECUTOR  = executor executor1
+EXPANDER  = expander expander1 expander2
+PARSER    = parser parser1
+UTILS     = utils utils1 utils2 utils3 utils4 utils5 utils6 utils7
+
+SRC = \
+	$(addprefix builtin/, $(addsuffix .c, $(BUILTIN))) \
+	$(addprefix executor/, $(addsuffix .c, $(EXECUTOR))) \
+	$(addprefix expander/, $(addsuffix .c, $(EXPANDER))) \
+	$(addprefix parser/, $(addsuffix .c, $(PARSER))) \
+	$(addprefix utils/, $(addsuffix .c, $(UTILS))) \
+	ft_split.c \
+	heredoc.c \
+	main.c \
+	signal.c \
+	tokenizer.c \
+
 OBJ = $(SRC:%.c=$(OBJ_DIR)/%.o)
 
 all: $(NAME)
@@ -14,11 +31,9 @@ all: $(NAME)
 $(NAME): $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) -o $(NAME) $(LDFLAGS)
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c | $(OBJ_DIR)
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OBJ_DIR):
-	mkdir -p $(OBJ_DIR)
 
 clean:
 	rm -rf $(OBJ_DIR)
