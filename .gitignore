@@ -1,0 +1,17 @@
+# Object files
+*.o
+obj/
+
+# Executable
+minishell/minishell
+minishell_fixed/minishell
+
+# Build artifacts
+*.a
+
+# System files
+.DS_Store
+*~
+
+# Temporary files
+*.tmp

@@ -42,7 +42,7 @@ char	*str_trim(char *str, size_t *j, size_t i)
 	char	*new_str;
 	size_t	k;
 
-	if (!str || *j < 0 || i < 0 || (*j + i >= ft_strlen(str)))
+	if (!str || !j || i == 0 || (*j + i >= ft_strlen(str)))
 		return (perror("str_trim failed"), NULL);
 	new_str = (char *)malloc(ft_strlen(str) - i);
 	if (!new_str)

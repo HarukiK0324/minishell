@@ -4,13 +4,18 @@ void	read_heredoc(t_fd *heredoc_delimiter, int fd)
 {
 	char	*line;
 
+	if (!heredoc_delimiter || !heredoc_delimiter->value)
+		return ;
 	while (1)
 	{
 		line = readline("> ");
 		if (!line)
 			return ;
 		if (ft_strcmp(line, heredoc_delimiter->value) == 0)
-			return (free(line));
+		{
+			free(line);
+			return ;
+		}
 		else if (fd != -1)
 		{
 			write(fd, line, ft_strlen(line));
@@ -40,11 +45,17 @@ int	ft_heredoc(t_cmd *cmd)
 	int		wstatus;
 	pid_t	pid;
 
+	if (!cmd || !cmd->heredoc_delimiter)
+		return (-1);
 	if (pipe(fd) == -1)
 		return (perror("pipe"), -1);
 	pid = fork();
 	if (pid < 0)
+	{
+		close(fd[0]);
+		close(fd[1]);
 		return (perror("fork"), -1);
+	}
 	if (pid == 0)
 	{
 		reset_heredoc_signal();
@@ -57,7 +68,11 @@ int	ft_heredoc(t_cmd *cmd)
 	cmd->heredoc_fd = fd[0];
 	waitpid(pid, &wstatus, 0);
 	if (WIFSIGNALED(wstatus))
-		return (close(fd[0]), -1);
+	{
+		close(fd[0]);
+		cmd->heredoc_fd = -1;
+		return (-1);
+	}
 	return (0);
 }
 

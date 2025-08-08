@@ -119,8 +119,19 @@ t_env	*init_env(char **environ)
 		if (!new_node)
 			return (perror("malloc"), free_env(env_list), NULL);
 		new_node->key = ft_strndup(environ[i], ft_strchar(environ[i], '='));
+		if (!new_node->key)
+		{
+			free(new_node);
+			return (perror("ft_strndup"), free_env(env_list), NULL);
+		}
 		new_node->value = ft_strdup(environ[i] + ft_strchar(environ[i], '=')
 				+ 1);
+		if (!new_node->value)
+		{
+			free(new_node->key);
+			free(new_node);
+			return (perror("ft_strdup"), free_env(env_list), NULL);
+		}
 		new_node->next = env_list;
 		env_list = new_node;
 		i++;
@@ -149,38 +160,21 @@ void	handle_interactive_sigint(int sig)
 {
 	(void)sig;
 	write(STDOUT_FILENO, "\n", 1);
-	rl_on_new_line();
-#if HAVE_RL_REPLACE_LINE
-	rl_replace_line("", 0);
-#endif
-	rl_redisplay();
-	errno = EINTR;
+	g_status = 2;
 }
 
 void	handle_sigint(int sig)
 {
 	(void)sig;
 	write(STDOUT_FILENO, "\n", 1);
-	rl_on_new_line();
-#if HAVE_RL_REPLACE_LINE
-	rl_replace_line("", 0);
-#endif
-	rl_redisplay();
 	g_status = 2;
-	errno = EINTR;
 }
 
 void	handle_sigquit(int sig)
 {
 	(void)sig;
 	write(STDOUT_FILENO, "Quit (core dumped)\n", 19);
-	rl_on_new_line();
-#if HAVE_RL_REPLACE_LINE
-	rl_replace_line("", 0);
-#endif
-	rl_redisplay();
 	g_status = 3;
-	errno = EINTR;
 }
 
 void	reset_default_signal(void)
