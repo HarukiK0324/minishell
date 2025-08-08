@@ -7,7 +7,7 @@ SRC_DIR = .
 OBJ_DIR = obj
 
 BUILTIN   = builtin builtin1 builtin2 builtin3 builtin4 builtin5 builtin6 builtin7
-EXECUTOR  = executor executor1
+EXECUTOR  = executor executor1 executor2
 EXPANDER  = expander expander1 expander2
 PARSER    = parser parser1
 UTILS     = utils utils1 utils2 utils3 utils4 utils5 utils6 utils7 utils8

@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:46 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 01:30:30 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/09 02:27:55 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,18 +102,8 @@ typedef struct s_env
 }								t_env;
 
 /* main.c */
-size_t							ft_strlen(const char *s);
-int								ft_strcmp(const char *s1, const char *s2);
-int								check_quote(char *input);
-char							*append(char *s1, char *s2, char c);
-void							free_list(t_env *env_list);
-size_t							ft_strchar(const char *s, char c);
-t_env							*init_env(char **environ);
-void							setup_signal_handlers(void);
-void							handle_sigint(int sig);
-void							handle_interactive_sigint(int sig);
-void							reset_default_signal(void);
-void							reset_heredoc_signal(void);
+void							minishell(char *input, int *status,
+									t_env *env_list);
 
 /* builtin */
 int								is_valid_identifier(char *str);
@@ -159,20 +149,33 @@ void							update_pwd(t_env *env_list, char *new_pwd);
 int								only_contains(char *str, char *chars);
 int								exec_echo(t_token *argv);
 
-/* executor.c */
+/* executor */
+void							pipe_executor1(int fd[2], t_node *ast,
+									t_env *env_list, int *status);
+void							pipe_executor2(int fd[2], t_node *ast,
+									t_env *env_list, int *status);
 void							exec_pipe(t_node *ast, t_env *env_list,
 									int *status);
 void							exec_cmd(t_env *env_list, t_cmd *cmd,
 									int *status);
 void							executor(t_node *ast, t_env *env_list,
 									int *status);
-int								is_builtin(char *cmd);
 void							exec_builtin(t_env *env_list, t_cmd *cmd,
 									int *status);
 int								process_redirections(t_cmd *cmd);
+void							execve_dup(t_cmd *cmd);
+void							free_all_arg(char *path, char **argv,
+									char **environ);
 void							ft_execve(t_env *env_list, t_cmd *cmd);
+void							exec_error(int *status, char *str);
+int								is_builtin(char *cmd);
+void							run_builtin(t_env *env_list, t_cmd *cmd,
+									int *status);
+void							handle_builtin_fd(t_cmd *cmd, int *status,
+									int original_stdin, int original_stdout);
+void							handle_status(int wstatus, int *status);
 
-/* expander.c */
+/* expander */
 int								expand_cmd_argv(t_token *argv, t_env *env_list,
 									int *status);
 int								expand_cmd_fd(t_fd *fd, t_env *env_list,
@@ -212,7 +215,7 @@ void							heredoc(t_node *ast, int *status);
 t_env							*init_env(char **environ);
 int								main(int argc, char **argv, char **environ);
 
-/* parser.c */
+/* parser */
 t_node							*parse_condition(t_token **tokens);
 t_node							*parse_pipe(t_token **tokens);
 t_node							*create_cmd(t_token **tokens);
@@ -280,5 +283,8 @@ void							ft_open_heredoc(t_cmd *cmd, int heredoc_count);
 void							ft_open_fd_in(t_cmd *cmd, t_fd *current);
 void							ft_open_fd_out(t_cmd *cmd, t_fd *current);
 char							*get_token_str(t_TokenType token);
+t_env							*init_env(char **environ);
+void							ft_exit(t_env *env_list, int status);
+void							init_g_status(int *status);
 
 #endif
