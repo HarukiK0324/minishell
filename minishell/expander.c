@@ -252,6 +252,7 @@ int	expand_cmd(t_cmd *cmd, t_env *env_list, int *status)
 		|| expand_cmd_fd(cmd->fds, env_list, status) == -1
 		|| expand_cmd_fd(cmd->heredoc_delimiter, env_list, status) == -1)
 		return (-1);
+	return (0);
 }
 
 int	expander(t_node *node, t_env *env_list, int *status)
@@ -259,14 +260,13 @@ int	expander(t_node *node, t_env *env_list, int *status)
 	if (!node)
 		return (0);
 	if (node->type == NODE_CMD)
-		if (expand_cmd(node->cmd, env_list, status) == -1)
+		return (expand_cmd(node->cmd, env_list, status));
+	else
+	{
+		if (expander(node->lhs, env_list, status) == -1)
 			return (-1);
-		else
-		{
-			if (expander(node->lhs, env_list, status) == -1)
-				return (-1);
-			if (node->type == NODE_PIPE)
-				if (expander(node->rhs, env_list, status) == -1)
-					return (-1);
-		}
+		if (node->type == NODE_PIPE)
+			return (expander(node->rhs, env_list, status));
+		return (0);
+	}
 }
