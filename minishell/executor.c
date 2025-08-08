@@ -21,6 +21,10 @@ void	exec_builtin(t_env *env_list, t_cmd *cmd, int *status)
 	{
 		perror("dup");
 		*status = 1;
+		if (original_stdin != -1)
+			close(original_stdin);
+		if (original_stdout != -1)
+			close(original_stdout);
 		return ;
 	}
 	if (process_redirections(cmd) == -1)
@@ -180,6 +184,11 @@ char	**to_list(t_token *argv)
 	i = 0;
 	while (argv)
 	{
+		if (!argv->value)
+		{
+			free_argv(list, i);
+			return (NULL);
+		}
 		list[i] = ft_strdup(argv->value);
 		if (!list[i])
 			return (perror("strdup"), free_argv(list, i), NULL);
@@ -226,6 +235,11 @@ char	**env_to_environ(t_env *env_list)
 	i = 0;
 	while (env_list)
 	{
+		if (!env_list->key || !env_list->value)
+		{
+			free_argv(environ, i);
+			return (NULL);
+		}
 		environ[i] = ft_env_join(env_list);
 		if (!environ[i])
 			return (free_argv(environ, i), NULL);
@@ -254,6 +268,7 @@ void	err_msg_errno(char *value, char *msg)
 
 void	ft_open_heredoc(t_cmd *cmd, t_fd *current, int heredoc_count)
 {
+	(void)current;
 	if (heredoc_count == cmd->heredoc_count)
 	{
 		if (cmd->fd_in != 0 && cmd->fd_in > 0)
@@ -369,6 +384,7 @@ void	ft_execve(t_env *env_list, t_cmd *cmd, int *status)
 	char	**environ;
 	char	**argv;
 
+	(void)status;
 	reset_default_signal();
 	if (process_redirections(cmd) == -1)
 		exit(EXIT_FAILURE);
@@ -392,14 +408,23 @@ void	ft_execve(t_env *env_list, t_cmd *cmd, int *status)
 	argv = to_list(cmd->argv);
 	environ = env_to_environ(env_list);
 	if (g_status != 0)
-		return (free(path), free_str_list(argv), free_str_list(environ),
-			exit(128 + g_status));
+	{
+		if (path)
+			free(path);
+		if (argv)
+			free_str_list(argv);
+		if (environ)
+			free_str_list(environ);
+		exit(128 + g_status);
+	}
 	if (path && argv && environ)
 		execve(path, argv, environ);
 	if (path)
 		free(path);
-	free_str_list(argv);
-	free_str_list(environ);
+	if (argv)
+		free_str_list(argv);
+	if (environ)
+		free_str_list(environ);
 	if (errno == ENOENT)
 		return (err_msg(cmd->argv->value, ": command not found\n"), exit(127));
 	err_msg_errno(cmd->argv->value, strerror(errno));

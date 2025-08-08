@@ -94,7 +94,7 @@ size_t							ft_strlen(const char *s);
 int								ft_strcmp(const char *s1, const char *s2);
 int								check_quote(char *input);
 char							*append(char *s1, char *s2, char c);
-void							free_list(t_env *env_list);
+void							free_env(t_env *env_list);
 size_t							ft_strchar(const char *s, char c);
 t_env							*init_env(char **environ);
 void							setup_signal_handlers(void);
