@@ -1,0 +1,9 @@
+# Binary
+minishell/minishell
+
+# Object files
+minishell/obj/
+*.o
+
+# Test files
+test_result

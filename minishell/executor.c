@@ -16,10 +16,17 @@ void	exec_builtin(t_env *env_list, t_cmd *cmd, int *status)
 	int	original_stdout;
 
 	original_stdin = dup(STDIN_FILENO);
-	original_stdout = dup(STDOUT_FILENO);
-	if (original_stdin == -1 || original_stdout == -1)
+	if (original_stdin == -1)
 	{
 		perror("dup");
+		*status = 1;
+		return ;
+	}
+	original_stdout = dup(STDOUT_FILENO);
+	if (original_stdout == -1)
+	{
+		perror("dup");
+		close(original_stdin);
 		*status = 1;
 		return ;
 	}
@@ -254,6 +261,7 @@ void	err_msg_errno(char *value, char *msg)
 
 void	ft_open_heredoc(t_cmd *cmd, t_fd *current, int heredoc_count)
 {
+	(void)current;
 	if (heredoc_count == cmd->heredoc_count)
 	{
 		if (cmd->fd_in != 0 && cmd->fd_in > 0)
@@ -369,6 +377,7 @@ void	ft_execve(t_env *env_list, t_cmd *cmd, int *status)
 	char	**environ;
 	char	**argv;
 
+	(void)status;
 	reset_default_signal();
 	if (process_redirections(cmd) == -1)
 		exit(EXIT_FAILURE);
