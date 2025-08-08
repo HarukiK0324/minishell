@@ -23,17 +23,11 @@ static int	is_valid_identifier(char *str)
 	return (1);
 }
 
-static int	is_numeric(char *str)
+static int	validate_digit_sequence(char *str, int start)
 {
 	int	i;
 
-	if (!str || !*str)
-		return (0);
-	i = 0;
-	if (str[i] == '-' || str[i] == '+')
-		i++;
-	if (!str[i])
-		return (0);
+	i = start;
 	while (str[i])
 	{
 		if (str[i] < '0' || str[i] > '9')
@@ -41,6 +35,51 @@ static int	is_numeric(char *str)
 		i++;
 	}
 	return (1);
+}
+
+static int	validate_negative_long(char *str, int i)
+{
+	int		len;
+	char	*long_min_str = "9223372036854775808";
+
+	if (!str[i])
+		return (0);
+	len = ft_strlen(&str[i]);
+	if (len > 19)
+		return (0);
+	if (len == 19 && ft_strcmp(&str[i], long_min_str) > 0)
+		return (0);
+	return (validate_digit_sequence(str, i));
+}
+
+static int	validate_positive_long(char *str, int i)
+{
+	int		len;
+	char	*long_max_str = "9223372036854775807";
+
+	if (!str[i])
+		return (0);
+	len = ft_strlen(&str[i]);
+	if (len > 19)
+		return (0);
+	if (len == 19 && ft_strcmp(&str[i], long_max_str) > 0)
+		return (0);
+	return (validate_digit_sequence(str, i));
+}
+
+static int	is_valid_long(char *str)
+{
+	int	i;
+
+	if (!str || !*str)
+		return (0);
+	i = 0;
+	if (str[i] == '+')
+		i++;
+	if (str[i] == '-')
+		return (validate_negative_long(str, i + 1));
+	else
+		return (validate_positive_long(str, i));
 }
 
 int	only_contains(char *str, char *chars)
@@ -289,36 +328,44 @@ static t_env	*find_env(t_env *env_list, char *key)
 	return (NULL);
 }
 
-static void	update_env(t_env *env_list, char *key, char *value)
+static void	update_existing_env(t_env *node, char *value)
+{
+	free(node->value);
+	if (value)
+		node->value = ft_strdup(value);
+	else
+		node->value = NULL;
+}
+
+static void	add_new_env(t_env *env_list, char *key, char *value)
 {
 	t_env	*node;
 	t_env	*tail;
 
+	node = malloc(sizeof(t_env));
+	if (!node)
+		return ;
+	node->key = ft_strdup(key);
+	if (value)
+		node->value = ft_strdup(value);
+	else
+		node->value = NULL;
+	node->next = NULL;
+	tail = env_list;
+	while (tail->next)
+		tail = tail->next;
+	tail->next = node;
+}
+
+static void	update_env(t_env *env_list, char *key, char *value)
+{
+	t_env	*node;
+
 	node = find_env(env_list, key);
 	if (node)
-	{
-		free(node->value);
-		if (value)
-			node->value = ft_strdup(value);
-		else
-			node->value = NULL;
-	}
+		update_existing_env(node, value);
 	else
-	{
-		node = malloc(sizeof(t_env));
-		if (!node)
-			return ;
-		node->key = ft_strdup(key);
-		if (value)
-			node->value = ft_strdup(value);
-		else
-			node->value = NULL;
-		node->next = NULL;
-		tail = env_list;
-		while (tail->next)
-			tail = tail->next;
-		tail->next = node;
-	}
+		add_new_env(env_list, key, value);
 }
 
 static char	*ft_strchr(const char *s, int c)
@@ -429,11 +476,45 @@ static void	print_export(t_env *env_list)
 	free(arr);
 }
 
+static void	print_export_error(char *value)
+{
+	write(2, "minishell: export: `", 20);
+	write(2, value, ft_strlen(value));
+	write(2, "': not a valid identifier\n", 27);
+}
+
+static int	handle_export_with_equals(t_token *tmp, t_env *env_list)
+{
+	char	*eq;
+	char	*key;
+
+	eq = ft_strchr(tmp->value, '=');
+	key = ft_strndup(tmp->value, eq - tmp->value);
+	if (!is_valid_identifier(key))
+	{
+		print_export_error(tmp->value);
+		free(key);
+		return (1);
+	}
+	update_env(env_list, key, eq + 1);
+	free(key);
+	return (0);
+}
+
+static int	handle_export_without_equals(t_token *tmp, t_env *env_list)
+{
+	if (!is_valid_identifier(tmp->value))
+	{
+		print_export_error(tmp->value);
+		return (1);
+	}
+	update_env(env_list, tmp->value, NULL);
+	return (0);
+}
+
 int	exec_export(t_token *argv, t_env *env_list)
 {
 	t_token	*tmp;
-	char	*eq;
-	char	*key;
 	int		status;
 
 	tmp = argv->next;
@@ -442,33 +523,10 @@ int	exec_export(t_token *argv, t_env *env_list)
 	status = 0;
 	while (tmp)
 	{
-		eq = ft_strchr(tmp->value, '=');
-		if (eq)
-		{
-			key = ft_strndup(tmp->value, eq - tmp->value);
-			if (!is_valid_identifier(key))
-			{
-				write(2, "minishell: export: `", 20);
-				write(2, tmp->value, ft_strlen(tmp->value));
-				write(2, "': not a valid identifier\n", 27);
-				status = 1;
-			}
-			else
-				update_env(env_list, key, eq + 1);
-			free(key);
-		}
+		if (ft_strchr(tmp->value, '='))
+			status |= handle_export_with_equals(tmp, env_list);
 		else
-		{
-			if (!is_valid_identifier(tmp->value))
-			{
-				write(2, "minishell: export: `", 20);
-				write(2, tmp->value, ft_strlen(tmp->value));
-				write(2, "': not a valid identifier\n", 27);
-				status = 1;
-			}
-			else
-				update_env(env_list, tmp->value, NULL);
-		}
+			status |= handle_export_without_equals(tmp, env_list);
 		tmp = tmp->next;
 	}
 	return (status);
@@ -523,7 +581,7 @@ int	exec_env(t_env *env_list)
 	return (0);
 }
 
-static int	ft_atoi(const char *str)
+static long	ft_atol(const char *str)
 {
 	int		i;
 	int		sign;
@@ -545,17 +603,17 @@ static int	ft_atoi(const char *str)
 		result = result * 10 + (str[i] - '0');
 		i++;
 	}
-	return ((int)(result * sign));
+	return (result * sign);
 }
 
 int	exec_exit(t_token *argv)
 {
-	int	exit_code;
+	long	exit_code;
 
 	printf("exit\n");
 	if (argv->next)
 	{
-		if (!is_numeric(argv->next->value))
+		if (!is_valid_long(argv->next->value))
 		{
 			write(2, "minishell: exit: ", 17);
 			write(2, argv->next->value, ft_strlen(argv->next->value));
@@ -567,8 +625,8 @@ int	exec_exit(t_token *argv)
 			write(2, "minishell: exit: too many arguments\n", 37);
 			return (1);
 		}
-		exit_code = ft_atoi(argv->next->value);
-		exit(exit_code);
+		exit_code = ft_atol(argv->next->value);
+		exit((int)(exit_code & 0xFF));
 	}
 	exit(0);
 }
