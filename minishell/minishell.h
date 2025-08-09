@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:46 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 03:43:14 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/09 15:44:30 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,9 +115,9 @@ int								validate_digit_sequence(char *str, int start);
 int								validate_negative_long(char *str, int i);
 int								validate_positive_long(char *str, int i);
 int								is_valid_long(char *str);
-void							remove_env(t_env **env_list, char *key);
-int								exec_unset(t_token *argv, t_env *env_list);
-int								exec_env(t_env *env_list);
+void print_env_list(t_env *env_list);
+int env_no_path_error(char *cmd);
+int exec_env(t_token *argv, t_env *env_list);
 long							ft_atol(const char *str);
 int								exec_exit(t_token *argv);
 void							print_export(t_env *env_list);
@@ -152,6 +152,10 @@ char							*get_cd_path(t_token *argv, t_env *env_list);
 void							update_pwd(t_env *env_list, char *new_pwd);
 int								only_contains(char *str, char *chars);
 int								exec_echo(t_token *argv);
+int	exec_exit(t_token *argv);
+void remove_env(t_env **env_list, char *key);
+int exec_unset(t_token *argv, t_env *env_list);
+void handle_append_export(t_env *env_list, char *key, char *value);
 
 /* executor */
 void							pipe_executor1(int fd[2], t_node *ast,

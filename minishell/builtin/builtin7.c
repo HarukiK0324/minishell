@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:00 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 03:57:21 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/09 15:42:03 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,4 +82,42 @@ int	exec_exit(t_token *argv)
 		exit((int)(exit_code & 0xFF));
 	}
 	exit(0);
+}
+
+void remove_env(t_env **env_list, char *key)
+{
+ t_env *prev;
+ t_env *current;
+
+ prev = NULL;
+ current = *env_list;
+ while (current)
+ {
+  if (ft_strcmp(current->key, key) == 0)
+  {
+   if (prev)
+    prev->next = current->next;
+   else
+    *env_list = current->next;
+   free(current->key);
+   free(current->value);
+   free(current);
+   break ;
+  }
+  prev = current;
+  current = current->next;
+ }
+}
+
+int exec_unset(t_token *argv, t_env *env_list)
+{
+ t_token *tmp;
+
+ tmp = argv->next;
+ while (tmp)
+ {
+  remove_env(&env_list, tmp->value);
+  tmp = tmp->next;
+ }
+ return (0);
 }
