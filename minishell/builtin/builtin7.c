@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:00 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 15:47:56 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/09 15:49:10 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,7 @@ int	exec_unset(t_token *argv, t_env *env_list)
 	}
 	return (0);
 }
+
 void	handle_append_export(t_env *env_list, char *key, char *value)
 {
 	t_env	*existing;
