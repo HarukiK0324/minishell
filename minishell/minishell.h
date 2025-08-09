@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:46 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 15:45:01 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/09 15:47:33 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,7 +152,6 @@ char							*get_cd_path(t_token *argv, t_env *env_list);
 void							update_pwd(t_env *env_list, char *new_pwd);
 int								only_contains(char *str, char *chars);
 int								exec_echo(t_token *argv);
-int								exec_exit(t_token *argv);
 void							remove_env(t_env **env_list, char *key);
 int								exec_unset(t_token *argv, t_env *env_list);
 void							handle_append_export(t_env *env_list, char *key,

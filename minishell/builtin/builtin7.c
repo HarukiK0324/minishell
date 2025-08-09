@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:00 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 15:44:48 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/09 15:47:56 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,31 +59,6 @@ int	exec_echo(t_token *argv)
 	return (0);
 }
 
-int	exec_exit(t_token *argv)
-{
-	long	exit_code;
-
-	printf("exit\n");
-	if (argv->next)
-	{
-		if (!is_valid_long(argv->next->value))
-		{
-			write(2, "minishell: exit: ", 17);
-			write(2, argv->next->value, ft_strlen(argv->next->value));
-			write(2, ": numeric argument required\n", 29);
-			exit(2);
-		}
-		if (argv->next->next)
-		{
-			write(2, "minishell: exit: too many arguments\n", 37);
-			return (1);
-		}
-		exit_code = ft_atol(argv->next->value);
-		exit((int)(exit_code & 0xFF));
-	}
-	exit(0);
-}
-
 void	remove_env(t_env **env_list, char *key)
 {
 	t_env	*prev;
@@ -120,4 +95,19 @@ int	exec_unset(t_token *argv, t_env *env_list)
 		tmp = tmp->next;
 	}
 	return (0);
+}
+void	handle_append_export(t_env *env_list, char *key, char *value)
+{
+	t_env	*existing;
+	char	*new_value;
+
+	existing = find_env(env_list, key);
+	if (existing && existing->value)
+	{
+		new_value = append(existing->value, value, '\0');
+		update_env(env_list, key, new_value);
+		free(new_value);
+	}
+	else
+		update_env(env_list, key, value);
 }
