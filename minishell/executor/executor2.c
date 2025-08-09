@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 02:04:31 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 02:07:27 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/09 15:46:10 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ void	run_builtin(t_env *env_list, t_cmd *cmd, int *status)
 	else if (ft_strcmp(cmd->argv->value, "unset") == 0)
 		*status = exec_unset(cmd->argv, env_list);
 	else if (ft_strcmp(cmd->argv->value, "env") == 0)
-		*status = exec_env(env_list);
+		*status = exec_env(cmd->argv, env_list);
 }
 
 void	handle_builtin_fd(t_cmd *cmd, int *status, int original_stdin,
