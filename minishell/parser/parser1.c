@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:18 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 00:57:19 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/11 22:06:38 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ int	add_fd(t_cmd *cmd, t_token **tokens)
 	fd->type = (*tokens)->type;
 	fd->next = NULL;
 	fd->fd = -1;
+	fd->value = NULL;
 	(*tokens) = (*tokens)->next;
 	if (!(*tokens))
 		return (print_synerr(TOKEN_NEWLINE), free_fds(fd), 0);
@@ -46,8 +47,10 @@ int	add_argv(t_token **argv, t_token **tokens)
 	if (!arg)
 		return (perror("malloc"), 0);
 	arg->type = (*tokens)->type;
-	arg->value = ft_strdup((*tokens)->value);
 	arg->next = NULL;
+	arg->value = ft_strdup((*tokens)->value);
+	if (!arg->value)
+		return (free(arg), 0);
 	(*tokens) = (*tokens)->next;
 	append_token(argv, arg);
 	return (1);

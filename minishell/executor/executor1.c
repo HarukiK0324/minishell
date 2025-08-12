@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:05 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 02:04:57 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/11 23:10:46 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ int	process_redirections(t_cmd *cmd)
 	if (current == NULL)
 		return (0);
 	heredoc_count = 0;
-	while (current)
+	while (current && status == 0)
 	{
 		if (current->type == TOKEN_REDIR_IN)
 			ft_open_fd_in(cmd, current);

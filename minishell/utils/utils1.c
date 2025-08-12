@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:22 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 00:57:23 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/11 22:49:47 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,6 +62,13 @@ void	free_cmd(t_cmd *cmd)
 		return ;
 	free_tokens(cmd->argv);
 	free_fds(cmd->fds);
+	free_fds(cmd->heredoc_delimiter);
+	if (cmd->heredoc_fd != -1)
+		close(cmd->heredoc_fd);
+	if (cmd->fd_in != 0 && cmd->fd_in != -1)
+		close(cmd->fd_in);
+	if (cmd->fd_out != 1 && cmd->fd_out != -1)
+		close(cmd->fd_out);
 	free(cmd);
 }
 

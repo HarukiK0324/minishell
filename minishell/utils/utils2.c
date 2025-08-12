@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:24 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 01:19:04 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/11 22:15:27 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,8 @@ t_node	*init_node(void)
 	node->lhs = NULL;
 	node->rhs = NULL;
 	node->cmd = NULL;
+	node->old_sigint = NULL;
+	node->old_sigquit = NULL;
 	return (node);
 }
 
@@ -86,6 +88,10 @@ t_cmd	*init_cmd(void)
 	cmd->fds = NULL;
 	cmd->fd_in = 0;
 	cmd->fd_out = 1;
+	cmd->heredoc_count = 0;
+	cmd->heredoc_fd = -1;
 	cmd->heredoc_delimiter = NULL;
+	cmd->old_sigint = NULL;
+	cmd->old_sigquit = NULL;
 	return (cmd);
 }

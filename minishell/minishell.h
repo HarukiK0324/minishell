@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:46 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 15:47:33 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/11 23:03:35 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,6 +106,7 @@ typedef struct s_env
 }								t_env;
 
 /* main.c */
+void set_status(int *status, int value);
 void							minishell(char *input, int *status,
 									t_env *env_list);
 

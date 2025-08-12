@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 01:13:43 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 02:23:45 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/11 22:17:37 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,9 @@ t_env	*init_env(char **environ)
 	while (environ[i])
 	{
 		new_node = (t_env *)malloc(sizeof(t_env));
+		new_node->next = NULL;
+		new_node->key = NULL;
+		new_node->value = NULL;
 		if (!new_node)
 			return (perror("malloc"), free_env(env_list), NULL);
 		new_node->key = ft_strndup(environ[i], ft_strchar(environ[i], '='));

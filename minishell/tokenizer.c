@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:50 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 00:57:52 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/11 22:12:22 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,7 @@ t_token	*init_token(t_TokenType type, const char *value, size_t value_len)
 	token->type = type;
 	token->value = ft_strndup(value, value_len);
 	if (!token->value)
-	{
-		free(token);
-		return (perror("strndup"), NULL);
-	}
+		return (free(token), perror("strndup"), NULL);
 	token->next = NULL;
 	return (token);
 }
