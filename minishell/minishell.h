@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:46 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/11 23:03:35 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 20:18:40 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,10 +105,21 @@ typedef struct s_env
 	struct s_env				*next;
 }								t_env;
 
+typedef struct s_shell
+{
+	int							*status;
+	int							*run_status;
+	char						*input;
+	t_env						*env_list;
+	t_node						*ast;
+	t_token						*tokens;
+}								t_shell;
+
 /* main.c */
-void set_status(int *status, int value);
-void							minishell(char *input, int *status,
-									t_env *env_list);
+int								init_shell(t_shell **shell, char **environ);
+void							set_status(int *status, int value);
+void							clean_up(t_shell *shell);
+void							minishell(t_shell *shell);
 
 /* builtin */
 int								is_valid_identifier(char *str);
@@ -120,7 +131,7 @@ void							print_env_list(t_env *env_list);
 int								env_no_path_error(char *cmd);
 int								exec_env(t_token *argv, t_env *env_list);
 long							ft_atol(const char *str);
-int								exec_exit(t_token *argv);
+void							exec_exit(t_shell *shell, t_token *argv);
 void							print_export(t_env *env_list);
 void							print_export_error(char *value);
 int								handle_export_with_equals(t_token *tmp,
@@ -159,16 +170,16 @@ void							handle_append_export(t_env *env_list, char *key,
 									char *value);
 
 /* executor */
-void							pipe_executor1(int fd[2], t_node *ast,
+void							pipe_executor1(int fd[2], t_shell *shell,
+									t_node *ast);
+void							pipe_executor2(int fd[2], t_shell *shell,
+									t_node *ast);
+void							exec_pipe(t_shell *shell, t_node *ast,
+									int *status);
+void							exec_cmd(t_shell *shell, t_env *env_list,
+									t_cmd *cmd, int *status);
+void							executor(t_shell *shell, t_node *ast,
 									t_env *env_list, int *status);
-void							pipe_executor2(int fd[2], t_node *ast,
-									t_env *env_list, int *status);
-void							exec_pipe(t_node *ast, t_env *env_list,
-									int *status);
-void							exec_cmd(t_env *env_list, t_cmd *cmd,
-									int *status);
-void							executor(t_node *ast, t_env *env_list,
-									int *status);
 void							exec_builtin(t_env *env_list, t_cmd *cmd,
 									int *status);
 int								process_redirections(t_cmd *cmd);
@@ -218,23 +229,23 @@ char							**ft_split(char const *s, char c);
 void							read_heredoc(t_fd *heredoc_delimiter, int fd);
 void							parse_heredoc(t_fd *heredoc_delimiter,
 									int fd_in, int fd_out);
-int								ft_heredoc(t_cmd *cmd);
+int								ft_heredoc(t_cmd *cmd, int *run_status);
 void							process_heredoc(t_cmd *cmd, int *status);
 void							heredoc(t_node *ast, int *status);
 void							heredoc_signal_hold(t_cmd *cmd);
 void							heredoc_signal_revert(t_cmd *cmd);
 
 /* main.c	*/
-t_env							*init_env(char **environ);
 int								main(int argc, char **argv, char **environ);
 
 /* parser */
-t_node							*parse_condition(t_token **tokens);
-t_node							*parse_pipe(t_token **tokens);
-t_node							*create_cmd(t_token **tokens);
-t_node							*parse_cmd(t_token **tokens);
-t_node							*parse(t_token *tokens);
-int								add_fd(t_cmd *cmd, t_token **tokens);
+t_node							*parse_condition(t_token **tokens, int *status);
+t_node							*parse_pipe(t_token **tokens, int *status);
+t_node							*create_cmd(t_token **tokens, int *status);
+t_node							*parse_cmd(t_token **tokens, int *status);
+t_node							*parse(t_token *tokens, int *status);
+int								add_fd(t_cmd *cmd, t_token **tokens,
+									int *status);
 int								add_argv(t_token **argv, t_token **tokens);
 int								token_cmd(t_token *tokens);
 
@@ -246,11 +257,13 @@ void							reset_heredoc_signal(void);
 
 /* tokenizer.c */
 t_token							*init_token(t_TokenType type, const char *value,
-									size_t len);
+									size_t len, int *status);
 t_TokenType						get_meta_type(const char *s);
-size_t							add_word(const char *input, t_token **list);
-size_t							add_metachar(const char *input, t_token **list);
-t_token							*tokenize(const char *input);
+size_t							add_word(const char *input, t_token **list,
+									int *status);
+size_t							add_metachar(const char *input, t_token **list,
+									int *status);
+t_token							*tokenize(const char *input, int *status);
 
 /* utils */
 int								ft_isblank(char c);
@@ -296,8 +309,9 @@ void							ft_open_heredoc(t_cmd *cmd, int heredoc_count);
 void							ft_open_fd_in(t_cmd *cmd, t_fd *current);
 void							ft_open_fd_out(t_cmd *cmd, t_fd *current);
 char							*get_token_str(t_TokenType token);
-t_env							*init_env(char **environ);
-void							ft_exit(t_env *env_list, int status);
+int								init_env(t_env *env_list, char **environ);
+void							ft_exit(t_shell *shell, t_env *env_list,
+									int status);
 void							init_g_status(int *status);
 
 #endif

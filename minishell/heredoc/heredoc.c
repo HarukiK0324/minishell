@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:37 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 03:39:17 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 19:42:44 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,29 +38,32 @@ void	parse_heredoc(t_fd *heredoc_delimiter, int fd_in, int fd_out)
 	close(fd_out);
 	if (!heredoc_delimiter)
 		return ;
-	while (heredoc_delimiter->next)
+	while (heredoc_delimiter->next && g_status == 0)
 	{
 		read_heredoc(heredoc_delimiter, -1);
 		heredoc_delimiter->fd = -1;
 		heredoc_delimiter = heredoc_delimiter->next;
 	}
-	read_heredoc(heredoc_delimiter, fd_in);
-	heredoc_delimiter->fd = fd_out;
+	if (g_status == 0)
+	{
+		read_heredoc(heredoc_delimiter, fd_in);
+		heredoc_delimiter->fd = fd_out;
+	}
 	close(fd_in);
 }
 
-int	ft_heredoc(t_cmd *cmd)
+int	ft_heredoc(t_cmd *cmd, int *run_status)
 {
 	int		fd[2];
 	int		wstatus;
 	pid_t	pid;
 
 	if (pipe(fd) == -1)
-		return (perror("pipe"), -1);
+		return (set_status(run_status, 1), perror("pipe"), -1);
 	heredoc_signal_hold(cmd);
 	pid = fork();
 	if (pid < 0)
-		return (perror("fork"), -1);
+		return (set_status(run_status, 1), perror("fork"), -1);
 	if (pid == 0)
 	{
 		parse_heredoc(cmd->heredoc_delimiter, fd[1], fd[0]);
@@ -78,27 +81,23 @@ int	ft_heredoc(t_cmd *cmd)
 	return (0);
 }
 
-void	process_heredoc(t_cmd *cmd, int *status)
+void	process_heredoc(t_cmd *cmd, int *run_status)
 {
 	if (!cmd->heredoc_delimiter || g_status != 0)
 		return ;
-	if (ft_heredoc(cmd) == -1)
-	{
-		*status = 130;
-		return ;
-	}
+	ft_heredoc(cmd, run_status);
 }
 
-void	heredoc(t_node *ast, int *status)
+void	heredoc(t_node *ast, int *run_status)
 {
-	if (!ast || g_status != 0)
+	if (!ast || g_status != 0 || run_status != 0)
 		return ;
 	if ((ast->type == NODE_PIPE || ast->type == NODE_AND_IF
-			|| ast->type == NODE_OR_IF) && g_status == 0)
+			|| ast->type == NODE_OR_IF) && g_status == 0 && run_status == 0)
 	{
-		heredoc(ast->lhs, status);
-		heredoc(ast->rhs, status);
+		heredoc(ast->lhs, run_status);
+		heredoc(ast->rhs, run_status);
 	}
-	else if (ast->type == NODE_CMD && g_status == 0)
-		process_heredoc(ast->cmd, status);
+	else if (ast->type == NODE_CMD && g_status == 0 && run_status == 0)
+		process_heredoc(ast->cmd, run_status);
 }

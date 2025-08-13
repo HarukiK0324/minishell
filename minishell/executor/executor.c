@@ -6,31 +6,31 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:03 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 03:40:26 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 20:11:02 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	pipe_executor1(int fd[2], t_node *ast, t_env *env_list, int *status)
+void	pipe_executor1(int fd[2], t_shell *shell, t_node *ast)
 {
 	dup2(fd[1], STDOUT_FILENO);
 	close(fd[0]);
 	close(fd[1]);
-	executor(ast, env_list, status);
-	exit(*status);
+	executor(shell, ast, shell->env_list, shell->status);
+	exit(*shell->status);
 }
 
-void	pipe_executor2(int fd[2], t_node *ast, t_env *env_list, int *status)
+void	pipe_executor2(int fd[2], t_shell *shell, t_node *ast)
 {
 	dup2(fd[0], STDIN_FILENO);
 	close(fd[0]);
 	close(fd[1]);
-	executor(ast, env_list, status);
-	exit(*status);
+	executor(shell, ast, shell->env_list, shell->status);
+	exit(*shell->status);
 }
 
-void	exec_pipe(t_node *ast, t_env *env_list, int *status)
+void	exec_pipe(t_shell *shell, t_node *ast, int *status)
 {
 	int		fd[2];
 	pid_t	pid1;
@@ -45,12 +45,12 @@ void	exec_pipe(t_node *ast, t_env *env_list, int *status)
 	if (pid1 < 0)
 		exec_error(status, "fork");
 	if (pid1 == 0)
-		pipe_executor1(fd, ast->lhs, env_list, status);
+		pipe_executor1(fd, shell, ast->lhs);
 	pid2 = fork();
 	if (pid2 < 0)
 		exec_error(status, "fork");
 	if (pid2 == 0)
-		pipe_executor2(fd, ast->rhs, env_list, status);
+		pipe_executor2(fd, shell, ast->rhs);
 	close(fd[0]);
 	close(fd[1]);
 	waitpid(pid1, &status1, 0);
@@ -59,7 +59,7 @@ void	exec_pipe(t_node *ast, t_env *env_list, int *status)
 	handle_status(status2, status);
 }
 
-void	exec_cmd(t_env *env_list, t_cmd *cmd, int *status)
+void	exec_cmd(t_shell *shell, t_env *env_list, t_cmd *cmd, int *status)
 {
 	pid_t	pid;
 	int		wstatus;
@@ -67,7 +67,11 @@ void	exec_cmd(t_env *env_list, t_cmd *cmd, int *status)
 	void	(*old_sigquit)(int);
 
 	if (cmd->argv && is_builtin(cmd->argv->value))
+	{
+		if (ft_strcmp(cmd->argv->value, "exit") == 0)
+			return (exec_exit(shell, cmd->argv));
 		return (exec_builtin(env_list, cmd, status));
+	}
 	old_sigint = signal(SIGINT, SIG_IGN);
 	old_sigquit = signal(SIGQUIT, SIG_IGN);
 	pid = fork();
@@ -81,27 +85,27 @@ void	exec_cmd(t_env *env_list, t_cmd *cmd, int *status)
 	handle_status(wstatus, status);
 }
 
-void	executor(t_node *ast, t_env *env_list, int *status)
+void	executor(t_shell *shell, t_node *ast, t_env *env_list, int *status)
 {
 	if (!ast)
 		return ;
 	if (ast->type == NODE_PIPE && g_status == 0)
-		exec_pipe(ast, env_list, status);
+		exec_pipe(shell, ast, status);
 	else if ((ast->type == NODE_AND_IF || ast->type == NODE_OR_IF)
 		&& g_status == 0)
 	{
-		executor(ast->lhs, env_list, status);
+		executor(shell, ast->lhs, env_list, status);
 		if (ast->type == NODE_AND_IF && *status == 0 && g_status == 0)
 		{
 			expander(ast->rhs, env_list, status);
-			executor(ast->rhs, env_list, status);
+			executor(shell, ast->rhs, env_list, status);
 		}
 		else if (ast->type == NODE_OR_IF && *status != 0 && g_status == 0)
 		{
 			expander(ast->rhs, env_list, status);
-			executor(ast->rhs, env_list, status);
+			executor(shell, ast->rhs, env_list, status);
 		}
 	}
 	else if (ast->type == NODE_CMD && g_status == 0)
-		exec_cmd(env_list, ast->cmd, status);
+		exec_cmd(shell, env_list, ast->cmd, status);
 }

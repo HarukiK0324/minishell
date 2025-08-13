@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:50 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 17:17:04 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 17:31:16 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ size_t	add_metachar(const char *input, t_token **list, int *status)
 
 	type = get_meta_type(input);
 	if (type == TOKEN_ERROR)
-		return (set_status(status, 2), (STDERR_FILENO,
+		return (set_status(status, 2), write(STDERR_FILENO,
 				"minishell: unknown token\n", 25), 0);
 	if (type == TOKEN_HEREDOC || type == TOKEN_APPEND || type == TOKEN_AND_IF
 		|| type == TOKEN_OR_IF)

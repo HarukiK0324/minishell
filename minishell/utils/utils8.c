@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 01:13:43 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/11 22:17:37 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 20:14:15 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,13 +37,11 @@ char	*get_token_str(t_TokenType token)
 	return (NULL);
 }
 
-t_env	*init_env(char **environ)
+int	init_env(t_env *env_list, char **environ)
 {
-	t_env	*env_list;
 	t_env	*new_node;
 	int		i;
 
-	env_list = NULL;
 	i = 0;
 	while (environ[i])
 	{
@@ -52,7 +50,7 @@ t_env	*init_env(char **environ)
 		new_node->key = NULL;
 		new_node->value = NULL;
 		if (!new_node)
-			return (perror("malloc"), free_env(env_list), NULL);
+			return (perror("malloc"), free_env(env_list), -1);
 		new_node->key = ft_strndup(environ[i], ft_strchar(environ[i], '='));
 		new_node->value = ft_strdup(environ[i] + ft_strchar(environ[i], '=')
 				+ 1);
@@ -60,12 +58,14 @@ t_env	*init_env(char **environ)
 		env_list = new_node;
 		i++;
 	}
-	return (env_list);
+	return (0);
 }
 
-void	ft_exit(t_env *env_list, int status)
+void	ft_exit(t_shell *shell, t_env *env_list, int status)
 {
 	free_env(env_list);
+	clean_up(shell);
+	free(shell);
 	printf("exit\n");
 	if (g_status != 0)
 		status = 128 + g_status;
@@ -74,6 +74,9 @@ void	ft_exit(t_env *env_list, int status)
 
 void	init_g_status(int *status)
 {
-	*status = 128 + g_status;
-	g_status = 0;
+	if (g_status != 0)
+	{
+		*status = 128 + g_status;
+		g_status = 0;
+	}
 }

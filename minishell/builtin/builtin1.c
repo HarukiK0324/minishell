@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:56:44 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 15:44:53 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 20:09:30 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,13 +75,13 @@ long	ft_atol(const char *str)
 	return (result * sign);
 }
 
-int	exec_exit(t_token *argv)
+void	exec_exit(t_shell *shell, t_token *argv)
 {
 	long	exit_code;
 
-	printf("exit\n");
 	if (argv->next)
 	{
+		printf("exit\n");
 		if (!is_valid_long(argv->next->value))
 		{
 			write(2, "minishell: exit: ", 17);
@@ -92,10 +92,10 @@ int	exec_exit(t_token *argv)
 		if (argv->next->next)
 		{
 			write(2, "minishell: exit: too many arguments\n", 37);
-			return (1);
+			*shell->status = 1;
 		}
 		exit_code = ft_atol(argv->next->value);
 		exit((int)(exit_code & 0xFF));
 	}
-	exit(0);
+	ft_exit(shell, shell->env_list, *shell->status);
 }

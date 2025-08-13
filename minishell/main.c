@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:42 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/11 23:01:45 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 20:18:28 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,61 +14,86 @@
 
 volatile sig_atomic_t	g_status = 0;
 
-void set_status(int *status, int value)
+int	init_shell(t_shell **shell, char **environ)
+{
+	*shell = (t_shell *)malloc(sizeof(t_shell));
+	if (!shell)
+		return (perror("malloc"), -1);
+	*((*shell)->status) = 0;
+	*((*shell)->run_status) = 0;
+	(*shell)->input = NULL;
+	(*shell)->env_list = NULL;
+	(*shell)->ast = NULL;
+	(*shell)->tokens = NULL;
+	if (init_env((*shell)->env_list, environ) == -1)
+		return (-1);
+	return (0);
+}
+
+void	set_status(int *status, int value)
 {
 	*status = value;
 }
 
-void	minishell(char *input, int *status, t_env *env_list)
+void	clean_up(t_shell *shell)
 {
-	t_token	*tokens;
-	t_node	*ast;
-
-	if (check_quote(input) == -1)
-		return (set_status(status, 2), free(input), err_msg("Unmatched quotes", ": Syntax error\n"));
-	tokens = tokenize(input);
-	ast = parse(tokens);
-	if (!ast)
-		set_status(status, 2);
-	else
-	{
-		if (expander(ast, env_list, status) == -1)
-			*status = 2;
-		else
-			*status = 0;
-		heredoc(ast, status);
-		if (g_status == 0 && *status == 0)
-			executor(ast, env_list, status);
-	}
-	free_tokens(tokens);
-	free_ast(ast);
-	add_history(input);
-	free(input);
+	free_tokens(shell->tokens);
+	shell->tokens = NULL;
+	free_ast(shell->ast);
+	shell->ast = NULL;
+	if (shell->input)
+		add_history(shell->input);
+	if (!shell->input)
+		free(shell->input);
+	shell->input = NULL;
 	g_status = 0;
+	shell->run_status = 0;
+}
+
+void	minishell(t_shell *shell)
+{
+	shell->tokens = tokenize(shell->input, shell->run_status);
+	if (shell->run_status != 0)
+		return (set_status(shell->status, *shell->run_status), clean_up(shell));
+	shell->ast = parse(shell->tokens, shell->run_status);
+	if (shell->run_status != 0)
+		return (set_status(shell->status, *shell->run_status), clean_up(shell));
+	if (expander(shell->ast, shell->env_list, shell->status) == -1)
+		return (set_status(shell->status, 1), clean_up(shell));
+	heredoc(shell->ast, shell->run_status);
+	if (g_status != 0)
+		return (set_status(shell->status, 130), clean_up(shell));
+	else if (*shell->run_status == 1)
+		return (set_status(shell->status, 1), clean_up(shell));
+	executor(shell, shell->ast, shell->env_list, shell->status);
+	clean_up(shell);
 }
 
 int	main(int argc, char **argv, char **environ)
 {
-	char	*input;
-	t_env	*env_list;
-	int		status;
+	t_shell	*shell;
 
 	(void)argc;
 	(void)argv;
-	status = 0;
-	env_list = init_env(environ);
-	if (!env_list)
-		return (perror("init_env failed"), 1);
+	shell = NULL;
+	if (init_shell(&shell, environ) == -1)
+		return (1);
 	while (1)
 	{
 		setup_signal_handlers();
-		input = readline("minishell$ ");
-		if (!input)
+		shell->input = readline("minishell$ ");
+		init_g_status(shell->status);
+		if (!shell->input)
 			break ;
-		if (g_status != 0)
-			init_g_status(&status);
-		if (ft_strlen(input) > 0)
-			minishell(input, &status, env_list);
+		if (check_quote(shell->input) == -1)
+		{
+			set_status(shell->status, 2);
+			free(shell->input);
+			write(STDERR_FILENO, "Syntax error", 12);
+			continue ;
+		}
+		if (ft_strlen(shell->input) > 0)
+			minishell(shell);
 	}
-	ft_exit(env_list, status);
+	ft_exit(shell, shell->env_list, *shell->status);
 }

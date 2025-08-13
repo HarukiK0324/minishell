@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 02:04:31 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 15:46:10 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 20:09:54 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,6 @@ void	run_builtin(t_env *env_list, t_cmd *cmd, int *status)
 		*status = exec_cd(cmd->argv, env_list);
 	else if (ft_strcmp(cmd->argv->value, "echo") == 0)
 		*status = exec_echo(cmd->argv);
-	else if (ft_strcmp(cmd->argv->value, "exit") == 0)
-		*status = exec_exit(cmd->argv);
 	else if (ft_strcmp(cmd->argv->value, "export") == 0)
 		*status = exec_export(cmd->argv, env_list);
 	else if (ft_strcmp(cmd->argv->value, "pwd") == 0)
