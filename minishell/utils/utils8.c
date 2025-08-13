@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 01:13:43 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 20:42:51 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 22:51:52 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ void	ft_exit(t_shell *shell, t_env *env_list, int status)
 	free(shell->status);
 	free(shell->run_status);
 	free(shell);
+	rl_clear_history();
 	printf("exit\n");
 	if (g_status != 0)
 		status = 128 + g_status;

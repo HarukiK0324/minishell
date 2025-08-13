@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:46 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 20:42:54 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 22:47:55 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -234,9 +234,6 @@ void							process_heredoc(t_cmd *cmd, int *status);
 void							heredoc(t_node *ast, int *status);
 void							heredoc_signal_hold(t_cmd *cmd);
 void							heredoc_signal_revert(t_cmd *cmd);
-
-/* main.c	*/
-int								main(int argc, char **argv, char **environ);
 
 /* parser */
 t_node							*parse_condition(t_token **tokens, int *status);

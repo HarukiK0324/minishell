@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:42 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 22:32:27 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 22:49:07 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void	clean_up(t_shell *shell)
 	shell->ast = NULL;
 	if (shell->input && ft_strlen(shell->input) > 0)
 		add_history(shell->input);
-	if (!shell->input)
+	if (shell->input)
 		free(shell->input);
 	shell->input = NULL;
 	init_g_status(shell->status);
