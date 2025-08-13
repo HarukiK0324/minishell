@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:28 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 23:20:36 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 23:58:01 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,6 @@ void	free_ast(t_node *ast)
 		free_ast(ast->lhs);
 	if (ast->rhs)
 		free_ast(ast->rhs);
-	free(ast->old_sigint);
-	free(ast->old_sigquit);
 	free(ast);
 }
 

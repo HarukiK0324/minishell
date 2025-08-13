@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:15 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 23:41:09 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/14 00:10:56 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,20 +71,20 @@ t_node	*create_cmd(t_token **tokens, int *status)
 	cmd = init_cmd();
 	if (!cmd)
 		return (set_status(status, 1), free_node(node), NULL);
+	node->cmd = cmd;
 	while (*tokens && token_cmd(*tokens))
 	{
 		if ((*tokens)->type == TOKEN_WORD)
 		{
 			if (!add_argv(&cmd->argv, tokens))
-				return (set_status(status, 1), free_cmd(cmd), NULL);
+				return (set_status(status, 1), free_node(node), NULL);
 		}
 		else
 		{
 			if (!add_fd(cmd, tokens, status))
-				return (free_cmd(cmd), NULL);
+				return (set_status(status, 1), free_node(node), NULL);
 		}
 	}
-	node->cmd = cmd;
 	return (node);
 }
 
@@ -122,6 +122,7 @@ t_node	*parse(t_token *tokens, int *status)
 		return (NULL);
 	node = parse_condition(&tokens, status);
 	if (node && tokens)
-		return (set_status(status, 2), print_synerr((tokens)->type), NULL);
+		return (set_status(status, 2), print_synerr((tokens)->type),
+			free_node(node), NULL);
 	return (node);
 }
