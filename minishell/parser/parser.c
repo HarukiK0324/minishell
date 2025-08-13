@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:15 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 20:22:33 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 23:41:09 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,5 +121,7 @@ t_node	*parse(t_token *tokens, int *status)
 	if (!tokens)
 		return (NULL);
 	node = parse_condition(&tokens, status);
+	if (node && tokens)
+		return (set_status(status, 2), print_synerr((tokens)->type), NULL);
 	return (node);
 }

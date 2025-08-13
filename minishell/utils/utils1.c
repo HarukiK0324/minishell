@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:22 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 20:22:43 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 23:17:46 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,8 @@ void	free_cmd(t_cmd *cmd)
 		close(cmd->fd_in);
 	if (cmd->fd_out != 1 && cmd->fd_out != -1)
 		close(cmd->fd_out);
+	free(cmd->old_sigint);
+	free(cmd->old_sigquit);
 	free(cmd);
 }
 
@@ -82,5 +84,7 @@ void	free_node(t_node *node)
 		free_node(node->lhs);
 	if (node->rhs)
 		free_node(node->rhs);
+	free(node->old_sigint);
+	free(node->old_sigquit);
 	free(node);
 }

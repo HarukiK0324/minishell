@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:42 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 22:49:07 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 23:42:40 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,11 @@ int	init_shell(t_shell **shell, char **environ)
 	if (!*shell)
 		return (perror("malloc"), -1);
 	(*shell)->status = malloc(sizeof(int));
-	(*shell)->run_status = malloc(sizeof(int));
-	if (!(*shell)->status || !(*shell)->run_status)
+	if (!(*shell)->status)
 		return (free(*shell), perror("malloc"), -1);
+	(*shell)->run_status = malloc(sizeof(int));
+	if (!(*shell)->run_status)
+		return (free((*shell)->status), free(*shell), perror("malloc"), -1);
 	*((*shell)->status) = 0;
 	*((*shell)->run_status) = 0;
 	(*shell)->input = NULL;
@@ -58,17 +60,19 @@ void	clean_up(t_shell *shell)
 void	minishell(t_shell *shell)
 {
 	shell->tokens = tokenize(shell->input, shell->run_status);
-	if (*shell->run_status != 0)
-		return (set_status(shell->status, *shell->run_status), clean_up(shell));
+	if (*(shell->run_status) != 0)
+		return (set_status(shell->status, *(shell->run_status)),
+			clean_up(shell));
 	shell->ast = parse(shell->tokens, shell->run_status);
-	if (*shell->run_status != 0)
-		return (set_status(shell->status, *shell->run_status), clean_up(shell));
+	if (*(shell->run_status) != 0)
+		return (set_status(shell->status, *(shell->run_status)),
+			clean_up(shell));
 	if (expander(shell->ast, shell->env_list, shell->status) == -1)
 		return (set_status(shell->status, 1), clean_up(shell));
 	heredoc(shell->ast, shell->run_status);
 	if (g_status != 0)
 		return (set_status(shell->status, 130), clean_up(shell));
-	else if (*shell->run_status == 1)
+	else if (*(shell->run_status) == 1)
 		return (set_status(shell->status, 1), clean_up(shell));
 	executor(shell, shell->ast, shell->env_list, shell->status);
 	clean_up(shell);
