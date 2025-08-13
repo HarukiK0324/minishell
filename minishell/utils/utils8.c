@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 01:13:43 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 20:36:33 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 20:42:51 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ char	*get_token_str(t_TokenType token)
 	return (NULL);
 }
 
-int	init_env(t_env *env_list, char **environ)
+int	init_env(t_env **env_list, char **environ)
 {
 	t_env	*new_node;
 	int		i;
@@ -50,12 +50,12 @@ int	init_env(t_env *env_list, char **environ)
 		new_node->key = NULL;
 		new_node->value = NULL;
 		if (!new_node)
-			return (perror("malloc"), free_env(env_list), -1);
+			return (perror("malloc"), free_env(*env_list), -1);
 		new_node->key = ft_strndup(environ[i], ft_strchar(environ[i], '='));
 		new_node->value = ft_strdup(environ[i] + ft_strchar(environ[i], '=')
 				+ 1);
-		new_node->next = env_list;
-		env_list = new_node;
+		new_node->next = *env_list;
+		*env_list = new_node;
 		i++;
 	}
 	return (0);

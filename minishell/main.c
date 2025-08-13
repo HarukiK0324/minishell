@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:42 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 20:36:15 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 20:43:06 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int	init_shell(t_shell **shell, char **environ)
 	(*shell)->env_list = NULL;
 	(*shell)->ast = NULL;
 	(*shell)->tokens = NULL;
-	if (init_env((*shell)->env_list, environ) == -1)
+	if (init_env(&((*shell)->env_list), environ) == -1)
 		return (-1);
 	return (0);
 }
@@ -57,10 +57,10 @@ void	clean_up(t_shell *shell)
 void	minishell(t_shell *shell)
 {
 	shell->tokens = tokenize(shell->input, shell->run_status);
-	if (shell->run_status != 0)
+	if (*shell->run_status != 0)
 		return (set_status(shell->status, *shell->run_status), clean_up(shell));
 	shell->ast = parse(shell->tokens, shell->run_status);
-	if (shell->run_status != 0)
+	if (*shell->run_status != 0)
 		return (set_status(shell->status, *shell->run_status), clean_up(shell));
 	if (expander(shell->ast, shell->env_list, shell->status) == -1)
 		return (set_status(shell->status, 1), clean_up(shell));

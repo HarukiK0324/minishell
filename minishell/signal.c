@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:48 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 19:41:38 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 22:13:11 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,11 +39,11 @@ void	reset_default_signal(void)
 	signal(SIGQUIT, SIG_DFL);
 }
 
-void	heredoc_int_handler(int signo)
+void	heredoc_int_handler(int sig)
 {
 	int	devnull;
 
-	(void)signo;
+	(void)sig;
 	write(1, "\n", 1);
 	g_status = 2;
 	rl_replace_line("", 0);

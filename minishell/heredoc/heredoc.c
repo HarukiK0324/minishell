@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:37 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 20:22:27 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 22:18:13 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,7 +67,7 @@ int	ft_heredoc(t_cmd *cmd, int *run_status)
 	if (pid == 0)
 	{
 		parse_heredoc(cmd->heredoc_delimiter, fd[1], fd[0]);
-		exit(EXIT_SUCCESS);
+		exit(g_status);
 	}
 	close(fd[1]);
 	cmd->heredoc_fd = fd[0];
@@ -90,14 +90,14 @@ void	process_heredoc(t_cmd *cmd, int *run_status)
 
 void	heredoc(t_node *ast, int *run_status)
 {
-	if (!ast || g_status != 0 || run_status != 0)
+	if (!ast || g_status != 0 || *run_status != 0)
 		return ;
 	if ((ast->type == NODE_PIPE || ast->type == NODE_AND_IF
-			|| ast->type == NODE_OR_IF) && g_status == 0 && run_status == 0)
+			|| ast->type == NODE_OR_IF) && g_status == 0 && *run_status == 0)
 	{
 		heredoc(ast->lhs, run_status);
 		heredoc(ast->rhs, run_status);
 	}
-	else if (ast->type == NODE_CMD && g_status == 0 && run_status == 0)
+	else if (ast->type == NODE_CMD && g_status == 0 && *run_status == 0)
 		process_heredoc(ast->cmd, run_status);
 }
