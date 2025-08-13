@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:37 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 22:18:13 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 22:31:15 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ int	ft_heredoc(t_cmd *cmd, int *run_status)
 	cmd->heredoc_fd = fd[0];
 	waitpid(pid, &wstatus, 0);
 	heredoc_signal_revert(cmd);
-	if (WTERMSIG(wstatus) == SIGINT)
+	if (WEXITSTATUS(wstatus) == 2)
 	{
 		g_status = 2;
 		return (write(STDOUT_FILENO, "\n", 1), close(fd[0]), -1);

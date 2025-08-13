@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:42 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 20:43:06 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 22:32:27 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,7 @@ void	clean_up(t_shell *shell)
 	if (!shell->input)
 		free(shell->input);
 	shell->input = NULL;
+	init_g_status(shell->status);
 	g_status = 0;
 	*(shell->run_status) = 0;
 }
