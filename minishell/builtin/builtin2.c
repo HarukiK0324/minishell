@@ -6,11 +6,11 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:56:47 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 15:44:54 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 20:21:45 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 void	print_export(t_env *env_list)
 {

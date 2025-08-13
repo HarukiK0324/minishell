@@ -6,11 +6,11 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 01:13:43 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 20:14:15 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 20:36:33 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 char	*get_token_str(t_TokenType token)
 {
@@ -65,6 +65,8 @@ void	ft_exit(t_shell *shell, t_env *env_list, int status)
 {
 	free_env(env_list);
 	clean_up(shell);
+	free(shell->status);
+	free(shell->run_status);
 	free(shell);
 	printf("exit\n");
 	if (g_status != 0)

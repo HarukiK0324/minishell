@@ -6,11 +6,11 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:15 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 17:28:34 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 20:22:33 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 t_node	*parse_condition(t_token **tokens, int *status)
 {

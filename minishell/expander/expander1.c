@@ -6,11 +6,11 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:11 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 17:40:30 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 20:22:21 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 char	*str_trim(char *str, size_t *j, size_t i)
 {

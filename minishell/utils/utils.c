@@ -6,11 +6,11 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:21 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 00:57:21 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 20:22:38 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 int	ft_isblank(char c)
 {

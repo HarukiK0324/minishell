@@ -6,11 +6,11 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:18 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 17:29:08 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 20:22:36 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 int	add_fd(t_cmd *cmd, t_token **tokens, int *status)
 {

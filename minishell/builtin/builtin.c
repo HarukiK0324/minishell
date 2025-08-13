@@ -6,11 +6,11 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:56:40 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 15:44:52 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 20:21:24 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 int	is_valid_identifier(char *str)
 {

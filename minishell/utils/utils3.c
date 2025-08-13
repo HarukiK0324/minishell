@@ -6,11 +6,11 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:27 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 00:57:27 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 20:22:50 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 size_t	ft_strlen(const char *s)
 {

@@ -6,11 +6,11 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:37 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 19:42:44 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 20:22:27 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 void	read_heredoc(t_fd *heredoc_delimiter, int fd)
 {

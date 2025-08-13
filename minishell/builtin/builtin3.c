@@ -6,11 +6,11 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:56:49 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 15:44:56 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 20:21:47 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 int	count_env(t_env *env_list)
 {

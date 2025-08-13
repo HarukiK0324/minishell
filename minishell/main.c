@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:42 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 20:18:28 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 20:36:15 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,12 @@ volatile sig_atomic_t	g_status = 0;
 int	init_shell(t_shell **shell, char **environ)
 {
 	*shell = (t_shell *)malloc(sizeof(t_shell));
-	if (!shell)
+	if (!*shell)
 		return (perror("malloc"), -1);
+	(*shell)->status = malloc(sizeof(int));
+	(*shell)->run_status = malloc(sizeof(int));
+	if (!(*shell)->status || !(*shell)->run_status)
+		return (free(*shell), perror("malloc"), -1);
 	*((*shell)->status) = 0;
 	*((*shell)->run_status) = 0;
 	(*shell)->input = NULL;
@@ -41,13 +45,13 @@ void	clean_up(t_shell *shell)
 	shell->tokens = NULL;
 	free_ast(shell->ast);
 	shell->ast = NULL;
-	if (shell->input)
+	if (shell->input && ft_strlen(shell->input) > 0)
 		add_history(shell->input);
 	if (!shell->input)
 		free(shell->input);
 	shell->input = NULL;
 	g_status = 0;
-	shell->run_status = 0;
+	*(shell->run_status) = 0;
 }
 
 void	minishell(t_shell *shell)

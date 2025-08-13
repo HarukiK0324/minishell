@@ -6,11 +6,11 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:08 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 17:40:24 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 20:22:18 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 int	expand_cmd_argv(t_token *argv, t_env *env_list, int *status)
 {

@@ -6,11 +6,11 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:05 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 20:10:34 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 20:22:06 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 void	exec_builtin(t_env *env_list, t_cmd *cmd, int *status)
 {

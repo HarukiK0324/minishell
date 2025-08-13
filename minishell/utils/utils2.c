@@ -6,11 +6,11 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:24 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/11 22:15:27 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 20:22:47 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 void	print_synerr(t_TokenType expected)
 {

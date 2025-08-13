@@ -6,11 +6,11 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:22 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/11 22:49:47 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 20:22:43 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 void	append_token(t_token **list, t_token *new_token)
 {

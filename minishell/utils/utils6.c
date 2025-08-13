@@ -6,11 +6,11 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:32 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 01:34:30 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 20:22:58 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 char	*get_path_from_env(char *argv, t_env *env_list)
 {

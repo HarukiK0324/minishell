@@ -6,11 +6,11 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 03:40:37 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/09 03:40:44 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 20:22:16 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "../minishell.h"
 
 void	signal_pipe_hold(t_node *ast)
 {
