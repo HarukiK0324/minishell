@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:37 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 16:24:12 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 16:25:49 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,25 +14,15 @@
 
 void read_heredoc(t_fd *heredoc_delimiter, int fd)
 {
-    char *line;
-    
+    char    *line;
+
     while (1)
     {
         line = readline("> ");
-        if (!line || g_status != 0)  // Check for EOF or signal
-        {
-            if (fd != -1)
-                close(fd);  // Close fd if interrupted
-            if (line)
-                free(line);
-            return;
-        }
-        
+        if (!line)
+            return (free(line));
         if (ft_strcmp(line, heredoc_delimiter->value) == 0)
-        {
-            free(line);
-            return;
-        }
+            return (free(line));
         else if (fd != -1)
         {
             write(fd, line, ft_strlen(line));
@@ -44,38 +34,24 @@ void read_heredoc(t_fd *heredoc_delimiter, int fd)
 
 void parse_heredoc(t_fd *heredoc_delimiter, int fd_in, int fd_out)
 {
-    // Set up a custom signal handler that will close file descriptors
-    struct sigaction sa;
-    sa.sa_handler = SIG_DFL;  // Use default handler
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = 0;
-    sigaction(SIGINT, &sa, NULL);
-    sigaction(SIGQUIT, &sa, NULL);
+    reset_heredoc_signal();
     
-    // Close read end in child
+    // Immediately close the read end in the child as we only need to write
     close(fd_out);
     
     if (!heredoc_delimiter)
-    {
-        close(fd_in);  // Make sure to close fd_in if we return early
         return;
-    }
-    
+        
     while (heredoc_delimiter->next)
     {
         read_heredoc(heredoc_delimiter, -1);
-        if (g_status != 0)  // Check if interrupted by signal
-        {
-            close(fd_in);  // Close fd_in before exiting
-            exit(EXIT_FAILURE);
-        }
         heredoc_delimiter->fd = -1;
         heredoc_delimiter = heredoc_delimiter->next;
     }
     
     read_heredoc(heredoc_delimiter, fd_in);
     heredoc_delimiter->fd = fd_out;
-    close(fd_in);  // Normal close at the end
+    close(fd_in);
 }
 
 int ft_heredoc(t_cmd *cmd)
@@ -89,35 +65,71 @@ int ft_heredoc(t_cmd *cmd)
     
     heredoc_signal_hold(cmd);
     
+    // Create two separate pipes - one for heredoc content, one for signaling completion
+    int signal_pipe[2];
+    if (pipe(signal_pipe) == -1)
+    {
+        close(fd[0]);
+        close(fd[1]);
+        return (perror("pipe"), -1);
+    }
+    
     pid = fork();
     if (pid < 0)
     {
         close(fd[0]);
         close(fd[1]);
+        close(signal_pipe[0]);
+        close(signal_pipe[1]);
         return (perror("fork"), -1);
     }
     
     if (pid == 0)
     {
-        reset_heredoc_signal();  // Set up signal handling in child
+        // Child process
+        close(signal_pipe[0]); // Close read end of signal pipe
+        
+        // Use dup2 to redirect stdin/stdout as needed for heredoc handling
         parse_heredoc(cmd->heredoc_delimiter, fd[1], fd[0]);
+        
+        // Write to signal pipe to indicate successful completion
+        write(signal_pipe[1], "1", 1);
+        close(signal_pipe[1]);
+        
         exit(EXIT_SUCCESS);
     }
     
-    close(fd[1]);  // Close write end in parent
+    // Parent process
+    close(fd[1]);  // Close write end of heredoc pipe
+    close(signal_pipe[1]); // Close write end of signal pipe
+    
     cmd->heredoc_fd = fd[0];
     
+    // Wait for child process to finish
     waitpid(pid, &wstatus, 0);
     heredoc_signal_revert(cmd);
     
+    // Check if we received completion signal
+    char buf[2] = {0};
+    int signal_read = read(signal_pipe[0], buf, 1);
+    close(signal_pipe[0]);
+    
     if (WIFSIGNALED(wstatus))
     {
-        int sig = WTERMSIG(wstatus);
-        if (sig == SIGINT)
+        // Child was terminated by a signal
+        if (WTERMSIG(wstatus) == SIGINT)
         {
             g_status = 2;
             write(STDOUT_FILENO, "\n", 1);
         }
+        close(fd[0]);
+        return -1;
+    }
+    
+    // If no completion signal was received but child exited normally,
+    // it means the child exited without properly closing FDs
+    if (signal_read <= 0 && WIFEXITED(wstatus))
+    {
         close(fd[0]);
         return -1;
     }
