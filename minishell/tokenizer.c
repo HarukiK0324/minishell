@@ -6,23 +6,25 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:50 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/11 22:12:22 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/13 17:17:04 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-t_token	*init_token(t_TokenType type, const char *value, size_t value_len)
+t_token	*init_token(t_TokenType type, const char *value, size_t value_len,
+		int *status)
 {
 	t_token	*token;
 
 	token = (t_token *)malloc(sizeof(t_token));
 	if (!token)
-		return (write(STDERR_FILENO, "minishell: token creation\n", 26), NULL);
+		return (set_status(status, 1), write(STDERR_FILENO,
+				"minishell: token creation\n", 26), NULL);
 	token->type = type;
 	token->value = ft_strndup(value, value_len);
 	if (!token->value)
-		return (free(token), perror("strndup"), NULL);
+		return (set_status(status, 1), free(token), perror("strndup"), NULL);
 	token->next = NULL;
 	return (token);
 }
@@ -50,7 +52,7 @@ t_TokenType	get_meta_type(const char *s)
 	return (TOKEN_ERROR);
 }
 
-size_t	add_word(const char *input, t_token **list)
+size_t	add_word(const char *input, t_token **list, int *status)
 {
 	t_token	*token;
 	size_t	len;
@@ -66,19 +68,19 @@ size_t	add_word(const char *input, t_token **list)
 			while (input[len] && input[len] != quote)
 				len++;
 			if (input[len] == '\0')
-				return (write(STDERR_FILENO, "minishell: unclosed quote\n", 26),
-					0);
+				return (set_status(status, 2), write(STDERR_FILENO,
+						"minishell: unclosed quote\n", 26), 0);
 		}
 		len++;
 	}
-	token = init_token(TOKEN_WORD, input, len);
+	token = init_token(TOKEN_WORD, input, len, status);
 	if (token == NULL)
 		return (0);
 	append_token(list, token);
 	return (len);
 }
 
-size_t	add_metachar(const char *input, t_token **list)
+size_t	add_metachar(const char *input, t_token **list, int *status)
 {
 	t_TokenType	type;
 	t_token		*token;
@@ -86,20 +88,21 @@ size_t	add_metachar(const char *input, t_token **list)
 
 	type = get_meta_type(input);
 	if (type == TOKEN_ERROR)
-		return (write(STDERR_FILENO, "minishell: unknown token\n", 25), 0);
+		return (set_status(status, 2), (STDERR_FILENO,
+				"minishell: unknown token\n", 25), 0);
 	if (type == TOKEN_HEREDOC || type == TOKEN_APPEND || type == TOKEN_AND_IF
 		|| type == TOKEN_OR_IF)
 		len = 2;
 	else
 		len = 1;
-	token = init_token(type, input, len);
+	token = init_token(type, input, len, status);
 	if (!token)
 		return (0);
 	append_token(list, token);
 	return (len);
 }
 
-t_token	*tokenize(const char *input)
+t_token	*tokenize(const char *input, int *status)
 {
 	t_token	*tokens;
 	size_t	len;
@@ -112,9 +115,9 @@ t_token	*tokenize(const char *input)
 		if (!*input)
 			break ;
 		if (ismetachar(*input))
-			len = add_metachar(input, &tokens);
+			len = add_metachar(input, &tokens, status);
 		else
-			len = add_word(input, &tokens);
+			len = add_word(input, &tokens, status);
 		if (len <= 0)
 			return (free_tokens(tokens), NULL);
 		input += len;
