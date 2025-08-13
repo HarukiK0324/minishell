@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:48 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 16:24:25 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/09 00:59:44 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,14 +39,8 @@ void	reset_default_signal(void)
 	signal(SIGQUIT, SIG_DFL);
 }
 
-void reset_heredoc_signal(void)
+void	reset_heredoc_signal(void)
 {
-    struct sigaction sa;
-    
-    sa.sa_handler = SIG_DFL;  // Use default handler for SIGINT
-    sigemptyset(&sa.sa_mask);
-    sa.sa_flags = 0;
-    sigaction(SIGINT, &sa, NULL);
-    
-    signal(SIGQUIT, SIG_IGN);  // Ignore SIGQUIT
+	signal(SIGINT, SIG_DFL);
+	signal(SIGQUIT, SIG_IGN);
 }
