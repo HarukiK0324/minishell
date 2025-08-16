@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:48 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 22:33:13 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/16 12:23:10 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ void	heredoc_int_handler(int sig)
 	devnull = open("/dev/null", O_RDONLY);
 	if (devnull >= 0)
 		dup2(devnull, STDIN_FILENO);
+	close(devnull);
 }
 
 void	reset_heredoc_signal(void)
