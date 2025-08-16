@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:24 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 20:22:47 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/16 15:41:08 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void	print_synerr(t_TokenType expected)
 {
 	char	*token;
 
-	if (expected == TOKEN_END || !expected)
+	if (expected == TOKEN_END)
 		write(2, "minishell: syntax error: unexpected end of file\n", 48);
 	else if (expected == TOKEN_NEWLINE)
 		write(2, "minishell: syntax error: unexpected token `newline'\n", 52);
