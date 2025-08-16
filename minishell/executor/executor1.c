@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:05 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 20:22:06 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/16 13:38:34 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,8 @@ void	exec_builtin(t_env *env_list, t_cmd *cmd, int *status)
 	original_stdin = dup(STDIN_FILENO);
 	original_stdout = dup(STDOUT_FILENO);
 	if (original_stdin == -1 || original_stdout == -1)
-		return (exec_error(status, "dup"));
+		return (close(original_stdin), close(original_stdout),
+			exec_error(status, "dup"));
 	if (process_redirections(cmd) == -1)
 		return (handle_builtin_fd(cmd, status, original_stdin,
 				original_stdout));

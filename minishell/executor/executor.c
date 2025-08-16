@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:03 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 20:22:04 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/16 13:36:19 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,12 +43,12 @@ void	exec_pipe(t_shell *shell, t_node *ast, int *status)
 	signal_pipe_hold(ast);
 	pid1 = fork();
 	if (pid1 < 0)
-		exec_error(status, "fork");
+		return (pipe_cleanup(fd, ast, status));
 	if (pid1 == 0)
 		pipe_executor1(fd, shell, ast->lhs);
 	pid2 = fork();
 	if (pid2 < 0)
-		exec_error(status, "fork");
+		return (waitpid(pid1, NULL, 0), pipe_cleanup(fd, ast, status));
 	if (pid2 == 0)
 		pipe_executor2(fd, shell, ast->rhs);
 	close(fd[0]);
@@ -76,7 +76,8 @@ void	exec_cmd(t_shell *shell, t_env *env_list, t_cmd *cmd, int *status)
 	old_sigquit = signal(SIGQUIT, SIG_IGN);
 	pid = fork();
 	if (pid < 0)
-		exec_error(status, "fork");
+		return (signal(SIGINT, old_sigint), signal(SIGQUIT, old_sigquit),
+			exec_error(status, "fork"));
 	if (pid == 0)
 		ft_execve(env_list, cmd);
 	waitpid(pid, &wstatus, 0);

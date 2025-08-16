@@ -6,11 +6,19 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 03:40:37 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 20:22:16 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/16 13:33:00 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../minishell.h"
+
+void	pipe_cleanup(int fd[], t_node *ast, int *status)
+{
+	close(fd[0]);
+	close(fd[1]);
+	signal_pipe_revert(ast);
+	exec_error(status, "fork");
+}
 
 void	signal_pipe_hold(t_node *ast)
 {
