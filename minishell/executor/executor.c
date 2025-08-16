@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:03 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/16 13:36:19 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/16 14:51:15 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ void	pipe_executor1(int fd[2], t_shell *shell, t_node *ast)
 	close(fd[0]);
 	close(fd[1]);
 	executor(shell, ast, shell->env_list, shell->status);
-	exit(*shell->status);
+	exit(*(shell->status));
 }
 
 void	pipe_executor2(int fd[2], t_shell *shell, t_node *ast)
@@ -27,7 +27,7 @@ void	pipe_executor2(int fd[2], t_shell *shell, t_node *ast)
 	close(fd[0]);
 	close(fd[1]);
 	executor(shell, ast, shell->env_list, shell->status);
-	exit(*shell->status);
+	exit(*(shell->status));
 }
 
 void	exec_pipe(t_shell *shell, t_node *ast, int *status)
