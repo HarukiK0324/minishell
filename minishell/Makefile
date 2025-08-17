@@ -6,7 +6,7 @@ NAME = minishell
 SRC_DIR = .
 OBJ_DIR = obj
 
-BUILTIN   = builtin builtin1 builtin2 builtin3 builtin4 builtin5 builtin6 builtin7
+BUILTIN   = builtin builtin1 builtin2 builtin3 builtin4 builtin5 builtin6 builtin7 builtin8
 EXECUTOR  = executor executor1 executor2 executor3
 EXPANDER  = expander expander1 expander2
 HEREDOC = heredoc heredoc1
