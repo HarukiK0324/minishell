@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:46 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/17 10:58:33 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/17 11:00:15 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,6 +195,8 @@ void							run_builtin(t_env *env_list, t_cmd *cmd,
 void							handle_builtin_fd(t_cmd *cmd, int *status,
 									int original_stdin, int original_stdout);
 void							handle_status(int wstatus, int *status);
+void							pipe_cleanup(int fd[], t_node *ast,
+									int *status);
 void							signal_pipe_hold(t_node *ast);
 void							signal_pipe_revert(t_node *ast);
 

@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 02:04:31 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 20:22:13 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/16 13:44:35 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ void	run_builtin(t_env *env_list, t_cmd *cmd, int *status)
 void	handle_builtin_fd(t_cmd *cmd, int *status, int original_stdin,
 		int original_stdout)
 {
-	*status = 2;
+	*status = 1;
 	if (cmd->fd_in != 0)
 		close(cmd->fd_in);
 	if (cmd->fd_out != 1)
