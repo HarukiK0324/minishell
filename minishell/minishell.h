@@ -6,7 +6,7 @@
 /*   By: hkasamat <hkasamat@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/09 00:57:46 by hkasamat          #+#    #+#             */
-/*   Updated: 2025/08/13 22:47:55 by hkasamat         ###   ########.fr       */
+/*   Updated: 2025/08/17 10:58:33 by hkasamat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -168,6 +168,7 @@ void							remove_env(t_env **env_list, char *key);
 int								exec_unset(t_token *argv, t_env *env_list);
 void							handle_append_export(t_env *env_list, char *key,
 									char *value);
+char							*concat_strings(const char *s1, const char *s2);
 
 /* executor */
 void							pipe_executor1(int fd[2], t_shell *shell,
